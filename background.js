@@ -20,11 +20,15 @@ function onInstall()
 	// })
 
 	chrome.storage.local.set({"groupCount": 0});   // FIXME: will this delete tabs if extension is updated?
-	//chrome.storage.local.set({"tabCount": 0});   // required for when no tabs are stored
 	chrome.storage.local.set({"buttonCount": 0});
-	chrome.contextMenus.create({"id": "LastTabContextMenu", "title": "LastTab"});
 
-	chrome.contextMenus.create({"id": "SortTabContextMenu", "title": "SortTab", });
+	chrome.contextMenus.create({"id": "SaveTabsContextMenu", "title": "Save the Tabs"});
+	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
+	chrome.contextMenus.create({"id": "greenFavicon", "title": "Green"});
+	chrome.contextMenus.create({"id": "blueFavicon", "title": "Blue"});
+	chrome.contextMenus.create({"id": "orangeFavicon", "title": "Orange"});
+	chrome.contextMenus.create({"id": "yellowFavicon", "title": "Yellow"});
+	chrome.contextMenus.create({"id": "purpleFavicon", "title": "Purple"});
 
 	// TODO: add customized tab for first install
     //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
@@ -164,6 +168,55 @@ function storeTabs(command)
 			// saves for persistent title through refresh
 			saveTitle[tabs[0].id] = promptUser;
 		})
+	}
+	/* context menus */
+	else if (command.menuItemId == "redFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "red"}, function(response) {});
+        })
+	}
+	else if (command.menuItemId == "greenFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "green"}, function(response) {});
+        })
+	}
+	else if (command.menuItemId == "blueFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "blue"}, function(response) {});
+        })
+	}
+	else if (command.menuItemId == "yellowFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "yellow"}, function(response) {});
+        })
+	}
+	else if (command.menuItemId == "orangeFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "orange"}, function(response) {});
+        })
+	}
+	else if (command.menuItemId == "purpleFavicon")
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "purple"}, function(response) {});
+        })
 	}
 }
 
