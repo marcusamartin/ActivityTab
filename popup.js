@@ -217,7 +217,7 @@ function getStorage(i)   // i == groupCount
 	})
 }
 
-/* for custom title of tabs */
+/* for titling tabs */
 document.addEventListener("DOMContentLoaded", function()
 {    
 	/* registers enter key press for title text field */
