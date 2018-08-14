@@ -1,12 +1,12 @@
 {
     "manifest_version": 2,
-    "name": "LastTab",
+    "name": "ActivityTab",
     "version": "0.1",
     "description": "Saves the current tabs.",
 
     "browser_action":
     {
-        "default_title:": "LastTab",
+        "default_title:": "ActivityTab",
         "default_popup": "popup.html"
     },
     "background":
@@ -45,6 +45,37 @@
                 "linux": "Ctrl + Up"
             },
             "description": "Last Tab: Custom Tab Name Feature (Ctrl/Command + Up)"
+        },
+        "left-key-toggle-feature":
+        {
+            "suggested_key": 
+            {
+                "windows": "Ctrl + Left",
+                "mac": "Command + Left",
+                "chromeos": "Ctrl + Left",
+                "linux": "Ctrl + Left"
+            },
+            "description": "SortTab Feature (Ctrl/Command + Left Arrow Key)"
+        },
+        "right-key-toggle-feature":
+        {
+            "suggested_key": 
+            {
+                "windows": "Ctrl + Right",
+                "mac": "Command + Right",
+                "chromeos": "Ctrl + Right",
+                "linux": "Ctrl + Right"
+            },
+            "description": "SortTab Feature (Ctrl/Command + Right Arrow Key)"
         }
-    }
+    },
+    "web_accessible_resources": 
+    [
+        "img/red-circle-16.png",
+        "img/green-circle-16.png",
+        "img/blue-circle-16.png",
+        "img/yellow-circle-16.png",
+        "img/orange-circle-16.png",
+        "img/purple-circle-16.png"
+    ]
 }

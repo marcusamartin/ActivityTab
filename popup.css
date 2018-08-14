@@ -10,7 +10,6 @@ body
 #topHalf
 {
 	background-color: green;   /* not working? */
-	color: green;
 }
 
 #textFieldsContainer
@@ -71,7 +70,7 @@ body
 	background-color: lightblue;
 }
 
-#sortTabs
+/* #sortTabs
 {
 	float: right;
 	height: 90px;
@@ -83,13 +82,76 @@ body
 	outline: none;
 	margin: 0px 8px 10px 8px;
 	font-size: 20px;
+} */
+
+#sortArea
+{
+	float: right;
+	height: 85px;
+	width: 285px;
+	margin: 0px 7px 5px 0px;
+
+	background-color: #a9a9a9;
+	border-style: outset;
+	/* border-width: 3px; */
+	padding: 0px 0px 0px 5px;  /* 5px 5px 5px 5px */
 }
 
-#sortTabs:focus
+/* #sortText
+{
+	width: 300px;
+	text-align: center;
+	font-size: 20px;
+	margin: 8px 0px 5px 0px;
+	padding: 0px 0px 0px 0px;
+} */
+
+.sortButton
+{
+	padding: 15px 15px 15px 15px;
+	margin: 5px 5px 5px 5px;
+	display: inline-block;
+	height: 30px;
+	width: 30px;
+	border-radius: 75%;
+}
+
+#redButton
+{
+	/* margin: 0px 0px 0px 15px; */
+	background-color: #ff0000;
+}
+
+#greenButton
+{
+	background-color: #00ff00;
+}
+
+#blueButton
+{
+	background-color: #0000ff;
+}
+
+#yellowButton
+{
+	background-color: #ffff00;
+}
+
+#orangeButton
+{
+	background-color: #ffa500;
+}
+
+#purpleButton
+{
+	background-color: #a020f0;
+}
+
+/* #sortTabs:focus
 {
 	border: 3px solid #000000;
 	background-color: lightblue;
-}
+} */
 
 /* bottom half */
 
@@ -107,7 +169,7 @@ button:hover
 	transition: 0.2s;
 }
 
-button
+.button
 {
 	border: none;
     background-color: lightblue;

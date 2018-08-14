@@ -1,3 +1,73 @@
+/* waits for popup button press and then sends message with button info to content.js */
+document.addEventListener("DOMContentLoaded", function()
+{
+	/* red button */
+	var button = document.getElementById("redButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "red"}, function(response) {});
+        })
+	})
+
+	/* green button */
+	var button = document.getElementById("greenButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "green"}, function(response) {});
+        })
+	})
+
+	/* blue button */
+	var button = document.getElementById("blueButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "blue"}, function(response) {});
+        })
+	})
+
+	/* yellow button */
+	var button = document.getElementById("yellowButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "yellow"}, function(response) {});
+        })
+	})
+
+	/* orange button */
+	var button = document.getElementById("orangeButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "orange"}, function(response) {});
+        })
+	})
+
+	/* purple button */
+	var button = document.getElementById("purpleButton");
+	button.addEventListener("click", function()
+	{
+		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+			// selected tab, {color property = button, button property = color}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "purple"}, function(response) {});
+        })
+	})
+})
+
 // calls function to populate buttons for popup
 insertButtons();
 
@@ -64,7 +134,6 @@ function getStorage(i)   // i == groupCount
 		/* tab button */
 		var groupButton = document.createElement("button");
 		/* set css of button */
-		groupButton.type = "button";
 		groupButton.id = "groupButton";
 		groupButton.innerHTML = group["groupName" + i];   // displays name of the button
 		// puts button in popup

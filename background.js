@@ -22,8 +22,9 @@ function onInstall()
 	chrome.storage.local.set({"groupCount": 0});   // FIXME: will this delete tabs if extension is updated?
 	//chrome.storage.local.set({"tabCount": 0});   // required for when no tabs are stored
 	chrome.storage.local.set({"buttonCount": 0});
-	
 	chrome.contextMenus.create({"id": "LastTabContextMenu", "title": "LastTab"});
+
+	chrome.contextMenus.create({"id": "SortTabContextMenu", "title": "SortTab", });
 
 	// TODO: add customized tab for first install
     //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
@@ -132,8 +133,24 @@ function storeTabs(command)
 			}
 		})
 	}
+	else if ("left-key-toggle-feature" == command)
+    {
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+            // selected tab, {url property = url, command property = command}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {command: "left-key-toggle-feature"}, function(response) {});
+        })
+    }
+    else if ("right-key-toggle-feature" == command)
+    {
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+        {
+            // selected tab, {url property = url, command property = command}, response for error message (not needed)
+            chrome.tabs.sendMessage(tabs[0].id, {command: "right-key-toggle-feature"}, function(response) {});
+        })
+    }
 	/* retitle current tab */
-	else
+	else if ("custom-title-toggle-feature" == command)
 	{
 		chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
 		{
