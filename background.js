@@ -1,3 +1,17 @@
+/* TODO:
+ * put colors of tabs into storage
+ * command that will save tabs of the same color
+ * correspond tab button colors with color of saved tabs within the tab button
+ * command that will save all of the tabs (has unique color)
+*/
+
+/* FIXME:
+ * background color of top half of popup is not working
+ * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
+   however, if bookmark icon is clicked again, icon will reset
+ * w3schools.com's favicon is not able to be changed (certain websites?)
+*/
+
 /* Storage Explanation
  * groupCount: tracks the number of buttons when adding and deleting buttons
  * buttonCount: tracks the number of buttons when adding (reset to 0 when there are 0 buttons)
