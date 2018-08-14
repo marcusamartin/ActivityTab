@@ -161,7 +161,11 @@ function getStorage(i)   // i == groupCount
 		/* creates a new window with saved tabs */
 		windowButton.onclick = function()
 		{
-			chrome.windows.create({"url": group["tabUrls" + i], "state": "maximized"});
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			}
+			//chrome.windows.create({"url": group["tabUrls" + i], "state": "maximized"});
 		}
 
 		/* trash button */

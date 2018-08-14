@@ -262,6 +262,24 @@ function createTab(group, i, j)
     })
 }
 
+/* creates the tabs in a new window */
+function createWindowTabs(group, i, j)
+{
+	if (j == 0)
+	{
+		// creates first tab in a new window
+		chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"});
+	}
+	else
+	{
+		chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+		{
+			var tabTitle = group["tabNames" + i][j];
+			tabIdsToTitles[tab.id] = tabTitle;
+		})
+	}
+}
+
 /* once content script has finished loading in the new tab, send message (title) to the tab */
 // content script would not be able to received message otherwise
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
