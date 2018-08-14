@@ -10,6 +10,7 @@
 // opens shortcut url upon extension installation
 chrome.runtime.onInstalled.addListener(onInstall);
 
+/* runs on installation of extension */
 function onInstall()
 {
 	chrome.storage.local.clear();
@@ -22,7 +23,7 @@ function onInstall()
 	chrome.storage.local.set({"groupCount": 0});   // FIXME: will this delete tabs if extension is updated?
 	chrome.storage.local.set({"buttonCount": 0});
 
-	chrome.contextMenus.create({"id": "SaveTabsContextMenu", "title": "Save the Tabs"});
+	chrome.contextMenus.create({"id": "saveTabs", "title": "Save the Tabs"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
 	chrome.contextMenus.create({"id": "greenFavicon", "title": "Green"});
 	chrome.contextMenus.create({"id": "blueFavicon", "title": "Blue"});
@@ -34,190 +35,184 @@ function onInstall()
     //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
 }
 
-// Ctrl/Command + L listener
-chrome.commands.onCommand.addListener(storeTabs);
+// when command is executed, determine which command was executed
+chrome.commands.onCommand.addListener(ActivityTabFeatures);
 
-// when context menu icon is clicked, store the tabs
-chrome.contextMenus.onClicked.addListener(storeTabs);
+// when context menu icon is clicked, determine which context menu was clicked
+chrome.contextMenus.onClicked.addListener(ActivityTabFeatures);
 
-/* stores tabs or creates custom title from command */
-function storeTabs(command)
+/* for commands and context menu */
+function ActivityTabFeatures(command)
 {
-	/* last tab feature */
-	if ("lasttab-toggle-feature" == command)
+	/* commands */
+	switch(command)
 	{
-		chrome.storage.local.get("groupCount", function(group)
+		/* save tabs */
+		case "lasttab-toggle-feature":
+			storeTabs();
+			break;
+		/* color change to left */
+		case "left-key-toggle-feature":
+			queryKeys("left-key-toggle-feature");
+			break;
+		/* color change to right */
+		case "right-key-toggle-feature":
+			queryKeys("right-key-toggle-feature");
+			break;
+		/* retitle current tab */
+		case "custom-title-toggle-feature":
+			chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
+			{
+				var promptUser = prompt("Rename tab:");
+
+				// title sent to content script
+				chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
+				// saves for persistent title through refresh
+				saveTitle[tabs[0].id] = promptUser;
+			})
+			break;
+	}
+
+	/* context menus */
+	switch (command.menuItemId)
+	{
+		case "saveTabs":
+			storeTabs();
+			break;
+		case "redFavicon":
+			queryContextMenu("buttonPress", "red");
+			break;
+		case "greenFavicon":
+			queryContextMenu("buttonPress", "green");
+			break;
+		case "blueFavicon":
+			queryContextMenu("buttonPress", "blue");
+			break;
+		case "yellowFavicon":
+			queryContextMenu("buttonPress", "yellow");
+			break;
+		case "orangeFavicon":
+			queryContextMenu("buttonPress", "orange");
+			break;
+		case "purpleFavicon":
+			queryContextMenu("buttonPress", "purple");
+			break;
+	}
+}
+
+/* puts current window's tabs into storage */
+function storeTabs()
+{
+	chrome.storage.local.get("groupCount", function(group)
+	{
+		// current count of groups
+		var groupCount = group.groupCount;
+
+		var promptUser = prompt("Group name: ");
+
+		// text limit so the text can fit in the button
+		promptUser = promptUser.substr(0, 26);
+
+		/* checks if duplicate name */   // FIXME: NOT WORKING
+		if (promptUser != "" && groupCount != 0)
 		{
-			// current count of groups
-			var groupCount = group.groupCount;
-
-			var promptUser = prompt("Group name: ");
-
-			// text limit so the text can fit in the button
-			promptUser = promptUser.substr(0, 26);
-
-			/* checks if duplicate name */   // NOT WORKING
-			if (promptUser != "" && groupCount != 0)
+			/* iterates through the buttons */
+			for (var i = 0; i < groupCount; i++)
 			{
-				/* iterates through the buttons */
-				for (var i = 0; i < groupCount; i++)
+				chrome.storage.local.get(["groupName" + i], function(anotherGroup) // cannot refer to groupName with i, only with numbers (ex: 1)
 				{
-					chrome.storage.local.get(["groupName" + i], function(anotherGroup) // cannot refer to groupName with i, only with numbers (ex: 1)
+					var groupName = anotherGroup["groupName" + i];   // with 0 duplicate name is caught
+					console.log("group: " + anotherGroup["groupName" + i]);
+
+					chrome.storage.local.get(null, function(items)
 					{
-						var groupName = anotherGroup["groupName" + i];   // with 0 duplicate name is caught
-						console.log("group: " + anotherGroup["groupName" + i]);
-
-						chrome.storage.local.get(null, function(items)
-						{
-							var allKeys = Object.keys(items);
-							console.log("storage: " + allKeys);
-						})
-						// console.log("groupName: " + groupName);   // somehow does not erase storage completely
-
-						if (groupName == promptUser)
-						{
-							alert("Duplicate name!");
-							var duplicatePrompt = prompt("Would you like to replace the group?");
-
-							if (duplicatePrompt)
-							{
-								alert("replaceButton");
-								//replaceButton(groupCount);
-							}
-						}
+						var allKeys = Object.keys(items);
+						console.log("storage: " + allKeys);
 					})
-				}
-			}
+					// console.log("groupName: " + groupName);   // somehow does not erase storage completely
 
-			/* checks if name is invalid */
-			if (promptUser == "")
-			{
-				alert("Please enter a name for the group!");
-				storeTabs(command);
-			}
-			/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
-			else
-			{
-				var groupObject = {};
-
-				/* stores all of the tab's information into an object and then puts object into storage */
-				chrome.tabs.query({currentWindow: true}, function(tabs)
-				{
-					/* gets each tab's name and url from an array of tabs and stores them into arrays */
-					var tabNamesArr = [];
-					var tabUrlsArr = [];
-					var tabCount = 0;
-
-					for (; tabCount < tabs.length; tabCount++)
+					if (groupName == promptUser)
 					{
-						tabNamesArr[tabCount] = tabs[tabCount].title;
-						// console.log("title of tab: " + tabs[tabCount].title);
-						tabUrlsArr[tabCount] = tabs[tabCount].url;
+						alert("Duplicate name!");
+						var duplicatePrompt = prompt("Would you like to replace the group?");
+
+						if (duplicatePrompt)
+						{
+							alert("replaceButton");
+							//replaceButton(groupCount);
+						}
 					}
-
-					var groupName = "groupName" + groupCount;
-					groupObject[groupName] = promptUser;
-
-					var tabNames = "tabNames" + groupCount;
-					groupObject[tabNames] = tabNamesArr;
-
-					var tabUrls = "tabUrls" + groupCount;
-					groupObject[tabUrls] = tabUrlsArr;
-
-					var tabCount2 = "tabCount" + groupCount;
-					groupObject[tabCount2] = tabCount;
-
-					// puts object into storage
-					chrome.storage.local.set(groupObject);
-
-					// set-up for next group so last group isn't overwritten
-					chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
-					chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
 				})
 			}
-		})
-	}
-	/* color change */
-	else if ("left-key-toggle-feature" == command)
-    {
-        chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-            // selected tab, {url property = url, command property = command}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {command: "left-key-toggle-feature"}, function(response) {});
-        })
-	}
-	/* color change */
-    else if ("right-key-toggle-feature" == command)
-    {
-        chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-            // selected tab, {url property = url, command property = command}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {command: "right-key-toggle-feature"}, function(response) {});
-        })
-    }
-	/* retitle current tab */
-	else if ("custom-title-toggle-feature" == command)
-	{
-		chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
-		{
-			var promptUser = prompt("Rename tab:");
+		}
 
-			// title sent to content script
-			chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
-			
-			// saves for persistent title through refresh
-			saveTitle[tabs[0].id] = promptUser;
-		})
-	}
-	/* context menus */
-	else if (command.menuItemId == "redFavicon")
+		/* checks if name is invalid */
+		if (promptUser == "")
+		{
+			alert("Please enter a name for the group!");
+			ActivityTabFeatures(command);
+		}
+		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		else
+		{
+			var groupObject = {};
+
+			/* stores all of the tab's information into an object and then puts object into storage */
+			chrome.tabs.query({currentWindow: true}, function(tabs)
+			{
+				/* gets each tab's name and url from an array of tabs and stores them into arrays */
+				var tabNamesArr = [];
+				var tabUrlsArr = [];
+				var tabCount = 0;
+
+				for (; tabCount < tabs.length; tabCount++)
+				{
+					tabNamesArr[tabCount] = tabs[tabCount].title;
+					// console.log("title of tab: " + tabs[tabCount].title);
+					tabUrlsArr[tabCount] = tabs[tabCount].url;
+				}
+
+				var groupName = "groupName" + groupCount;
+				groupObject[groupName] = promptUser;
+
+				var tabNames = "tabNames" + groupCount;
+				groupObject[tabNames] = tabNamesArr;
+
+				var tabUrls = "tabUrls" + groupCount;
+				groupObject[tabUrls] = tabUrlsArr;
+
+				var tabCount2 = "tabCount" + groupCount;
+				groupObject[tabCount2] = tabCount;
+
+				// puts object into storage
+				chrome.storage.local.set(groupObject);
+
+				// set-up for next group so last group isn't overwritten
+				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
+				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
+			})
+		}
+	})
+}
+
+/* sends message with command info to content.js */
+function queryKeys(item)
+{
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "red"}, function(response) {});
-        })
-	}
-	else if (command.menuItemId == "greenFavicon")
+		// selected tab, {command property = command}, response for error message (not needed)
+		chrome.tabs.sendMessage(tabs[0].id, {command: item}, function(response) {});
+	})
+}
+
+/* sends message with context menu info to content.js */
+function queryContextMenu(buttonPress, color)
+{
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "green"}, function(response) {});
-        })
-	}
-	else if (command.menuItemId == "blueFavicon")
-	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "blue"}, function(response) {});
-        })
-	}
-	else if (command.menuItemId == "yellowFavicon")
-	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "yellow"}, function(response) {});
-        })
-	}
-	else if (command.menuItemId == "orangeFavicon")
-	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "orange"}, function(response) {});
-        })
-	}
-	else if (command.menuItemId == "purpleFavicon")
-	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "purple"}, function(response) {});
-        })
-	}
+		// selected tab, {button property = context menu pressed, color property = button color}, response for error message (not needed)
+		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+	})
 }
 
 /* stores tabs from text field */
@@ -252,7 +247,7 @@ function storeTabsTextField(storeTabsTextField)
 		// 				if (promptUser == groupName)
 		// 				{
 		// 					alert("Duplicate name of an existing group!");
-		// 					storeTabs();
+		// 					ActivityTabFeatures();
 		// 				}
 		// 			})
 		// 		}

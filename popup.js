@@ -5,68 +5,54 @@ document.addEventListener("DOMContentLoaded", function()
 	var button = document.getElementById("redButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "red"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "red");
 	})
 
 	/* green button */
 	var button = document.getElementById("greenButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "green"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "green");
 	})
 
 	/* blue button */
 	var button = document.getElementById("blueButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "blue"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "blue");
 	})
 
 	/* yellow button */
 	var button = document.getElementById("yellowButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "yellow"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "yellow");
 	})
 
 	/* orange button */
 	var button = document.getElementById("orangeButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "orange"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "orange");
 	})
 
 	/* purple button */
 	var button = document.getElementById("purpleButton");
 	button.addEventListener("click", function()
 	{
-		chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
-        {
-			// selected tab, {color property = button, button property = color}, response for error message (not needed)
-            chrome.tabs.sendMessage(tabs[0].id, {button: "buttonPress", color: "purple"}, function(response) {});
-        })
+		queryButtonClick("buttonPress", "purple");
 	})
 })
+
+/* sends message with button info to content.js */
+function queryButtonClick(buttonPress, color)
+{
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+	{
+		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
+		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+	})
+}
 
 // calls function to populate buttons for popup
 insertButtons();
@@ -81,28 +67,19 @@ function insertButtons()
 	{
 		groupCount = group.groupCount;
 		buttonCount = group.buttonCount;
-
-		// console.log("groupCount: " + groupCount);
 		
-		/* checks if there are no buttons */
-		if (groupCount == 0)   // enables empty text to be displayed
+		/* checks if there are no buttons to display empty text */
+		if (groupCount == 0)
 		{
-			document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
-			document.getElementById("groupButtons").style.color = "blue";
-			document.getElementById("groupButtons").style.width = "532px";
-			document.getElementById("groupButtons").style.fontWeight = "900";
-			document.getElementById("groupButtons").style.fontSize = 20;
-			document.getElementById("groupButtons").style.textAlign = "center";
-
-			// console.log("buttonCount: " + buttonCount);
-			chrome.storage.local.set({"buttonCount": 0});   // sets button count to 0 since there are no buttons
+			setEmptyText();
+			// sets button count to 0 since there are no buttons
+			chrome.storage.local.set({"buttonCount": 0});
 		}
 		/* creates the buttons */
 		else
 		{
 			for (var i = 0; i < buttonCount; i++)
 			{
-				// console.log("for buttonCount: " + buttonCount);
 				getStorage(i);
 			}
 		}
@@ -111,110 +88,129 @@ function insertButtons()
 		chrome.storage.local.get(null, function(items) 
 		{
 			var allKeys = Object.keys(items);
-			// console.log("after displaying all the buttons, storage: " + allKeys);
+			console.log("after displaying all the buttons, storage: " + allKeys);
 		})
 		chrome.storage.local.get("groupCount", function(groups)
 		{
-			// console.log("after displaying all the buttons, groupCount: " + groups.groupCount);
+			console.log("after displaying all the buttons, groupCount: " + groups.groupCount);
 		})
 	})
 }
 
+function setEmptyText()
+{
+	document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
+	document.getElementById("groupButtons").style.color = "blue";
+	document.getElementById("groupButtons").style.width = "532px";
+	document.getElementById("groupButtons").style.fontWeight = "900";
+	document.getElementById("groupButtons").style.fontSize = 20;
+	document.getElementById("groupButtons").style.textAlign = "center";
+}
+
+/* gets and displays tab, window, and trash buttons from storage */
 function getStorage(i)   // i == groupCount
 {
 	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i], function(group)
 	{
-		/* checks  if storage is empty or if a group was deleted */
+		/* checks  if storage is empty or if a group was deleted (still checks group number if deleted) */
 		if (group["groupName" + i] == null)
 		{
-			// console.log("empty");
 			return;
 		}
 
-		/* tab button */
-		var groupButton = document.createElement("button");
-		/* set css of button */
-		groupButton.id = "groupButton";
-		groupButton.innerHTML = group["groupName" + i];   // displays name of the button
-		// puts button in popup
-		document.getElementById("groupButtons").appendChild(groupButton);   // used to be appendChild
-
-		/* opens tabs if button is clicked */
-		groupButton.onclick = function()
-		{
-			/* opens the tabs */
-			for (var j = 0; j < group["tabCount" + i]; j++)
-			{
-				chrome.extension.getBackgroundPage().createTab(group, i, j);
-				// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
-				// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
-			}
-		}
-
-		/* window button */
-		var windowButton = document.createElement("button");
-		// set css of button
-		windowButton.id = "windowButton";
-		// appends button to corresponding tab button
-		document.getElementById("groupButtons").appendChild(windowButton);
-
-		/* creates a new window with saved tabs */
-		windowButton.onclick = function()
-		{
-			for (var j = 0; j < group["tabCount" + i]; j++)
-			{
-				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
-			}
-			//chrome.windows.create({"url": group["tabUrls" + i], "state": "maximized"});
-		}
-
-		/* trash button */
-		var trashButton = document.createElement("button");
-		// set css of button
-		trashButton.id = "trashButton";
-		// appends button to corresponding tab button
-		document.getElementById("groupButtons").appendChild(trashButton);
-
-		/* deletes group if trash icon is clicked  */
-		trashButton.onclick = function()
-		{
-			var confirmDelete = confirm("Are you sure you want to delete " + group["groupName" + i] + "?");
-			if (confirmDelete)
-			{
-				// removes the group name, tab names, tab urls, and number of tabs from storage
-				chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabCount" + i]);
-
-				/* last button is deleted, so button counter can be decreased by 1 */
-				chrome.storage.local.get("buttonCount", function(group2)
-				{
-					if ((i + 1) == group2.buttonCount)   // (i + 1) == last button
-					{
-						var subtractOne = (group2.buttonCount) - 1;
-						// console.log(subtractOne);
-						chrome.storage.local.set({"buttonCount": subtractOne});
-					}
-				})
-
-				chrome.storage.local.get("groupCount", function(group)
-				{
-					/* debugging */
-					chrome.storage.local.get(null, function(items) 
-					{
-						var allKeys = Object.keys(items);
-						// console.log("storage: " + allKeys);
-					})
-
-					var resetGroupCount = group.groupCount - 1;
-					// subtract one from groupCount for removal of a group
-					chrome.storage.local.set({"groupCount": resetGroupCount}, function()
-					{
-						window.location.reload();
-					})
-					// console.log("resetGroupCount: " + resetGroupCount);
-				})
-			}
-		}
+		displayTabButton(group, i);
+		displayWindowButton(group, i);
+		displayTrashButton(group, i);
 	})
+}
+
+/* display tab button */
+function displayTabButton(group, i)
+{
+	var groupButton = document.createElement("button");
+	/* set css of button */
+	groupButton.id = "groupButton";
+	groupButton.innerHTML = group["groupName" + i];
+	// puts button in popup
+	document.getElementById("groupButtons").appendChild(groupButton);
+
+	/* opens tabs if button is clicked */
+	groupButton.onclick = function()
+	{
+		/* opens the tabs */
+		for (var j = 0; j < group["tabCount" + i]; j++)
+		{
+			chrome.extension.getBackgroundPage().createTab(group, i, j);
+			// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
+			// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
+		}
+	}
+}
+
+/* display window button */
+function displayWindowButton(group, i)
+{
+	var windowButton = document.createElement("button");
+	// set css of button
+	windowButton.id = "windowButton";
+	// appends button to corresponding tab button
+	document.getElementById("groupButtons").appendChild(windowButton);
+
+	/* creates a new window with saved tabs */
+	windowButton.onclick = function()
+	{
+		for (var j = 0; j < group["tabCount" + i]; j++)
+		{
+			chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+		}
+	}
+}
+
+/* display trash button */
+function displayTrashButton(group, i)
+{
+	var trashButton = document.createElement("button");
+	// set css of button
+	trashButton.id = "trashButton";
+	// appends button to corresponding tab button
+	document.getElementById("groupButtons").appendChild(trashButton);
+
+	/* deletes group if trash icon is clicked  */
+	trashButton.onclick = function()
+	{
+		var confirmDelete = confirm("Are you sure you want to delete " + group["groupName" + i] + "?");
+		if (confirmDelete)
+		{
+			// removes the group name, tab names, tab urls, and number of tabs from storage
+			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabCount" + i]);
+
+			/* last button is deleted, so button counter can be decreased by 1 */
+			chrome.storage.local.get("buttonCount", function(group2)
+			{
+				if ((i + 1) == group2.buttonCount)   // (i + 1) == last button
+				{
+					var subtractOne = (group2.buttonCount) - 1;
+					chrome.storage.local.set({"buttonCount": subtractOne});
+				}
+			})
+
+			/* debugging */
+			chrome.storage.local.get("groupCount", function(group)
+			{
+				chrome.storage.local.get(null, function(items) 
+				{
+					var allKeys = Object.keys(items);
+				})
+
+				var resetGroupCount = group.groupCount - 1;
+				// subtract one from groupCount for removal of a group
+				chrome.storage.local.set({"groupCount": resetGroupCount}, function()
+				{
+					window.location.reload();
+				})
+			})
+		}
+	}
 }
 
 /* for titling tabs */
@@ -241,6 +237,7 @@ document.addEventListener("DOMContentLoaded", function()
 			// refer to background page because popup is automatically closed when a tab is created,
 			// so callback function would never execute
 			chrome.extension.getBackgroundPage().storeTabsTextField(storeTabsTextField);
+			// reloads popup to immediately display stored tab button
 			window.location.reload();
 		}
 	})
@@ -254,7 +251,6 @@ function renameTab()
 {
 	// get text from text field
 	var customTitleField = document.getElementById("customTitleField").value;
-	// console.log("customTitleField: " + customTitleField);
 	
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs)
 	{
