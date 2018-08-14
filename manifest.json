@@ -1,0 +1,50 @@
+{
+    "manifest_version": 2,
+    "name": "LastTab",
+    "version": "0.1",
+    "description": "Saves the current tabs.",
+
+    "browser_action":
+    {
+        "default_title:": "LastTab",
+        "default_popup": "popup.html"
+    },
+    "background":
+    {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "content_scripts":
+    [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
+    "permissions": ["tabs", "storage", "contextMenus"],
+    "commands":
+    {
+        "lasttab-toggle-feature":
+        {
+            "suggested_key":
+            {
+                "windows": "Ctrl + L",
+                "mac": "Command + L",
+                "chromeos": "Ctrl + L",
+                "linux": "Ctrl + L"
+            },
+            "description": "Last Tab Feature (Ctrl/Command + L)"
+        },
+        "custom-title-toggle-feature":
+        {
+            "suggested_key":
+            {
+                "windows": "Ctrl + Up",
+                "mac": "Command + Up",
+                "chromeos": "Ctrl + Up",
+                "linux": "Ctrl + Up"
+            },
+            "description": "Last Tab: Custom Tab Name Feature (Ctrl/Command + Up)"
+        }
+    }
+}

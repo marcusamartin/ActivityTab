@@ -1,0 +1,154 @@
+/* determines the size of the popup */
+body
+{
+	min-height: 25px;
+	width: 532px;
+}
+
+/* top half */
+
+#topHalf
+{
+	background-color: green;   /* not working? */
+	color: green;
+}
+
+#textFieldsContainer
+{
+	float: left;
+	height: 90px;
+	width: 200px;
+	display: block;
+	margin: 0px 16px 0px 0px;
+}
+
+#customTitleField
+{
+	float: left;
+	height: 40px;
+	width: 200px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid blue;
+    transition: 0.3s;
+	outline: none;
+	/* margin: 7px 8px 10px 8px; */
+	margin: 0px 8px 10px 8px;
+	font-size: 20px;
+	text-align: left;
+}
+
+#customTitleField:focus
+{
+	border:3px solid #000000;
+	background-color: lightblue;
+}
+
+#customTitleField:hover
+{
+	border-color: #000000;
+}
+
+#saveTabsTextField
+{
+	float: left;
+	height: 40px;
+	width: 200px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid blue;
+    transition: 0.3s;
+	outline: none;
+	/* margin: 7px 8px 10px 8px; */
+	margin: 0px 8px 10px 8px;
+	font-size: 20px;
+	text-align: left;
+}
+
+#saveTabsTextField:focus
+{
+	border: 3px solid #000000;
+	background-color: lightblue;
+}
+
+#sortTabs
+{
+	float: right;
+	height: 90px;
+	width: 300px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid #cccccc;
+    transition: 0.3s;
+	outline: none;
+	margin: 0px 8px 10px 8px;
+	font-size: 20px;
+}
+
+#sortTabs:focus
+{
+	border: 3px solid #000000;
+	background-color: lightblue;
+}
+
+/* bottom half */
+
+#buttonArea
+{
+	background-color: pink;
+}
+
+/* gives appearance that button is popping out of popup */
+button:hover
+{
+	transform: scale3d(1.03, 1.03, 1.03);
+	color: #000000;
+	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+	transition: 0.2s;
+}
+
+button
+{
+	border: none;
+    background-color: lightblue;
+    text-decoration: none;
+    display: inline-block;   /* makes buttons be on one line */
+}
+
+/* tabs button */
+#groupButton
+{
+	float: left;
+	height: 40px;
+	width: 300px;
+	border: none;
+	margin: 7px 8px 7px 8px;   /* top right bottom left */
+	font-size: 20px;
+	text-align: center;
+	border-radius: 4px;
+}
+
+#windowButton
+{
+	float: left;
+	height: 40px;
+	width: 80px;
+	border: none;
+	margin: 7px 8px 7px 30px;   /* top right bottom left */
+	font-size: 20px;
+	text-align: center;
+	border-radius: 4px;
+}
+
+/* trash button */
+#trashButton
+{
+	float: center;
+	height: 40px;
+	width: 40px;
+	border: none;
+	margin: 7px 8px 7px 30px;   /* top right bottom left */
+	font-size: 20px;
+	text-align: center;
+	border-radius: 4px;
+}
