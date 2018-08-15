@@ -1,6 +1,6 @@
 /* TODO:
  * put colors of tabs into storage
- * command that will save tabs of the same color
+ * command(s) and buttons that will save tabs of the same color
  * correspond tab button colors with color of saved tabs within the tab button
  * command that will save all of the tabs (has unique color)
 */
@@ -141,7 +141,6 @@ function storeTabs(command)
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		else
 		{
-			console.log("checking to see if there is a duplicate: " + isDuplicate);
 			var groupObject = {};
 
 			/* stores all of the tab's information into an object and then puts object into storage */
@@ -150,13 +149,36 @@ function storeTabs(command)
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
+				var tabColorsArr = tabs.map(t => t.favIconUrl);   // tabColorsArr
+				// tabColorsArr.substr(46, tabColorsArr.length);
+				console.log("tabColorsArr length: " + tabColorsArr.length);
+				console.log("tabColorsArr: " + tabColorsArr);
+
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
 				{
 					tabNamesArr[tabCount] = tabs[tabCount].title;
-					// console.log("title of tab: " + tabs[tabCount].title);
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
+					// tabColorsArr[tabCount] = 0;
+					// console.log("tabColorsArr[tabCount]: " + tabColorsArr[tabCount]);
+					// invalid, use chrome.tabs.executeScript to iterate through tabs
+					//var documentFaviconURL = tabs[tabCount].querySelector("link[rel*='shortcut icon']").href;
+					// "*://*/*" put in permissions to allow access to pages
+
+					// tabId, object details, function callback)
+					// tabColorsArr[tabCount] = lol(tabs, tabCount);
+
+					// chrome.tabs.executeScript(tabs[tabCount].id, 
+					// 	{code: 
+					// 		'var currentFaviconURL = document.querySelector("link[rel*=\'shortcut icon\']").href; var redURL = chrome.runtime.getURL("img/red-circle-16.png");var greenURL = chrome.runtime.getURL("img/green-circle-16.png");var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");/* stores tab color depending on current favicon url */switch(currentFaviconURL){case redURL:tabColorsArr.tabCount = "red";case greenURL:tabColorsArr.tabCount = "green";case blueURL:tabColorsArr.tabCount = "blue";case yellowURL:tabColorsArr.tabCount = "yellow";case orangeURL:tabColorsArr.tabCount = "orange";case purpleURL:tabColorsArr.tabCount = "purple";default:tabColorsArr.tabCount = "no color";}'
+					// 	}, function (result){});
+					
+					// chrome.tabs.executeScript(tabs[tabCount].id, 
+					// 	{code: 'async function (){var currentFaviconURL = document.querySelector("link[rel*=\'shortcut icon\']").href;var redURL = chrome.runtime.getURL("img/red-circle-16.png");var greenURL = chrome.runtime.getURL("img/green-circle-16.png");var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");/* stores tab color depending on current favicon url */switch(currentFaviconURL){case redURL:await return "red";case greenURL:await return = "green";case blueURL:await return = "blue";case yellowURL:await return = "yellow";case orangeURL:await return = "orange";case purpleURL:await return = "purple";default:await return = "no color";}})();'
+					// 	}, function (result){});
+
+					// console.log("tabColorsArr[tabCount] after storeTabColor: " + tabColorsArr[tabCount]);
 				}
 
 				var groupName = "groupName" + groupCount;
@@ -168,12 +190,14 @@ function storeTabs(command)
 				var tabUrls = "tabUrls" + groupCount;
 				groupObject[tabUrls] = tabUrlsArr;
 
+				var tabColor = "tabColor" + groupCount;
+				groupObject[tabColor] = tabColorsArr;
+
 				var tabCount2 = "tabCount" + groupCount;
 				groupObject[tabCount2] = tabCount;
 
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
-				console.log("put object in storage")
 
 				// set-up for next group so last group isn't overwritten
 				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
@@ -188,6 +212,12 @@ function storeTabs(command)
 		}
 	})
 }
+
+// async function lol(tabs, tabCount)
+// {
+// 	let promise = chrome.tabs.executeScript(tabs[tabCount].id, {file: "storeTabColor.js"}, function (result){});
+// 	await promise;
+// }
 
 /* checks if there is a duplicate name and then removes the button at the end that is still
    added because of the first ~asynchronous~ function in storeTabs() */
@@ -337,12 +367,12 @@ function storeTabsTextField(storeTabsTextField)
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
+				// var tabColorsArr = [];
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
 				{
 					tabNamesArr[tabCount] = tabs[tabCount].title;
-					// console.log("title of tab: " + tabs[tabCount].title);
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
 				}
 
@@ -369,16 +399,24 @@ function storeTabsTextField(storeTabsTextField)
 	})
 }
 
-/* stores title of tab for later use when tab is fully updated */
+// stores title of tab for later use when tab is fully updated
 var tabIdsToTitles = {};
+// stores color of tab for later use when tab is fully updated
+var tabIdsToColor = {};
 
 /* creates the tabs */
 function createTab(group, i, j)
 {
     chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
     {
+		/* saves title of tab */
         var tabTitle = group["tabNames" + i][j];
-        tabIdsToTitles[tab.id] = tabTitle;
+		tabIdsToTitles[tab.id] = tabTitle;
+
+		/* saves color of tab */
+		var tabColor = group["tabColor" + i][j];
+		tabIdsToColor[tab.id] = tabColor;
+		console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
     })
 }
 
@@ -396,6 +434,10 @@ function createWindowTabs(group, i, j)
 		{
 			var tabTitle = group["tabNames" + i][j];
 			tabIdsToTitles[tab.id] = tabTitle;
+
+			var tabColor = group["tabColor" + i][j];
+			tabIdsToColor[tab.id] = tabColor;
+			console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
 		})
 	}
 }
@@ -408,6 +450,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
 	if (tabIdsToTitles[tabId] && changeInfo.status === "complete") 
 	{
 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
+		console.log("send tabIdsToTitles[tabId] to content.js: " + tabIdsToTitles[tabId] + ", id: " + tabId);
+		console.log("send tabIdsToColor[tab.id] to content.js: " + tabIdsToColor[tabId] + ", id: " + tabId);
+		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
 	}
 })
 

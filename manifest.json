@@ -21,7 +21,7 @@
             "js": ["content.js"]
         }
     ],
-    "permissions": ["tabs", "storage", "contextMenus"],
+    "permissions": ["tabs", "storage", "contextMenus", "*://*/*"],
     "commands":
     {
         "lasttab-toggle-feature":

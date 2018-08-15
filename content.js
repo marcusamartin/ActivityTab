@@ -1,10 +1,20 @@
 /* sets tab title */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-    /* title from command/saved title, custom title from popup text field, creating tabs with title */
+    /* title from command/saved title, title from popup text field, creating tabs with title */
     if (request.title || request.name || request.getTitle)
     {
         document.title = request.title || request.name || request.getTitle;
+    }
+    /* color from command */
+    else if (request.getColor)   // request.getColor == actual favicon url
+    {
+        console.log("setFaviconURL(request.getColor): " + request.getColor);
+        var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
+        link.type = "image/x-icon";
+        link.rel = "shortcut icon";
+
+        setFaviconURLFromURL(request.getColor);
     }
     /* command for left/right key */
     else if (request.command)
@@ -136,6 +146,46 @@ function setFaviconURL(color)
             break;
         case "purple":
             link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            break;
+        default:
+            break;
+    }
+}
+
+function setFaviconURLFromURL(colorURL)
+{
+    var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+    var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+    var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+    var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
+    link.type = "image/x-icon";
+    link.rel = "shortcut icon";
+    
+    switch(colorURL)
+    {
+        case redURL:
+            link.href = chrome.runtime.getURL("img/red-circle-16.png");
+            break;
+        case greenURL:
+            link.href = chrome.runtime.getURL("img/green-circle-16.png");
+            break;
+        case blueURL:
+            link.href = chrome.runtime.getURL("img/blue-circle-16.png");
+            break;
+        case yellowURL:
+            link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            break;
+        case orangeURL:
+            link.href = chrome.runtime.getURL("img/orange-circle-16.png");
+            break;
+        case purpleURL:
+            link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            break;
+        default:
             break;
     }
 }

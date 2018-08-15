@@ -54,11 +54,11 @@ function queryButtonClick(buttonPress, color)
 	})
 }
 
-// calls function to populate buttons for popup
-insertButtons();
+// calls function continuously to populate buttons for popup
+displayButtons();
 
-/* Inserts buttons into popup */
-function insertButtons()
+/* Display buttons in popup */
+function displayButtons()
 {
 	var groupCount;
 	var buttonCount;
@@ -110,7 +110,7 @@ function setEmptyText()
 /* gets and displays tab, window, and trash buttons from storage */
 function getStorage(i)   // i == groupCount
 {
-	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i], function(group)
+	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
 	{
 		/* checks  if storage is empty or if a group was deleted (still checks group number if deleted) */
 		if (group["groupName" + i] == null)
