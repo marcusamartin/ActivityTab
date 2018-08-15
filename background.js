@@ -6,6 +6,7 @@
 */
 
 /* FIXME:
+ * buttonCount is inefficient, fix by using an array of object and .length
  * background color of top half of popup is not working
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
@@ -63,7 +64,7 @@ function ActivityTabFeatures(command)
 	{
 		/* save tabs */
 		case "lasttab-toggle-feature":
-			storeTabs();
+			storeTabs(command);
 			break;
 		/* color change to left */
 		case "left-key-toggle-feature":
@@ -91,7 +92,7 @@ function ActivityTabFeatures(command)
 	switch (command.menuItemId)
 	{
 		case "saveTabs":
-			storeTabs();
+			storeTabs(command);
 			break;
 		case "redFavicon":
 			queryContextMenu("buttonPress", "red");
@@ -115,10 +116,11 @@ function ActivityTabFeatures(command)
 }
 
 /* puts current window's tabs into storage */
-function storeTabs()
+function storeTabs(command)
 {
 	chrome.storage.local.get("groupCount", function(group)
 	{
+		var isDuplicate = false;
 		// current count of groups
 		var groupCount = group.groupCount;
 
@@ -128,37 +130,7 @@ function storeTabs()
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if duplicate name */   // FIXME: NOT WORKING
-		if (promptUser != "" && groupCount != 0)
-		{
-			/* iterates through the buttons */
-			for (var i = 0; i < groupCount; i++)
-			{
-				chrome.storage.local.get(["groupName" + i], function(anotherGroup) // cannot refer to groupName with i, only with numbers (ex: 1)
-				{
-					var groupName = anotherGroup["groupName" + i];   // with 0 duplicate name is caught
-					console.log("group: " + anotherGroup["groupName" + i]);
-
-					chrome.storage.local.get(null, function(items)
-					{
-						var allKeys = Object.keys(items);
-						console.log("storage: " + allKeys);
-					})
-					// console.log("groupName: " + groupName);   // somehow does not erase storage completely
-
-					if (groupName == promptUser)
-					{
-						alert("Duplicate name!");
-						var duplicatePrompt = prompt("Would you like to replace the group?");
-
-						if (duplicatePrompt)
-						{
-							alert("replaceButton");
-							//replaceButton(groupCount);
-						}
-					}
-				})
-			}
-		}
+		checkDuplicateName(promptUser, groupCount, command);
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -169,6 +141,7 @@ function storeTabs()
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		else
 		{
+			console.log("checking to see if there is a duplicate: " + isDuplicate);
 			var groupObject = {};
 
 			/* stores all of the tab's information into an object and then puts object into storage */
@@ -200,12 +173,91 @@ function storeTabs()
 
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
+				console.log("put object in storage")
 
 				// set-up for next group so last group isn't overwritten
 				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
 				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
+
+				chrome.storage.local.get(null, function(items)
+				{
+					var allKeys = Object.keys(items);
+					console.log("storage: " + allKeys);
+				})
 			})
 		}
+	})
+}
+
+/* checks if there is a duplicate name and then removes the button at the end that is still
+   added because of the first ~asynchronous~ function in storeTabs() */
+function checkDuplicateName(promptUser, groupCount, command)
+{
+	if (promptUser != "" && groupCount != 0)
+	{
+		/* iterates through the buttons */
+		for (var i = 0; i < groupCount; i++)
+		{
+			chrome.storage.local.get(["groupName" + i], function(i, anotherGroup)
+			{
+				var groupName = anotherGroup["groupName" + i];
+					
+				if (groupName == promptUser)
+				{
+					alert("Duplicate name!");
+					var duplicatePrompt = confirm("Would you like to replace the group?");
+
+					if (duplicatePrompt)
+					{
+						replaceButton(i, promptUser);
+						// removes added button from asynchronous function
+						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabCount" + groupCount]);
+					}
+					else
+					{
+						alert("Please enter a different name for the group!");
+						ActivityTabFeatures(command);
+					}
+				}
+			}.bind(this, i))   // used since asynchronous function would update i before using it; makes for loop work as intended
+		}
+	}
+}
+
+/* updates correct button with tab information */
+function replaceButton(replacementButton, promptUser)
+{
+	var groupObject = {};
+
+	/* stores all of the tab's information into an object and then puts object into storage */
+	chrome.tabs.query({currentWindow: true}, function(tabs)
+	{
+		/* gets each tab's name and url from an array of tabs and stores them into arrays */
+		var tabNamesArr = [];
+		var tabUrlsArr = [];
+		var tabCount = 0;
+
+		for (; tabCount < tabs.length; tabCount++)
+		{
+			tabNamesArr[tabCount] = tabs[tabCount].title;
+			// console.log("title of tab: " + tabs[tabCount].title);
+			tabUrlsArr[tabCount] = tabs[tabCount].url;
+		}
+
+		var groupName = "groupName" + replacementButton;
+		groupObject[groupName] = promptUser;
+
+		var tabNames = "tabNames" + replacementButton;
+		groupObject[tabNames] = tabNamesArr;
+
+		var tabUrls = "tabUrls" + replacementButton;
+		groupObject[tabUrls] = tabUrlsArr;
+
+		var tabCount2 = "tabCount" + replacementButton;
+		groupObject[tabCount2] = tabCount;
+
+		// puts object into storage
+		chrome.storage.local.set(groupObject);
 	})
 }
 
