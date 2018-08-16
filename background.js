@@ -1,15 +1,17 @@
 /* TODO:
- * put colors of tabs into storage
  * command(s) and buttons that will save tabs of the same color
  * correspond tab button colors with color of saved tabs within the tab button
  * command that will save all of the tabs (has unique color)
+ * buttons will go into workspace that will be able to be named, pulldown that will show button tabs
+ * option to create workspace
+ * close all tabs with specific color (button next to trash?)
 */
 
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
  * setting groupCount on installation might delete user's tabs if extension is updated, fix
- * Save tabs text field does not catch duplicates (does not delete extra button)
  * background color of top half of popup is not working
+ * change favicon colors to match button colors
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
  * w3schools.com's favicon is not able to be changed (certain websites?)
@@ -87,6 +89,8 @@ function ActivityTabFeatures(command)
 				// saves for persistent title through refresh
 				saveTitle[tabs[0].id] = promptUser;
 			})
+		case "same-color-tabs-toggle-feature":
+			sameColorTabs(command);
 			break;
 	}
 
@@ -129,9 +133,6 @@ function storeTabs(command)
 
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
-
-		/* checks if duplicate name */
-		// checkDuplicateName(promptUser, groupCount, command);
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -180,6 +181,7 @@ function storeTabs(command)
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
 
+				/* checks if duplicate name */
 				checkDuplicateName(promptUser, groupCount, command);
 
 				// set-up for next group so last group isn't overwritten
@@ -217,21 +219,8 @@ function checkDuplicateName(promptUser, groupCount, command)
 					if (duplicatePrompt)
 					{
 						replaceButton(i, promptUser);
-						console.log("BEFORE REMOVAL, groupCount: " + groupCount);
-						chrome.storage.local.get(null, function(items) 
-						{
-							var allKeys = Object.keys(items);
-							console.log("BEFORE REMOVAL, storage: " + allKeys);
-						})
 						// removes added button from asynchronous function since a button is still added
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
-						chrome.storage.local.set({"groupCount": groupCount});
-						console.log("AFTER REMOVAL, groupCount: " + groupCount);
-						chrome.storage.local.get(null, function(items) 
-						{
-							var allKeys = Object.keys(items);
-							console.log("AFTER REMOVAL, storage: " + allKeys);
-						})
 					}
 					else
 					{
@@ -288,6 +277,90 @@ function replaceButton(replacementButton, promptUser)
 	})
 }
 
+function sameColorTabs(command)
+{
+	chrome.storage.local.get("groupCount", function(group)
+	{
+		// current count of groups
+		var groupCount = group.groupCount;
+
+		var promptUser = prompt("Group name: ");
+
+		// text limit so the text can fit in the button
+		promptUser = promptUser.substr(0, 26);
+
+		/* checks if name is invalid */
+		if (promptUser == "")
+		{
+			alert("Please enter a name for the group!");
+			sameColorTabs(command);
+		}
+		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		else
+		{
+			var groupObject = {};
+
+			/* stores all of the tab's information into an object and then puts object into storage */
+			chrome.tabs.query({currentWindow: true}, function(tabs)
+			{
+				/* gets each tab's name and url from an array of tabs and stores them into arrays */
+				var tabNamesArr = [];
+				var tabUrlsArr = [];
+				var tabColorsArr = tabs.map(t => t.favIconUrl);
+				var tabCount = 0;
+
+				for (; tabCount < tabs.length; tabCount++)
+				{
+					tabNamesArr[tabCount] = tabs[tabCount].title;
+					tabUrlsArr[tabCount] = tabs[tabCount].url;
+				}
+
+				var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+				var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+				var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+				var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+				var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+				var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+				/* removes favicon urls that are not colored from tab colors array */
+				for (var i = 0; i < tabColorsArr.length; i++)
+				{
+					if (tabColorsArr[i] != redURL && tabColorsArr[i] != greenURL && tabColorsArr[i] != blueURL &&
+						tabColorsARR[i] != yellowURL && tabColorsArr[i] != orangeURL && tabColorsArr[i] != purpleURL)
+					{
+						tabColorsArr.splice(i, 1);
+					}
+				}
+
+				var groupName = "groupName" + groupCount;
+				groupObject[groupName] = promptUser;
+
+				var tabNames = "tabNames" + groupCount;
+				groupObject[tabNames] = tabNamesArr;
+
+				var tabUrls = "tabUrls" + groupCount;
+				groupObject[tabUrls] = tabUrlsArr;
+
+				var tabColor = "tabColor" + groupCount;
+				groupObject[tabColor] = tabColorsArr;
+
+				var tabCount2 = "tabCount" + groupCount;
+				groupObject[tabCount2] = tabCount;
+
+				// puts object into storage
+				chrome.storage.local.set(groupObject);
+
+				/* checks if duplicate name */
+				checkDuplicateName(promptUser, groupCount, command);
+
+				// set-up for next group so last group isn't overwritten
+				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
+				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
+			})
+		}
+	})
+}
+
 /* sends message with command info to content.js */
 function queryKeys(item)
 {
@@ -322,9 +395,6 @@ function storeTabsTextField(storeTabsTextField)
 
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
-
-		/* checks if duplicate name */
-		// checkDuplicateName(promptUser, groupCount, "");
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -370,6 +440,7 @@ function storeTabsTextField(storeTabsTextField)
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
 
+				/* checks if duplicate name */
 				checkDuplicateName(promptUser, groupCount, "");
 
 				chrome.storage.local.get(null, function(items) 

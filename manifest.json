@@ -24,17 +24,17 @@
     "permissions": ["tabs", "storage", "contextMenus", "*://*/*"],
     "commands":
     {
-        "lasttab-toggle-feature":
-        {
-            "suggested_key":
-            {
-                "windows": "Ctrl + L",
-                "mac": "Command + L",
-                "chromeos": "Ctrl + L",
-                "linux": "Ctrl + L"
-            },
-            "description": "Last Tab Feature (Ctrl/Command + L)"
-        },
+        // "lasttab-toggle-feature":
+        // {
+        //     "suggested_key":
+        //     {
+        //         "windows": "Ctrl + L",
+        //         "mac": "Command + L",
+        //         "chromeos": "Ctrl + L",
+        //         "linux": "Ctrl + L"
+        //     },
+        //     "description": "Last Tab Feature (Ctrl/Command + L)"
+        // },
         "custom-title-toggle-feature":
         {
             "suggested_key":
@@ -67,6 +67,17 @@
                 "linux": "Ctrl + Right"
             },
             "description": "SortTab Feature (Ctrl/Command + Right Arrow Key)"
+        },
+        "same-color-tabs-toggle-feature":
+        {
+            "suggested_key":
+            {
+                "windows": "Ctrl + M",
+                "mac": "Command + M",
+                "chromeos": "Ctrl + M",
+                "linux": "Ctrl + M"
+            },
+            "description": "ActivityTab Feature (Ctrl/Command + M)"
         }
     },
     "web_accessible_resources": 
