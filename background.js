@@ -8,6 +8,8 @@
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
  * setting groupCount on installation might delete user's tabs if extension is updated, fix
+ * Save tabs text field does not catch duplicates (changes replacement button info but still creates a new button if the title of a tab was changed)
+ * Save tabs text field does not store color and display favicon correctly
  * background color of top half of popup is not working
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
@@ -129,7 +131,7 @@ function storeTabs(command)
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
-		/* checks if duplicate name */   // FIXME: NOT WORKING
+		/* checks if duplicate name */
 		checkDuplicateName(promptUser, groupCount, command);
 
 		/* checks if name is invalid */
@@ -228,7 +230,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 	}
 }
 
-/* updates correct button with tab information */
+/* updates correct button with tab information but does not replace button */
 function replaceButton(replacementButton, promptUser)
 {
 	var groupObject = {};
@@ -301,31 +303,8 @@ function storeTabsTextField(storeTabsTextField)
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
-		/* checks if duplicate name */   // NOT WORKING
-		// if (promptUser != "")
-		// {
-		// 	chrome.storage.local.get("groupCount", function(group)
-		// 	{
-		// 		groupCount = group.groupCount;
-				
-		// 		var i = 0;
-		// 		/* iterates through the buttons */
-		// 		for (; i < groupCount; i++)
-		// 		{
-		// 			chrome.storage.local.get("groupName", function(anotherGroup)
-		// 			{
-		// 				alert("groupName: " + anotherGroup["groupName" + i]);   // groupName is undefined
-		// 				var groupName = anotherGroup["groupName" + i];
-
-		// 				if (promptUser == groupName)
-		// 				{
-		// 					alert("Duplicate name of an existing group!");
-		// 					ActivityTabFeatures();
-		// 				}
-		// 			})
-		// 		}
-		// 	})
-		// }
+		/* checks if duplicate name */
+		checkDuplicateName(promptUser, groupCount, storeTabsTextField);
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -344,7 +323,7 @@ function storeTabsTextField(storeTabsTextField)
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
-				// var tabColorsArr = [];
+				var tabColorsArr = tabs.map(t => t.favIconUrl);
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
@@ -361,6 +340,9 @@ function storeTabsTextField(storeTabsTextField)
 
 				var tabUrls = "tabUrls" + groupCount;
 				groupObject[tabUrls] = tabUrlsArr;
+
+				var tabColor = "tabColor" + groupCount;
+				groupObject[tabColor] = tabColorsArr;
 
 				var tabCount2 = "tabCount" + groupCount;
 				groupObject[tabCount2] = tabCount;
