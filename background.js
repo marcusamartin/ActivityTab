@@ -8,8 +8,7 @@
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
  * setting groupCount on installation might delete user's tabs if extension is updated, fix
- * Save tabs text field does not catch duplicates (changes replacement button info but still creates a new button if the title of a tab was changed)
- * Save tabs text field does not store color and display favicon correctly
+ * Save tabs text field does not catch duplicates (does not delete extra button)
  * background color of top half of popup is not working
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
@@ -132,7 +131,7 @@ function storeTabs(command)
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if duplicate name */
-		checkDuplicateName(promptUser, groupCount, command);
+		// checkDuplicateName(promptUser, groupCount, command);
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -181,6 +180,8 @@ function storeTabs(command)
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
 
+				checkDuplicateName(promptUser, groupCount, command);
+
 				// set-up for next group so last group isn't overwritten
 				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
 				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
@@ -216,13 +217,30 @@ function checkDuplicateName(promptUser, groupCount, command)
 					if (duplicatePrompt)
 					{
 						replaceButton(i, promptUser);
-						// removes added button from asynchronous function
+						console.log("BEFORE REMOVAL, groupCount: " + groupCount);
+						chrome.storage.local.get(null, function(items) 
+						{
+							var allKeys = Object.keys(items);
+							console.log("BEFORE REMOVAL, storage: " + allKeys);
+						})
+						// removes added button from asynchronous function since a button is still added
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						chrome.storage.local.set({"groupCount": groupCount});
+						console.log("AFTER REMOVAL, groupCount: " + groupCount);
+						chrome.storage.local.get(null, function(items) 
+						{
+							var allKeys = Object.keys(items);
+							console.log("AFTER REMOVAL, storage: " + allKeys);
+						})
 					}
 					else
 					{
 						alert("Please enter a different name for the group!");
-						ActivityTabFeatures(command);
+						/* only if command had activated prompt, not the save tabs text field */
+						if (command)
+						{
+							ActivityTabFeatures(command);
+						}
 					}
 				}
 			}.bind(this, i))   // used since asynchronous function would update i before using it; makes for loop work as intended
@@ -298,13 +316,15 @@ function storeTabsTextField(storeTabsTextField)
 		// current count of groups
 		var groupCount = group.groupCount;
 
+		console.log("storeTabsTextField groupCount: " + groupCount);
+
 		var promptUser =  storeTabsTextField;
 
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if duplicate name */
-		checkDuplicateName(promptUser, groupCount, storeTabsTextField);
+		// checkDuplicateName(promptUser, groupCount, "");
 
 		/* checks if name is invalid */
 		if (promptUser == "")
@@ -349,6 +369,14 @@ function storeTabsTextField(storeTabsTextField)
 
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
+
+				checkDuplicateName(promptUser, groupCount, "");
+
+				chrome.storage.local.get(null, function(items) 
+				{
+					var allKeys = Object.keys(items);
+					console.log("after storing button info, storage: " + allKeys);
+				})
 
 				// set-up for next group so last group isn't overwritten
 				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set

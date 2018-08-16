@@ -118,6 +118,8 @@ function getStorage(i)   // i == groupCount
 			return;
 		}
 
+		console.log("getStorage groupCount: " + i);
+
 		displayTabButton(group, i);
 		displayWindowButton(group, i);
 		displayTrashButton(group, i);
@@ -223,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function()
 		if (enterKey.keyCode == 13) 
 		{
 			renameTab();
+			// reloads popup immediately to show that tab was retitled
+			window.location.reload();
 		}
 	})
 
@@ -237,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function()
 			// refer to background page because popup is automatically closed when a tab is created,
 			// so callback function would never execute
 			chrome.extension.getBackgroundPage().storeTabsTextField(storeTabsTextField);
-			// reloads popup to immediately display stored tab button
+			// reloads popup immediately to display stored tab button
 			window.location.reload();
 		}
 	})
