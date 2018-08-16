@@ -24,7 +24,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         /* determine correct color from left/right key command */
         if (request.command == "left-key-toggle-feature")
         {
-            console.log("left key");
             color = leftArrowKeyTabColor();
         }
         else

@@ -7,6 +7,7 @@
 
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
+ * setting groupCount on installation might delete user's tabs if extension is updated, fix
  * background color of top half of popup is not working
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
@@ -120,7 +121,6 @@ function storeTabs(command)
 {
 	chrome.storage.local.get("groupCount", function(group)
 	{
-		var isDuplicate = false;
 		// current count of groups
 		var groupCount = group.groupCount;
 
@@ -149,36 +149,16 @@ function storeTabs(command)
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
-				var tabColorsArr = tabs.map(t => t.favIconUrl);   // tabColorsArr
-				// tabColorsArr.substr(46, tabColorsArr.length);
+				var tabColorsArr = tabs.map(t => t.favIconUrl);
+				var tabCount = 0;
+
 				console.log("tabColorsArr length: " + tabColorsArr.length);
 				console.log("tabColorsArr: " + tabColorsArr);
-
-				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
 				{
 					tabNamesArr[tabCount] = tabs[tabCount].title;
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
-					// tabColorsArr[tabCount] = 0;
-					// console.log("tabColorsArr[tabCount]: " + tabColorsArr[tabCount]);
-					// invalid, use chrome.tabs.executeScript to iterate through tabs
-					//var documentFaviconURL = tabs[tabCount].querySelector("link[rel*='shortcut icon']").href;
-					// "*://*/*" put in permissions to allow access to pages
-
-					// tabId, object details, function callback)
-					// tabColorsArr[tabCount] = lol(tabs, tabCount);
-
-					// chrome.tabs.executeScript(tabs[tabCount].id, 
-					// 	{code: 
-					// 		'var currentFaviconURL = document.querySelector("link[rel*=\'shortcut icon\']").href; var redURL = chrome.runtime.getURL("img/red-circle-16.png");var greenURL = chrome.runtime.getURL("img/green-circle-16.png");var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");/* stores tab color depending on current favicon url */switch(currentFaviconURL){case redURL:tabColorsArr.tabCount = "red";case greenURL:tabColorsArr.tabCount = "green";case blueURL:tabColorsArr.tabCount = "blue";case yellowURL:tabColorsArr.tabCount = "yellow";case orangeURL:tabColorsArr.tabCount = "orange";case purpleURL:tabColorsArr.tabCount = "purple";default:tabColorsArr.tabCount = "no color";}'
-					// 	}, function (result){});
-					
-					// chrome.tabs.executeScript(tabs[tabCount].id, 
-					// 	{code: 'async function (){var currentFaviconURL = document.querySelector("link[rel*=\'shortcut icon\']").href;var redURL = chrome.runtime.getURL("img/red-circle-16.png");var greenURL = chrome.runtime.getURL("img/green-circle-16.png");var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");/* stores tab color depending on current favicon url */switch(currentFaviconURL){case redURL:await return "red";case greenURL:await return = "green";case blueURL:await return = "blue";case yellowURL:await return = "yellow";case orangeURL:await return = "orange";case purpleURL:await return = "purple";default:await return = "no color";}})();'
-					// 	}, function (result){});
-
-					// console.log("tabColorsArr[tabCount] after storeTabColor: " + tabColorsArr[tabCount]);
 				}
 
 				var groupName = "groupName" + groupCount;
@@ -213,12 +193,6 @@ function storeTabs(command)
 	})
 }
 
-// async function lol(tabs, tabCount)
-// {
-// 	let promise = chrome.tabs.executeScript(tabs[tabCount].id, {file: "storeTabColor.js"}, function (result){});
-// 	await promise;
-// }
-
 /* checks if there is a duplicate name and then removes the button at the end that is still
    added because of the first ~asynchronous~ function in storeTabs() */
 function checkDuplicateName(promptUser, groupCount, command)
@@ -241,7 +215,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 					{
 						replaceButton(i, promptUser);
 						// removes added button from asynchronous function
-						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabCount" + groupCount]);
+						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 					}
 					else
 					{
@@ -265,12 +239,12 @@ function replaceButton(replacementButton, promptUser)
 		/* gets each tab's name and url from an array of tabs and stores them into arrays */
 		var tabNamesArr = [];
 		var tabUrlsArr = [];
+		var tabColorsArr = tabs.map(t => t.favIconUrl);
 		var tabCount = 0;
 
 		for (; tabCount < tabs.length; tabCount++)
 		{
 			tabNamesArr[tabCount] = tabs[tabCount].title;
-			// console.log("title of tab: " + tabs[tabCount].title);
 			tabUrlsArr[tabCount] = tabs[tabCount].url;
 		}
 
@@ -282,6 +256,9 @@ function replaceButton(replacementButton, promptUser)
 
 		var tabUrls = "tabUrls" + replacementButton;
 		groupObject[tabUrls] = tabUrlsArr;
+
+		var tabColor = "tabColor" + replacementButton;
+		groupObject[tabColor] = tabColorsArr;
 
 		var tabCount2 = "tabCount" + replacementButton;
 		groupObject[tabCount2] = tabCount;

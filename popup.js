@@ -182,7 +182,7 @@ function displayTrashButton(group, i)
 		if (confirmDelete)
 		{
 			// removes the group name, tab names, tab urls, and number of tabs from storage
-			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabCount" + i]);
+			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
 
 			/* last button is deleted, so button counter can be decreased by 1 */
 			chrome.storage.local.get("buttonCount", function(group2)
