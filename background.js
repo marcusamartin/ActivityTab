@@ -66,10 +66,6 @@ function ActivityTabFeatures(command)
 	/* commands */
 	switch(command)
 	{
-		/* save tabs */
-		case "lasttab-toggle-feature":
-			storeTabs(command);
-			break;
 		/* color change to left */
 		case "left-key-toggle-feature":
 			queryKeys("left-key-toggle-feature");
@@ -89,6 +85,7 @@ function ActivityTabFeatures(command)
 				// saves for persistent title through refresh
 				saveTitle[tabs[0].id] = promptUser;
 			})
+			break;
 		case "same-color-tabs-toggle-feature":
 			sameColorTabs(command);
 			break;
@@ -97,9 +94,6 @@ function ActivityTabFeatures(command)
 	/* context menus */
 	switch (command.menuItemId)
 	{
-		case "saveTabs":
-			storeTabs(command);
-			break;
 		case "redFavicon":
 			queryContextMenu("buttonPress", "red");
 			break;
@@ -121,85 +115,8 @@ function ActivityTabFeatures(command)
 	}
 }
 
-/* puts current window's tabs into storage */
-function storeTabs(command)
-{
-	chrome.storage.local.get("groupCount", function(group)
-	{
-		// current count of groups
-		var groupCount = group.groupCount;
-
-		var promptUser = prompt("Group name: ");
-
-		// text limit so the text can fit in the button
-		promptUser = promptUser.substr(0, 26);
-
-		/* checks if name is invalid */
-		if (promptUser == "")
-		{
-			alert("Please enter a name for the group!");
-			ActivityTabFeatures(command);
-		}
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
-		else
-		{
-			var groupObject = {};
-
-			/* stores all of the tab's information into an object and then puts object into storage */
-			chrome.tabs.query({currentWindow: true}, function(tabs)
-			{
-				/* gets each tab's name and url from an array of tabs and stores them into arrays */
-				var tabNamesArr = [];
-				var tabUrlsArr = [];
-				var tabColorsArr = tabs.map(t => t.favIconUrl);
-				var tabCount = 0;
-
-				console.log("tabColorsArr length: " + tabColorsArr.length);
-				console.log("tabColorsArr: " + tabColorsArr);
-
-				for (; tabCount < tabs.length; tabCount++)
-				{
-					tabNamesArr[tabCount] = tabs[tabCount].title;
-					tabUrlsArr[tabCount] = tabs[tabCount].url;
-				}
-
-				var groupName = "groupName" + groupCount;
-				groupObject[groupName] = promptUser;
-
-				var tabNames = "tabNames" + groupCount;
-				groupObject[tabNames] = tabNamesArr;
-
-				var tabUrls = "tabUrls" + groupCount;
-				groupObject[tabUrls] = tabUrlsArr;
-
-				var tabColor = "tabColor" + groupCount;
-				groupObject[tabColor] = tabColorsArr;
-
-				var tabCount2 = "tabCount" + groupCount;
-				groupObject[tabCount2] = tabCount;
-
-				// puts object into storage
-				chrome.storage.local.set(groupObject);
-
-				/* checks if duplicate name */
-				checkDuplicateName(promptUser, groupCount, command);
-
-				// set-up for next group so last group isn't overwritten
-				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
-				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
-
-				chrome.storage.local.get(null, function(items)
-				{
-					var allKeys = Object.keys(items);
-					console.log("storage: " + allKeys);
-				})
-			})
-		}
-	})
-}
-
 /* checks if there is a duplicate name and then removes the button at the end that is still
-   added because of the first ~asynchronous~ function in storeTabs() */
+   added because of the first ~asynchronous~ function in sameColorTabs() and storeTabsTextField() */
 function checkDuplicateName(promptUser, groupCount, command)
 {
 	if (promptUser != "" && groupCount != 0)
@@ -284,6 +201,8 @@ function sameColorTabs(command)
 		// current count of groups
 		var groupCount = group.groupCount;
 
+		console.log("before group name");
+
 		var promptUser = prompt("Group name: ");
 
 		// text limit so the text can fit in the button
@@ -307,55 +226,81 @@ function sameColorTabs(command)
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
+				// var tabColorsArr = [];
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
 				{
 					tabNamesArr[tabCount] = tabs[tabCount].title;
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
+					// tabColorsArr[tabCount] = tabs[tabCount].favIconUrl;
 				}
 
-				var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-				var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-				var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-				var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-				var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-				var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
-
-				/* removes favicon urls that are not colored from tab colors array */
-				for (var i = 0; i < tabColorsArr.length; i++)
+				// var currentFaviconURL = document.querySelector("link[rel*='shortcut icon']").href;
+				// HAVE TO CALL DOCUMENT IN CONTENT SCRIPT
+				// var currentFaviconURL = chrome.tabs.sendMessage(tabs[0].id, {getTab: ""}, function(response) {});
+				chrome.tabs.getSelected(null, function(tab)
 				{
-					if (tabColorsArr[i] != redURL && tabColorsArr[i] != greenURL && tabColorsArr[i] != blueURL &&
-						tabColorsARR[i] != yellowURL && tabColorsArr[i] != orangeURL && tabColorsArr[i] != purpleURL)
+					console.log("**********************************************BEGINNING****************************");
+					var currentFaviconURL;
+					var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+					var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+					var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+					var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+					var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+					var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+					currentFaviconURL = tab.favIconUrl;
+					console.log("getSelected faviconurl: " + currentFaviconURL);
+					console.log("before for loop, tabCount: " + tabCount);
+					console.log("before for loop, tabColorsArr.length: " + tabColorsArr.length);
+					// to traverse entire array even after splice
+					var tabColorsArrLength = tabColorsArr.length;
+
+					/* removes favicon urls that are not colored from tab colors array */
+					for (var i = 0; i < tabColorsArrLength; i++)
 					{
-						tabColorsArr.splice(i, 1);
+						console.log("i value start: " + i);
+						if (tabColorsArr[i] != currentFaviconURL && tabColorsArr[i] != undefined)
+						{
+							console.log("tabColorsArr[i]: " + tabColorsArr[i] + ", currentFaviconURL: " + currentFaviconURL);
+							console.log("before splice, tabColorsArr: " + tabColorsArr);
+							tabColorsArr.splice(i, 1);
+							tabCount--;
+							console.log("after splice, tabColorsArr: " + tabColorsArr);
+						}
+						console.log("i value end: " + i);
 					}
-				}
 
-				var groupName = "groupName" + groupCount;
-				groupObject[groupName] = promptUser;
+					console.log("after for loop, tabColorsArr.length: " + tabColorsArr.length);
+					console.log("after for loop, tabColorsArr: " + tabColorsArr);
+					console.log("after for loop, tabCount: " + tabCount);
 
-				var tabNames = "tabNames" + groupCount;
-				groupObject[tabNames] = tabNamesArr;
+					var groupName = "groupName" + groupCount;
+					groupObject[groupName] = promptUser;
 
-				var tabUrls = "tabUrls" + groupCount;
-				groupObject[tabUrls] = tabUrlsArr;
+					var tabNames = "tabNames" + groupCount;
+					groupObject[tabNames] = tabNamesArr;
 
-				var tabColor = "tabColor" + groupCount;
-				groupObject[tabColor] = tabColorsArr;
+					var tabUrls = "tabUrls" + groupCount;
+					groupObject[tabUrls] = tabUrlsArr;
 
-				var tabCount2 = "tabCount" + groupCount;
-				groupObject[tabCount2] = tabCount;
+					var tabColor = "tabColor" + groupCount;
+					groupObject[tabColor] = tabColorsArr;
 
-				// puts object into storage
-				chrome.storage.local.set(groupObject);
+					var tabCount2 = "tabCount" + groupCount;
+					groupObject[tabCount2] = tabCount;
 
-				/* checks if duplicate name */
-				checkDuplicateName(promptUser, groupCount, command);
+					// puts object into storage
+					chrome.storage.local.set(groupObject);
 
-				// set-up for next group so last group isn't overwritten
-				chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
-				chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
+					/* checks if duplicate name */
+					checkDuplicateName(promptUser, groupCount, command);
+
+					// set-up for next group so last group isn't overwritten
+					chrome.storage.local.set({"groupCount": (groupCount + 1)});   // enables empty text to be set
+					chrome.storage.local.set({"buttonCount": (groupCount + 1)});   // tracks number of buttons so it can display them all even if one is deleted
+				})
 			})
 		}
 	})
