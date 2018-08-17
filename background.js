@@ -135,7 +135,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 
 					if (duplicatePrompt)
 					{
-						replaceButton(i, promptUser);
+						replaceButton(i, promptUser, command);
 						// removes added button from asynchronous function since a button is still added
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 					}
@@ -155,7 +155,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 }
 
 /* updates correct button with tab information but does not replace button */
-function replaceButton(replacementButton, promptUser)
+function replaceButton(replacementButton, promptUser, command)
 {
 	var groupObject = {};
 
@@ -174,23 +174,76 @@ function replaceButton(replacementButton, promptUser)
 			tabUrlsArr[tabCount] = tabs[tabCount].url;
 		}
 
-		var groupName = "groupName" + replacementButton;
-		groupObject[groupName] = promptUser;
+		if (command == "same-color-tabs-toggle-feature")
+		{
+			/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
+			chrome.tabs.getSelected(null, function(tab)
+			{
+				var currentFaviconURL = tab.favIconUrl;
+				var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+				var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+				var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+				var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+				var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+				var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
-		var tabNames = "tabNames" + replacementButton;
-		groupObject[tabNames] = tabNamesArr;
+				/* removes favicon urls that are not colored from tab colors array */
+				for (var i = 0; i < tabColorsArr.length; i++)
+				{
+					if (tabColorsArr[i] != currentFaviconURL)
+					{
+						tabColorsArr.splice(i, 1);
+						// removes name of array as well
+						tabNamesArr.splice(i, 1);
+						// removes url of array as well
+						tabUrlsArr.splice(i, 1);
+						// decrements tab count as differe colored tab is removed
+						tabCount--;
+						// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
+						i--;
+					}
+				}
 
-		var tabUrls = "tabUrls" + replacementButton;
-		groupObject[tabUrls] = tabUrlsArr;
+				var groupName = "groupName" + replacementButton;
+				groupObject[groupName] = promptUser;
 
-		var tabColor = "tabColor" + replacementButton;
-		groupObject[tabColor] = tabColorsArr;
+				var tabNames = "tabNames" + replacementButton;
+				groupObject[tabNames] = tabNamesArr;
 
-		var tabCount2 = "tabCount" + replacementButton;
-		groupObject[tabCount2] = tabCount;
+				var tabUrls = "tabUrls" + replacementButton;
+				groupObject[tabUrls] = tabUrlsArr;
 
-		// puts object into storage
-		chrome.storage.local.set(groupObject);
+				var tabColor = "tabColor" + replacementButton;
+				groupObject[tabColor] = tabColorsArr;
+
+				var tabCount2 = "tabCount" + replacementButton;
+				groupObject[tabCount2] = tabCount;
+
+				// puts object into storage
+				chrome.storage.local.set(groupObject);
+			})
+		}
+		/* command from store tabs text field */
+		else
+		{
+			var groupName = "groupName" + replacementButton;
+			groupObject[groupName] = promptUser;
+	
+			var tabNames = "tabNames" + replacementButton;
+			groupObject[tabNames] = tabNamesArr;
+	
+			var tabUrls = "tabUrls" + replacementButton;
+			groupObject[tabUrls] = tabUrlsArr;
+	
+			var tabColor = "tabColor" + replacementButton;
+			groupObject[tabColor] = tabColorsArr;
+	
+			var tabCount2 = "tabCount" + replacementButton;
+			groupObject[tabCount2] = tabCount;
+	
+			// puts object into storage
+			chrome.storage.local.set(groupObject);
+		}
 	})
 }
 
@@ -236,13 +289,10 @@ function sameColorTabs(command)
 					// tabColorsArr[tabCount] = tabs[tabCount].favIconUrl;
 				}
 
-				// var currentFaviconURL = document.querySelector("link[rel*='shortcut icon']").href;
-				// HAVE TO CALL DOCUMENT IN CONTENT SCRIPT
-				// var currentFaviconURL = chrome.tabs.sendMessage(tabs[0].id, {getTab: ""}, function(response) {});
+				/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
 				chrome.tabs.getSelected(null, function(tab)
 				{
-					console.log("**********************************************BEGINNING****************************");
-					var currentFaviconURL;
+					var currentFaviconURL = tab.favIconUrl;
 					var redURL = chrome.runtime.getURL("img/red-circle-16.png");
 					var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
 					var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
@@ -250,21 +300,11 @@ function sameColorTabs(command)
 					var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
 					var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
-					currentFaviconURL = tab.favIconUrl;
-					console.log("getSelected faviconurl: " + currentFaviconURL);
-					console.log("before for loop, tabCount: " + tabCount);
-					console.log("before for loop, tabColorsArr.length: " + tabColorsArr.length);
-					// to traverse entire array even after splice
-					var tabColorsArrLength = tabColorsArr.length;
-
 					/* removes favicon urls that are not colored from tab colors array */
 					for (var i = 0; i < tabColorsArr.length; i++)
 					{
-						console.log("i value start: " + i);
-						console.log("tabColorsArr[i]: " + tabColorsArr[i] + ", currentFaviconURL: " + currentFaviconURL);
 						if (tabColorsArr[i] != currentFaviconURL)
 						{
-							console.log("before splice, tabColorsArr: " + tabColorsArr);
 							tabColorsArr.splice(i, 1);
 							// removes name of array as well
 							tabNamesArr.splice(i, 1);
@@ -274,14 +314,8 @@ function sameColorTabs(command)
 							tabCount--;
 							// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 							i--;
-							console.log("after splice, tabColorsArr: " + tabColorsArr);
 						}
-						console.log("i value end: " + i);
 					}
-
-					console.log("after for loop, tabColorsArr.length: " + tabColorsArr.length);
-					console.log("after for loop, tabColorsArr: " + tabColorsArr);
-					console.log("after for loop, tabCount: " + tabCount);
 
 					var groupName = "groupName" + groupCount;
 					groupObject[groupName] = promptUser;
