@@ -258,15 +258,22 @@ function sameColorTabs(command)
 					var tabColorsArrLength = tabColorsArr.length;
 
 					/* removes favicon urls that are not colored from tab colors array */
-					for (var i = 0; i < tabColorsArrLength; i++)
+					for (var i = 0; i < tabColorsArr.length; i++)
 					{
 						console.log("i value start: " + i);
-						if (tabColorsArr[i] != currentFaviconURL && tabColorsArr[i] != undefined)
+						console.log("tabColorsArr[i]: " + tabColorsArr[i] + ", currentFaviconURL: " + currentFaviconURL);
+						if (tabColorsArr[i] != currentFaviconURL)
 						{
-							console.log("tabColorsArr[i]: " + tabColorsArr[i] + ", currentFaviconURL: " + currentFaviconURL);
 							console.log("before splice, tabColorsArr: " + tabColorsArr);
 							tabColorsArr.splice(i, 1);
+							// removes name of array as well
+							tabNamesArr.splice(i, 1);
+							// removes url of array as well
+							tabUrlsArr.splice(i, 1);
+							// decrements tab count as differe colored tab is removed
 							tabCount--;
+							// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
+							i--;
 							console.log("after splice, tabColorsArr: " + tabColorsArr);
 						}
 						console.log("i value end: " + i);
