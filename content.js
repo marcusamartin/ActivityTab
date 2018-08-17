@@ -7,7 +7,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         document.title = request.title || request.name || request.getTitle;
     }
     /* color from command */
-    else if (request.getColor)   // request.getColor == actual favicon url
+    // request.getColor == actual favicon url
+    else if (request.getColor)
     {
         console.log("setFaviconURL(request.getColor): " + request.getColor);
         var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");

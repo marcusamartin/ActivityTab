@@ -108,7 +108,8 @@ function setEmptyText()
 }
 
 /* gets and displays tab, window, and trash buttons from storage */
-function getStorage(i)   // i == groupCount
+// i == groupCount
+function getStorage(i)
 {
 	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
 	{
@@ -189,7 +190,8 @@ function displayTrashButton(group, i)
 			/* last button is deleted, so button counter can be decreased by 1 */
 			chrome.storage.local.get("buttonCount", function(group2)
 			{
-				if ((i + 1) == group2.buttonCount)   // (i + 1) == last button
+				// (i + 1) == last button
+				if ((i + 1) == group2.buttonCount)
 				{
 					var subtractOne = (group2.buttonCount) - 1;
 					chrome.storage.local.set({"buttonCount": subtractOne});
@@ -234,21 +236,21 @@ document.addEventListener("DOMContentLoaded", function()
 	})
 
 	/* registers enter key press for save tabs text field */
-	var saveTabsTextField = document.getElementById("saveTabsTextField");
-	saveTabsTextField.addEventListener("keyup", function(enterKey)
-	{
-		if (enterKey.keyCode == 13) 
-		{
-			// get text from text field
-			var storeTabsTextField = document.getElementById("saveTabsTextField").value;
+	// var saveTabsTextField = document.getElementById("saveTabsTextField");
+	// saveTabsTextField.addEventListener("keyup", function(enterKey)
+	// {
+	// 	if (enterKey.keyCode == 13) 
+	// 	{
+	// 		// get text from text field
+	// 		var storeTabsTextField = document.getElementById("saveTabsTextField").value;
 
-			// refer to background page because popup is automatically closed when a tab is created,
-			// so callback function would never execute
-			chrome.extension.getBackgroundPage().storeTabsTextField(storeTabsTextField);
-			// reloads popup immediately to display stored tab button
-			window.location.reload();
-		}
-	})
+	// 		// refer to background page because popup is automatically closed when a tab is created,
+	// 		// so callback function would never execute
+	// 		chrome.extension.getBackgroundPage().storeTabsTextField(storeTabsTextField);
+	// 		// reloads popup immediately to display stored tab button
+	// 		window.location.reload();
+	// 	}
+	// })
 
 	var sortTabsTextField = document.getElementById("sortTabsTextField");
 	sortTabsTextField.addEventListener("keyup", function(enterKey)
