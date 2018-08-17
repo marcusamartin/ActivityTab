@@ -217,7 +217,10 @@ function displayTrashButton(group, i)
 
 /* for titling tabs */
 document.addEventListener("DOMContentLoaded", function()
-{    
+{
+	// text field is selected when extension icon is clicked
+	document.getElementById("customTitleField").focus();
+
 	/* registers enter key press for title text field */
 	var customTitleTextField = document.getElementById("customTitleField");
 	customTitleTextField.addEventListener("keyup", function(enterKey)
@@ -236,6 +239,7 @@ document.addEventListener("DOMContentLoaded", function()
 	{
 		if (enterKey.keyCode == 13) 
 		{
+			// get text from text field
 			var storeTabsTextField = document.getElementById("saveTabsTextField").value;
 
 			// refer to background page because popup is automatically closed when a tab is created,
@@ -246,8 +250,21 @@ document.addEventListener("DOMContentLoaded", function()
 		}
 	})
 
-	// text field is selected when extension icon is clicked
-	document.getElementById("customTitleField").focus();
+	var sortTabsTextField = document.getElementById("sortTabsTextField");
+	sortTabsTextField.addEventListener("keyup", function(enterKey)
+	{
+		if (enterKey.keyCode == 13)
+		{
+			// get text from text field
+			var storeSortTabsTextField = document.getElementById("sortTabsTextField").value;
+
+			// refer to background page because popup is automatically closed when a tab is created,
+			// so callback function would never execute
+			chrome.extension.getBackgroundPage().storeSortTabsTextField(storeSortTabsTextField);
+			// reloads popup immediately to display stored tab button
+			window.location.reload();
+		}
+	})
 })
 
 /* gets title from text field and renames the tab */

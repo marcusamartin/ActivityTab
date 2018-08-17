@@ -24,17 +24,6 @@
     "permissions": ["tabs", "storage", "contextMenus", "*://*/*"],
     "commands":
     {
-        // "lasttab-toggle-feature":
-        // {
-        //     "suggested_key":
-        //     {
-        //         "windows": "Ctrl + L",
-        //         "mac": "Command + L",
-        //         "chromeos": "Ctrl + L",
-        //         "linux": "Ctrl + L"
-        //     },
-        //     "description": "Last Tab Feature (Ctrl/Command + L)"
-        // },
         "custom-title-toggle-feature":
         {
             "suggested_key":

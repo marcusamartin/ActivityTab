@@ -153,6 +153,22 @@ body
 	background-color: lightblue;
 } */
 
+#sortTabsTextField
+{
+	float: left;
+	height: 40px;
+	width: 281px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid blue;
+    transition: 0.3s;
+	outline: none;
+	/* margin: 7px 8px 10px 8px; */
+	margin: 0px 8px 15px 0px;
+	font-size: 20px;
+	text-align: left;
+}
+
 /* bottom half */
 
 #buttonArea
