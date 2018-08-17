@@ -39,18 +39,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         // set favicon url according to button color
         setFaviconURL(request.color);
     }
-    // else if (request.getTab == "")
-    // {
-    //     chrome.tabs.getSelected(null, function(tab)
-    //     {
-    //         console.log(tab);
-    //     })
-    //     // chrome.tabs.getCurrent(function(tab)
-    //     // {
-    //     //     console.log("favIconURL: " + tab.favIconUrl);
-    //     //     sendResponse({getTab: tab.favIconUrl});
-    //     // })
-    // }
 })
 
 /* left arrow key: returns correct tab color by looking at favicon url */

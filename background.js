@@ -5,6 +5,7 @@
  * buttons will go into workspace that will be able to be named, pulldown that will show button tabs
  * option to create workspace
  * close all tabs with specific color (button next to trash?)
+ * add context menu for saving all tabs
 */
 
 /* FIXME:
@@ -574,14 +575,42 @@ function createWindowTabs(group, i, j)
 	if (j == 0)
 	{
 		// creates first tab in a new window
-		chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"});
+		// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
+		chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+		{
+			console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
+			/* onUpdated not being called on first tab of window for some reason */
+			var firstTabInWindow = window.tabs[0].id;
+
+			var tabTitle = group["tabNames" + i][j];
+			tabIdsToTitles[firstTabInWindow] = tabTitle;
+			console.log("set FIRST tabIdsToTitles[tab.id]: " + tabIdsToTitles[firstTabInWindow]);
+
+			var tabColor = group["tabColor" + i][j];
+			tabIdsToColor[firstTabInWindow] = tabColor;
+			console.log("set FIRST tabIdsToColor[tab.id]: " + tabIdsToColor[firstTabInWindow]);
+			// chrome.runtime.getBackgroundPage(function (backgroundPage)
+			// {
+			// 	if (backgroundPage.id == window.id)
+			// 	{
+
+			// 	}
+			// })
+			// chrome.windows.update(window.id, updateInfo, function (window2)
+			// {
+			// 	chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
+			// 	chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
+			// })
+		})
 	}
 	else
 	{
 		chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
 		{
+			console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
 			var tabTitle = group["tabNames" + i][j];
 			tabIdsToTitles[tab.id] = tabTitle;
+			console.log("set tabIdsToTitles[tab.id]: " + tabIdsToTitles[tab.id]);
 
 			var tabColor = group["tabColor" + i][j];
 			tabIdsToColor[tab.id] = tabColor;
@@ -589,7 +618,6 @@ function createWindowTabs(group, i, j)
 		})
 	}
 }
-
 /* once content script has finished loading in the new tab, send message (title) to the tab */
 // content script would not be able to received message otherwise
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
