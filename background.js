@@ -42,7 +42,7 @@ function onInstall()
 	chrome.storage.local.set({"groupCount": 0});   // FIXME: will this delete tabs if extension is updated?
 	chrome.storage.local.set({"buttonCount": 0});
 
-	chrome.contextMenus.create({"id": "saveTabs", "title": "Save the Tabs"});
+	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
 	chrome.contextMenus.create({"id": "greenFavicon", "title": "Green"});
 	chrome.contextMenus.create({"id": "blueFavicon", "title": "Blue"});
@@ -94,6 +94,9 @@ function ActivityTabFeatures(command)
 	/* context menus */
 	switch (command.menuItemId)
 	{
+		case "sameColorTabs":
+			sameColorTabs(command)
+			break;
 		case "redFavicon":
 			queryContextMenu("buttonPress", "red");
 			break;
