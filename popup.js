@@ -47,42 +47,42 @@ document.addEventListener("DOMContentLoaded", function()
 	var menu1 = document.getElementById("menu1");
 	menu1.addEventListener("click", function()
 	{
-		console.log("hi1");
+		queryDropDownClick("menu1");
 	})
 
 	/* second item of dropdown menu */
 	var menu2 = document.getElementById("menu2");
 	menu2.addEventListener("click", function()
 	{
-		console.log("hi2");
+		queryDropDownClick("menu2");
 	})
 
 	/* third item of dropdown menu */
 	var menu3 = document.getElementById("menu3");
 	menu3.addEventListener("click", function()
 	{
-		console.log("hi3");
+		queryDropDownClick("menu3");
 	})
 
 	/* fourth item of dropdown menu */
 	var menu4 = document.getElementById("menu4");
 	menu4.addEventListener("click", function()
 	{
-		console.log("hi4");
+		queryDropDownClick("menu4");
 	})
 
 	/* fifth item of dropdown menu */
 	var menu5 = document.getElementById("menu5");
 	menu5.addEventListener("click", function()
 	{
-		console.log("hi5");
+		queryDropDownClick("menu5");
 	})
 
 	/* sixth item of dropdown menu */
 	var menu6 = document.getElementById("menu6");
 	menu6.addEventListener("click", function()
 	{
-		console.log("hi6");
+		queryDropDownClick("menu6");
 	})
 })
 
@@ -93,6 +93,129 @@ function queryButtonClick(buttonPress, color)
 	{
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+	})
+}
+
+function queryDropDownClick(menuItem)
+{
+	switch(menuItem)
+    {
+		case "menu1":
+			var confirmDelete = confirm("Are you sure you want to delete all red tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("red");
+			}
+            break;
+        case "menu2":
+			var confirmDelete = confirm("Are you sure you want to delete all green tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("green");
+			}
+            break;
+        case "menu3":
+			var confirmDelete = confirm("Are you sure you want to delete all blue tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("blue");
+			}
+            break;
+        case "menu4":
+			var confirmDelete = confirm("Are you sure you want to delete all yellow tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("yellow");
+			}
+            break;
+        case "menu5":
+			var confirmDelete = confirm("Are you sure you want to delete all orange tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("orange");
+			}
+            break;
+        case "menu6":
+			var confirmDelete = confirm("Are you sure you want to delete all purple tabs?");
+
+			if (confirmDelete)
+			{
+				checkFaviconURL("purple");
+			}
+            break;
+        default:
+            break;
+    }
+}
+
+function checkFaviconURL(color)
+{
+	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+	chrome.tabs.query({currentWindow: true}, function (tabs)
+	{
+		for (var i = 0; i < tabs.length; i++)
+		{
+			console.log("tabi favIconUrl: " + i + " " + tabs[i].favIconUrl);
+
+			switch(color)
+			{
+				case "red":
+					if (tabs[i].favIconUrl == redURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				case "green":
+					if (tabs[i].favIconUrl == greenURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				case "blue":
+					if (tabs[i].favIconUrl == blueURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				case "yellow":
+					if (tabs[i].favIconUrl == yellowURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				case "orange":
+					if (tabs[i].favIconUrl == orangeURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				case "purple":
+					if (tabs[i].favIconUrl == purpleURL)
+					{
+						chrome.tabs.remove(tabs[i].id);
+						console.log("removed");
+					}
+					break;
+				default:
+					break;
+			}
+		}
 	})
 }
 
