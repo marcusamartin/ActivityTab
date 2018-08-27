@@ -42,6 +42,48 @@ document.addEventListener("DOMContentLoaded", function()
 	{
 		queryButtonClick("buttonPress", "purple");
 	})
+
+	/* first item of dropdown menu */
+	var menu1 = document.getElementById("menu1");
+	menu1.addEventListener("click", function()
+	{
+		console.log("hi1");
+	})
+
+	/* second item of dropdown menu */
+	var menu2 = document.getElementById("menu2");
+	menu2.addEventListener("click", function()
+	{
+		console.log("hi2");
+	})
+
+	/* third item of dropdown menu */
+	var menu3 = document.getElementById("menu3");
+	menu3.addEventListener("click", function()
+	{
+		console.log("hi3");
+	})
+
+	/* fourth item of dropdown menu */
+	var menu4 = document.getElementById("menu4");
+	menu4.addEventListener("click", function()
+	{
+		console.log("hi4");
+	})
+
+	/* fifth item of dropdown menu */
+	var menu5 = document.getElementById("menu5");
+	menu5.addEventListener("click", function()
+	{
+		console.log("hi5");
+	})
+
+	/* sixth item of dropdown menu */
+	var menu6 = document.getElementById("menu6");
+	menu6.addEventListener("click", function()
+	{
+		console.log("hi6");
+	})
 })
 
 /* sends message with button info to content.js */
@@ -235,23 +277,6 @@ document.addEventListener("DOMContentLoaded", function()
 		}
 	})
 
-	/* registers enter key press for save tabs text field */
-	// var saveTabsTextField = document.getElementById("saveTabsTextField");
-	// saveTabsTextField.addEventListener("keyup", function(enterKey)
-	// {
-	// 	if (enterKey.keyCode == 13) 
-	// 	{
-	// 		// get text from text field
-	// 		var storeTabsTextField = document.getElementById("saveTabsTextField").value;
-
-	// 		// refer to background page because popup is automatically closed when a tab is created,
-	// 		// so callback function would never execute
-	// 		chrome.extension.getBackgroundPage().storeTabsTextField(storeTabsTextField);
-	// 		// reloads popup immediately to display stored tab button
-	// 		window.location.reload();
-	// 	}
-	// })
-
 	var sortTabsTextField = document.getElementById("sortTabsTextField");
 	sortTabsTextField.addEventListener("keyup", function(enterKey)
 	{
@@ -283,3 +308,13 @@ function renameTab()
 		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
 	})
 }
+
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+
+// Close the dropdown menu if the user clicks outside of it
+// alert(document.getElementsByClassName("dropbtn"));
+// document.getElementsByClassName("dropdown-content").onclick = function()
+// {
+// 	console.log('ok');
+// }
