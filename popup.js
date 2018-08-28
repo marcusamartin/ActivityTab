@@ -166,50 +166,42 @@ function checkFaviconURL(color)
 	{
 		for (var i = 0; i < tabs.length; i++)
 		{
-			console.log("tabi favIconUrl: " + i + " " + tabs[i].favIconUrl);
-
 			switch(color)
 			{
 				case "red":
 					if (tabs[i].favIconUrl == redURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				case "green":
 					if (tabs[i].favIconUrl == greenURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				case "blue":
 					if (tabs[i].favIconUrl == blueURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				case "yellow":
 					if (tabs[i].favIconUrl == yellowURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				case "orange":
 					if (tabs[i].favIconUrl == orangeURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				case "purple":
 					if (tabs[i].favIconUrl == purpleURL)
 					{
 						chrome.tabs.remove(tabs[i].id);
-						console.log("removed");
 					}
 					break;
 				default:

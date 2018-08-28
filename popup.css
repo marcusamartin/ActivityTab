@@ -26,7 +26,7 @@ body
 	float: left;
 	height: 40px;
 	width: 200px;
-    padding: 12px 20px;
+    padding: 12px 20px 12px 15px;
     box-sizing: border-box;
     border: 3px solid blue;
     transition: 0.3s;
@@ -52,7 +52,7 @@ body
 	float: left;
 	height: 40px;
 	width: 200px;
-    padding: 12px 20px;
+	padding: 12px 15px 12px 15px;
     box-sizing: border-box;
     border: 3px solid blue;
     transition: 0.3s;
@@ -83,7 +83,7 @@ body
 .sortButton
 {
 	padding: 15px 15px 15px 15px;
-	margin: 5px 5px 5px 5px;
+	margin: 5px 5px 10px 5px; /* 3 px bottom */
 	display: inline-block;
 	height: 30px;
 	width: 30px;
@@ -92,32 +92,32 @@ body
 
 #redButton
 {
-	background-color: #ff0000;
+	background-color: #FF0000;
 }
 
 #greenButton
 {
-	background-color: #00ff00;
+	background-color: #00FF00;
 }
 
 #blueButton
 {
-	background-color: #0000ff;
+	background-color: #0000FF;
 }
 
 #yellowButton
 {
-	background-color: #ffff00;
+	background-color: #FFFF00;
 }
 
 #orangeButton
 {
-	background-color: #ffa500;
+	background-color: #FFA500;
 }
 
 #purpleButton
 {
-	background-color: #a020f0;
+	background-color: #A020F0;
 }
 
 /* Dropdown Button */
@@ -125,39 +125,131 @@ body
 {
     background-color: #4CAF50;
     color: white;
-    padding: 16px;
-    font-size: 16px;
+    padding: 0px 10px 15px 10px;
+    font-size: 20px;
     border: none;
-    cursor: pointer;
+	cursor: pointer;
+	margin: 0px 0px 0px 60px;
+	height: 40px;
 }
 
 .dropdown 
 {
     position: relative;
-    display: inline-block;
+	display: inline-block;
 }
 
 .dropdown-content 
 {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
+    background-color: #F9F9F9;
+    width: 157px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+	z-index: 1;
+	cursor: pointer;
+	margin: 0px 0px 0px 60px;
 }
 
 .dropdown-content a 
 {
-    color: black;
+    color: #000000;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+	display: block;
+	text-align: center;
+	font-size: 20px;
 }
 
-.dropdown-content a:hover 
+
+#menu1
 {
-	background-color: #f1f1f1
+	border-width: 3px;
+	border-style: solid;
+	border-color:#FF0000;
+	background-color: #F1F1F1;
+}
+
+#menu1:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #FF0000;
+}
+
+#menu2
+{
+	border-width: 3px;
+	border-style: solid;
+	border-color:#00FF00;
+	background-color: #F1F1F1;
+}
+
+#menu2:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #00FF00;
+}
+
+#menu3
+{
+	border-width: 3px;
+	border-style: solid;
+	border-color:#0000FF;
+	background-color: #F1F1F1;
+}
+
+#menu3:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #0000FF;
+}
+
+#menu4
+{
+	border-width: 3px;
+	border-style: solid;
+	border-color:#FFFF00;
+	background-color: #F1F1F1;
+}
+
+#menu4:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #FFFF00;
+}
+
+#menu5
+{
+	border-width: 3px;
+	border-style: solid;
+	border-color:#FFA500;
+	background-color: #F1F1F1;
+}
+
+#menu5:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #FFA500;
+}
+
+#menu6
+{
+	border-width: 3px;
+	border-style: solid;
+	border-color: #A020F0;
+	background-color: #F1F1F1;
+}
+
+#menu6:hover
+{
+	transition: 0.2s;
+	border-width: 3px;
+	background-color: #A020F0;
 }
 
 .dropdown:hover .dropdown-content 

@@ -40,6 +40,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         // set favicon url according to button color
         setFaviconURL(request.color);
     }
+    else if (request.checkFaviconURL)
+    {
+        console.log("sender.tab: " + sender.tab);
+        alert(document.querySelector("link[rel*='shortcut icon']").href);
+        checkFaviconURL(request.checkFaviconURL, sender.tab);
+    }
 })
 
 /* left arrow key: returns correct tab color by looking at favicon url */
@@ -78,6 +84,8 @@ function leftArrowKeyTabColor()
         // cycle back to purple
         case redURL:
             return "purple";
+        default:
+            return;
     }
 }
 
@@ -117,6 +125,8 @@ function rightArrowKeyTabColor()
         // cycle back to red
         case purpleURL:
             return "red";
+        default:
+            return;
     }
 }
 
@@ -188,4 +198,34 @@ function setFaviconURLFromURL(colorURL)
         default:
             break;
     }
+}
+
+function checkFaviconURL(menuItem, tabID)
+{
+    console.log("tabID: " + tabID);
+    // current favicon url of page
+    var currentFaviconURL = document.querySelector("link[rel*='shortcut icon']").href;
+    var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+    var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+    var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+    switch(menuItem)
+    {
+        case "red":
+            chrome.tabs.get(tabID, function ()
+            {
+                alert(tabID.querySelector("link[rel*='shortcut icon']").href);
+                if (tabID.querySelector("link[rel*='shortcut icon']").href == redURL)
+                {
+                    alert(chrome.tabs.remove(tabID));
+                    chrome.tabs.remove(tabID);
+                }
+            })
+            break;
+    }
+
+
 }
