@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* color from SAVED color */
     else if (request.color)
     {
-        console.log("request.color: " + request.color);
+        // console.log("request.color: " + request.color);
         var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
         link.type = "image/x-icon";
         link.rel = "shortcut icon";

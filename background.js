@@ -559,24 +559,17 @@ var saveColor = {};
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
-	console.log("CHROME.RUNTIME.ONMESSAGE------------------------------------");
-	// saves title
-	// console.log("saves title");
-	// saveTitle[message.id] = message.name;
-
-	// saveColor[message.id] = "hi";
-	// console.log("saveColor[message.id]: " + saveColor[message.id]);
-
-	console.log("background.js got a message")
-    console.log("request: " + request);
-    console.log("sender: " + sender);
+	// console.log("CHROME.RUNTIME.ONMESSAGE------------------------------------");
+	// console.log("background.js got a message")
+    // console.log("request: " + request);
+    // console.log("sender: " + sender);
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		console.log("CHROME.TABS.QUERY1-------------------------------------------");
-		console.log("request: " + request);
+		// console.log("CHROME.TABS.QUERY1-------------------------------------------");
+		// console.log("request: " + request);
 		saveColor[tab[0].id] = request;
-		console.log("SAVED COLOR: " + saveColor[tab[0].id]);
+		// console.log("SAVED COLOR: " + saveColor[tab[0].id]);
 	})
 
 	sendResponse();
@@ -585,119 +578,45 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
 	/* title was changed */
-	console.log("CHROME.TABS.ONUPDATED-----------------------------------");
-	console.log("saves title updated");
+	// console.log("CHROME.TABS.ONUPDATED-----------------------------------");
+	// console.log("saves title updated");
 	if (saveTitle[tabId] != null)
 	{
-		console.log("title sent to content script");
+		// console.log("title sent to content script");
 		// title sent to content script
     	chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
 
-	console.log("right before query2");
+	// console.log("right before query2");
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		console.log("CHROME.TABS.QUERY2-----------------------------------");
+		// console.log("CHROME.TABS.QUERY2-----------------------------------");
 		// console.log("tab[0].id: " + tab[0].id);
-		if (saveColor[tab[0].id] == undefined)
-		{
-			console.log("saveColor[tab[0].id] is UNDEFINED");
-		}
-		else
-		{
-			console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-		}
+		// if (saveColor[tab[0].id] == undefined)
+		// {
+		// 	console.log("saveColor[tab[0].id] is UNDEFINED");
+		// }
+		// else
+		// {
+		// 	console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+		// }
 
-		if (saveColor[tab[0].id] != undefined)   // tab.favIconURL for if button press changed it
+		/* does not send message to content script if the tab is not colored */
+		if (saveColor[tab[0].id] != undefined)
 		{
 			console.log("tab[0]: " + tab[0]);
 			console.log("tab[0].favIconURL: " + tab[0].favIconURL);
-			if (saveColor[tab[0].id != tab[0].favIconURL])
-			{
-				console.log("query2, deleting saveColor[tab[0].id: " + saveColor[tab[0].id]);
-				delete saveColor[tab[0].id];
-			}
-			else
-			{
-				console.log("INSIDE IF NOT UNDEFINED, saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				console.log("color sent to content script, saveColor[tab[0].id: " + saveColor[tab[0].id]);
-				chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
-			}
-			// console.log("INSIDE IF NOT UNDEFINED, saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-			// console.log("color sent to content script, saveColor[tab[0].id: " + saveColor[tab[0].id]);
-			// chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
-			// console.log("Deleting saveColor[tab[0].id");
-			// delete saveColor[tab[0].id];
-			// console.log("Deleted saveColor[tab[0].id");
+			console.log("color sent to content script, saveColor[tab[0].id: " + saveColor[tab[0].id]);
+			chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
 		}
 	})
-	// console.log("saveColor[0]: " + saveColor[0]);   // UNDEFINED
-	// if (saveColor[0] != undefined)
-	// {
-	// 	console.log("INSIDE IF NOT UNDEFINED, saveColor[0]: " + saveColor[0]);
-	// 	console.log("color sent to content script");
-	// 	chrome.tabs.sendMessage(tabId, {color: saveColor[0]}, function(response){});
-	// }
 })
 
-function updatedSaveColor(color)
-{
-	console.log("UPDATEDSAVECOLOR---------------------------------------");
-	console.log("updatedSaveColor, color: " + color);
-	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-    var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
-
-	// chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
-	// {
-	// 	var promptUser = prompt("Rename tab:");
-
-	// 	// title sent to content script
-	// 	chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
-	// 	// saves for persistent title through refresh
-	// 	saveTitle[tabs[0].id] = promptUser;
-	// })
-	
-	chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
-	{
-		switch(color)
-		{
-			case "red":
-				saveColor[tab[0].id] = redURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			case "green":
-				saveColor[tab[0].id] = greenURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			case "blue":
-				saveColor[tab[0].id] = blueURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			case "yellow":
-				saveColor[tab[0].id] = yellowURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			case "orange":
-				saveColor[tab[0].id] = orangeURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			case "purple":
-				saveColor[tab[0].id] = purpleURL;
-				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-				break;
-			default:
-				break;
-		}
-	})
-}
-
+/* deletes tab color that is saved in saveColor if color button is pressed;
+   if not deleted, asynchronous function calls would make saveColor override color from the button */
 function deleteSaveColor(color)
 {
-	console.log("DELETESAVECOLOR--------------------------------------");
+	// console.log("DELETESAVECOLOR--------------------------------------");
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
 		// in case same color button is pressed
