@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function()
 	var button = document.getElementById("greenButton");
 	button.addEventListener("click", function()
 	{
+		console.log("green button press");
 		queryButtonClick("buttonPress", "green");
 	})
 
@@ -109,15 +110,20 @@ function setSortTabsTextFieldBorderColor()
 /* sends message with button info to content.js */
 function queryButtonClick(buttonPress, color)
 {
+	console.log("queryButtonClick--------------");
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
+		console.log("sending message, button:color" + buttonPress + ":" + color);
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+		console.log("right before deleteSaveColor()");
+		chrome.extension.getBackgroundPage().deleteSaveColor(color);
 		// refreshes popup to change sort tabs text field's border color to correct color
 		window.location.reload();
 	})
 }
 
+/* deletes tabs of specified color */
 function queryDropDownClick(menuItem)
 {
 	switch(menuItem)
@@ -175,6 +181,7 @@ function queryDropDownClick(menuItem)
     }
 }
 
+/* iterates through current tabs in window and deletes tabs of specified color */
 function checkAndRemoveFaviconURL(color)
 {
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");

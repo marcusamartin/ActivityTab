@@ -364,7 +364,6 @@ function queryKeys(item)
 		// selected tab, {command property = command}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {command: item}, function(response) {});
 		console.log("queryKeys, sending message, tabs[0].id: " + tabs[0].id);
-		chrome.tabs.sendMessage(tabs[0].id, {color: item}, function(response) {});
 	})
 }
 
@@ -560,6 +559,7 @@ var saveColor = {};
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
+	console.log("CHROME.RUNTIME.ONMESSAGE------------------------------------");
 	// saves title
 	// console.log("saves title");
 	// saveTitle[message.id] = message.name;
@@ -573,9 +573,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
+		console.log("CHROME.TABS.QUERY1-------------------------------------------");
 		console.log("request: " + request);
-		saveColor[0] = request;
-		console.log("SAVED COLOR: " + saveColor[0]);
+		saveColor[tab[0].id] = request;
+		console.log("SAVED COLOR: " + saveColor[tab[0].id]);
 	})
 
 	sendResponse();
@@ -584,6 +585,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
 	/* title was changed */
+	console.log("CHROME.TABS.ONUPDATED-----------------------------------");
 	console.log("saves title updated");
 	if (saveTitle[tabId] != null)
 	{
@@ -592,17 +594,55 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
     	chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
 
-	console.log("saveColor[0]: " + saveColor[0]);   // UNDEFINED
-	if (saveColor[0] != undefined)
+	console.log("right before query2");
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		console.log("INSIDE IF NOT UNDEFINED, saveColor[0]: " + saveColor[0]);
-		console.log("color sent to content script");
-		chrome.tabs.sendMessage(tabId, {color: saveColor[0]}, function(response){});
-	}
+		console.log("CHROME.TABS.QUERY2-----------------------------------");
+		// console.log("tab[0].id: " + tab[0].id);
+		if (saveColor[tab[0].id] == undefined)
+		{
+			console.log("saveColor[tab[0].id] is UNDEFINED");
+		}
+		else
+		{
+			console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+		}
+
+		if (saveColor[tab[0].id] != undefined)   // tab.favIconURL for if button press changed it
+		{
+			console.log("tab[0]: " + tab[0]);
+			console.log("tab[0].favIconURL: " + tab[0].favIconURL);
+			if (saveColor[tab[0].id != tab[0].favIconURL])
+			{
+				console.log("query2, deleting saveColor[tab[0].id: " + saveColor[tab[0].id]);
+				delete saveColor[tab[0].id];
+			}
+			else
+			{
+				console.log("INSIDE IF NOT UNDEFINED, saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				console.log("color sent to content script, saveColor[tab[0].id: " + saveColor[tab[0].id]);
+				chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
+			}
+			// console.log("INSIDE IF NOT UNDEFINED, saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+			// console.log("color sent to content script, saveColor[tab[0].id: " + saveColor[tab[0].id]);
+			// chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
+			// console.log("Deleting saveColor[tab[0].id");
+			// delete saveColor[tab[0].id];
+			// console.log("Deleted saveColor[tab[0].id");
+		}
+	})
+	// console.log("saveColor[0]: " + saveColor[0]);   // UNDEFINED
+	// if (saveColor[0] != undefined)
+	// {
+	// 	console.log("INSIDE IF NOT UNDEFINED, saveColor[0]: " + saveColor[0]);
+	// 	console.log("color sent to content script");
+	// 	chrome.tabs.sendMessage(tabId, {color: saveColor[0]}, function(response){});
+	// }
 })
 
 function updatedSaveColor(color)
 {
+	console.log("UPDATEDSAVECOLOR---------------------------------------");
 	console.log("updatedSaveColor, color: " + color);
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
     var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
@@ -621,7 +661,7 @@ function updatedSaveColor(color)
 	// 	saveTitle[tabs[0].id] = promptUser;
 	// })
 	
-	chrome.tabs.query({active: true, currentWindow: true}, function (tab) 
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
 	{
 		switch(color)
 		{
@@ -651,6 +691,21 @@ function updatedSaveColor(color)
 				break;
 			default:
 				break;
+		}
+	})
+}
+
+function deleteSaveColor(color)
+{
+	console.log("DELETESAVECOLOR--------------------------------------");
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+	{
+		// in case same color button is pressed
+		if (saveColor[tab[0].id] != color)
+		{
+			delete saveColor[tab[0].id];
+			// sets saveColor[tab[0].id] to changed color so that the new color is saved
+			saveColor[tab[0].id] = color;
 		}
 	})
 }
