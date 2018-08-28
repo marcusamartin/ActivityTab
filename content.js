@@ -4,7 +4,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* title from command/saved title, title from popup text field, creating tabs with title */
     if (request.title || request.name || request.getTitle)
     {
+        console.log("sets title: " + request.title);
         document.title = request.title || request.name || request.getTitle;
+    }
+    /* color from SAVED color */
+    else if (request.color)
+    {
+        console.log("request.color: " + request.color);
+        var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
+        link.type = "image/x-icon";
+        link.rel = "shortcut icon";
+
+        setFaviconURL(request.color);
     }
     /* color from command */
     // request.getColor == actual favicon url
@@ -33,6 +44,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         }
 
         setFaviconURL(color);
+
+        // not working, try sending a message
+        //chrome.extension.getBackgroundPage().updatedSaveColor(color);
+        //code to send message to open notification. This will eventually move into my extension logic
+        // chrome.runtime.sendMessage({type: "notification", options: 
+        // { 
+        //     type: "basic", 
+        //     iconUrl: chrome.extension.getURL("icon128.png"),
+        //     title: "Test",
+        //     message: "Test"
+        // }})
+
+        chrome.runtime.sendMessage(color, function(response){});   // sends red
     }
     /* popup color button press */
     else if (request.button == "buttonPress")
@@ -226,6 +250,4 @@ function checkFaviconURL(menuItem, tabID)
             })
             break;
     }
-
-
 }

@@ -74,7 +74,7 @@ function setSortTabsTextFieldBorderColor()
 	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
 	// checks current tab's favicon url
-	chrome.tabs.query({active: true, currentWindow: true}, function (tab)
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
 		console.log("tab.favIconUrl: " + tab[0].favIconUrl);
 		switch(tab[0].favIconUrl)

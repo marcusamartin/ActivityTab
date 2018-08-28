@@ -1,10 +1,8 @@
 /* TODO:
- * command(s) and buttons that will save tabs of the same color
  * correspond tab button colors with color of saved tabs within the tab button
- * command that will save all of the tabs (has unique color)
  * buttons will go into workspace that will be able to be named, pulldown that will show button tabs
  * option to create workspace
- * close all tabs with specific color (button next to trash?)
+ * close all tabs with specific color (icons below color buttons)
  * add context menu for saving all tabs
  * save current colored tabs textfield should be colored according to current tab's color
 */
@@ -14,9 +12,11 @@
  * setting groupCount on installation might delete user's tabs if extension is updated, fix
  * background color of top half of popup is not working
  * change favicon colors to match button colors
+ * use favIconUrl instead of "shortcut icon" to better change favicon url?
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
  * w3schools.com's favicon is not able to be changed (certain websites?)
+ * will still some tabs even if tab is not colored
 */
 
 /* Storage Explanation
@@ -260,7 +260,7 @@ function sameColorTabs(command)
 		// current count of groups
 		var groupCount = group.groupCount;
 
-		console.log("before group name");
+		// console.log("before group name");
 
 		var promptUser = prompt("Group name: ");
 
@@ -360,8 +360,11 @@ function queryKeys(item)
 {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
+		console.log("queryKeys, sending COMMAND message, tabs[0].id: " + tabs[0].id);
 		// selected tab, {command property = command}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {command: item}, function(response) {});
+		console.log("queryKeys, sending message, tabs[0].id: " + tabs[0].id);
+		chrome.tabs.sendMessage(tabs[0].id, {color: item}, function(response) {});
 	})
 }
 
@@ -375,84 +378,6 @@ function queryContextMenu(buttonPress, color)
 	})
 }
 
-/* stores tabs from text field */
-// function storeTabsTextField(storeTabsTextField)
-// {
-// 	chrome.storage.local.get("groupCount", function(group)
-// 	{
-// 		// current count of groups
-// 		var groupCount = group.groupCount;
-
-// 		console.log("storeTabsTextField groupCount: " + groupCount);
-
-// 		var promptUser =  storeTabsTextField;
-
-// 		// text limit so the text can fit in the button
-// 		promptUser = promptUser.substr(0, 26);
-
-// 		/* checks if name is invalid */
-// 		if (promptUser == "")
-// 		{
-// 			alert("Please enter a name for the group!");
-// 			storeTabsTextField();
-// 		}
-// 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
-// 		else
-// 		{
-// 			var groupObject = {};
-
-// 			/* stores all of the tab's information into an object and then puts object into storage */
-// 			chrome.tabs.query({currentWindow: true}, function(tabs) 
-// 			{
-// 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
-// 				var tabNamesArr = [];
-// 				var tabUrlsArr = [];
-// 				var tabColorsArr = tabs.map(t => t.favIconUrl);
-// 				var tabCount = 0;
-
-// 				for (; tabCount < tabs.length; tabCount++)
-// 				{
-// 					tabNamesArr[tabCount] = tabs[tabCount].title;
-// 					tabUrlsArr[tabCount] = tabs[tabCount].url;
-// 				}
-
-// 				var groupName = "groupName" + groupCount;
-// 				groupObject[groupName] = promptUser;
-
-// 				var tabNames = "tabNames" + groupCount;
-// 				groupObject[tabNames] = tabNamesArr;
-
-// 				var tabUrls = "tabUrls" + groupCount;
-// 				groupObject[tabUrls] = tabUrlsArr;
-
-// 				var tabColor = "tabColor" + groupCount;
-// 				groupObject[tabColor] = tabColorsArr;
-
-// 				var tabCount2 = "tabCount" + groupCount;
-// 				groupObject[tabCount2] = tabCount;
-
-// 				// puts object into storage
-// 				chrome.storage.local.set(groupObject);
-
-// 				/* checks if duplicate name */
-// 				checkDuplicateName(promptUser, groupCount, "");
-
-// 				chrome.storage.local.get(null, function(items) 
-// 				{
-// 					var allKeys = Object.keys(items);
-// 					console.log("after storing button info, storage: " + allKeys);
-// 				})
-
-// 				/* set-up for next group so last group isn't overwritten */
-// 				// enables empty text to be set
-// 				chrome.storage.local.set({"groupCount": (groupCount + 1)});
-// 				// tracks number of buttons so it can display them all even if one is deleted
-// 				chrome.storage.local.set({"buttonCount": (groupCount + 1)});
-// 			})
-// 		}
-// 	})
-// }
-
 function storeSortTabsTextField(storeSortTabsTextField)
 {
 	chrome.storage.local.get("groupCount", function(group)
@@ -460,7 +385,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 		// current count of groups
 		var groupCount = group.groupCount;
 
-		console.log("before group name");
+		// console.log("before group name");
 
 		var promptUser = storeSortTabsTextField;
 
@@ -573,16 +498,16 @@ function createTab(group, i, j)
 		/* saves color of tab */
 		var tabColor = group["tabColor" + i][j];
 		tabIdsToColor[tab.id] = tabColor;
-		console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
+		// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
     })
 }
 
 /* creates the tabs in a new window */
 function createWindowTabs(group, i, j)
 {
+	// creates a window with first url
 	if (j == 0)
 	{
-		// creates a window with url
 		chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
 		{
 			// accesses window's array of tabs to access first tab's id
@@ -598,46 +523,134 @@ function createWindowTabs(group, i, j)
 	{
 		chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
 		{
-			console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
+			// console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
 			var tabTitle = group["tabNames" + i][j];
 			tabIdsToTitles[tab.id] = tabTitle;
-			console.log("set tabIdsToTitles[tab.id]: " + tabIdsToTitles[tab.id]);
+			// console.log("set tabIdsToTitles[tab.id]: " + tabIdsToTitles[tab.id]);
 
 			var tabColor = group["tabColor" + i][j];
 			tabIdsToColor[tab.id] = tabColor;
-			console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
+			// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
 		})
 	}
 }
-/* once content script has finished loading in the new tab, send message (title) to the tab */
-// content script would not be able to received message otherwise
+
+/* once content script has finished loading in the new tab, send message (title) to the tab,
+   keeps title and color from SAVED tabs persistent through refresh */
+// content script would not be able to received message if page has not loaded
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
 {
+	// console.log("onupdated");
 	/* tab has been fully loaded */
-	if (tabIdsToTitles[tabId] && changeInfo.status === "complete") 
+	// console.log("tabIdsToTitles[tabId]: " + tabIdsToTitles[tabId]);
+	// console.log("changeInfo.status: " + changeInfo.status);
+	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
 	{
+		// console.log("complete");
 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
-		console.log("send tabIdsToTitles[tabId] to content.js: " + tabIdsToTitles[tabId] + ", id: " + tabId);
-		console.log("send tabIdsToColor[tab.id] to content.js: " + tabIdsToColor[tabId] + ", id: " + tabId);
+		// console.log("send tabIdsToTitles[tabId] to content.js: " + tabIdsToTitles[tabId] + ", id: " + tabId);
+		// console.log("send tabIdsToColor[tab.id] to content.js: " + tabIdsToColor[tabId] + ", id: " + tabId);
 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
 	}
 })
 
 /* for keeping title through tab refresh */
 var saveTitle = {};
+var saveColor = {};
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
 	// saves title
-	saveTitle[message.id] = message.name;
+	// console.log("saves title");
+	// saveTitle[message.id] = message.name;
+
+	// saveColor[message.id] = "hi";
+	// console.log("saveColor[message.id]: " + saveColor[message.id]);
+
+	console.log("background.js got a message")
+    console.log("request: " + request);
+    console.log("sender: " + sender);
+
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+	{
+		console.log("request: " + request);
+		saveColor[0] = request;
+		console.log("SAVED COLOR: " + saveColor[0]);
+	})
+
+	sendResponse();
 })
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
 	/* title was changed */
+	console.log("saves title updated");
 	if (saveTitle[tabId] != null)
 	{
+		console.log("title sent to content script");
 		// title sent to content script
     	chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
+
+	console.log("saveColor[0]: " + saveColor[0]);   // UNDEFINED
+	if (saveColor[0] != undefined)
+	{
+		console.log("INSIDE IF NOT UNDEFINED, saveColor[0]: " + saveColor[0]);
+		console.log("color sent to content script");
+		chrome.tabs.sendMessage(tabId, {color: saveColor[0]}, function(response){});
+	}
 })
+
+function updatedSaveColor(color)
+{
+	console.log("updatedSaveColor, color: " + color);
+	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+    var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+	// chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
+	// {
+	// 	var promptUser = prompt("Rename tab:");
+
+	// 	// title sent to content script
+	// 	chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
+	// 	// saves for persistent title through refresh
+	// 	saveTitle[tabs[0].id] = promptUser;
+	// })
+	
+	chrome.tabs.query({active: true, currentWindow: true}, function (tab) 
+	{
+		switch(color)
+		{
+			case "red":
+				saveColor[tab[0].id] = redURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			case "green":
+				saveColor[tab[0].id] = greenURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			case "blue":
+				saveColor[tab[0].id] = blueURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			case "yellow":
+				saveColor[tab[0].id] = yellowURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			case "orange":
+				saveColor[tab[0].id] = orangeURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			case "purple":
+				saveColor[tab[0].id] = purpleURL;
+				console.log("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
+				break;
+			default:
+				break;
+		}
+	})
+}
