@@ -43,47 +43,12 @@ document.addEventListener("DOMContentLoaded", function()
 		queryButtonClick("buttonPress", "purple");
 	})
 
-	/* first item of dropdown menu */
-	var menu1 = document.getElementById("menu1");
-	menu1.addEventListener("click", function()
+	/* changes select button color */
+	var select = document.getElementById("mySelect");
+	select.onchange = function() 
 	{
-		queryDropDownClick("menu1");
-	})
-
-	/* second item of dropdown menu */
-	var menu2 = document.getElementById("menu2");
-	menu2.addEventListener("click", function()
-	{
-		queryDropDownClick("menu2");
-	})
-
-	/* third item of dropdown menu */
-	var menu3 = document.getElementById("menu3");
-	menu3.addEventListener("click", function()
-	{
-		queryDropDownClick("menu3");
-	})
-
-	/* fourth item of dropdown menu */
-	var menu4 = document.getElementById("menu4");
-	menu4.addEventListener("click", function()
-	{
-		queryDropDownClick("menu4");
-	})
-
-	/* fifth item of dropdown menu */
-	var menu5 = document.getElementById("menu5");
-	menu5.addEventListener("click", function()
-	{
-		queryDropDownClick("menu5");
-	})
-
-	/* sixth item of dropdown menu */
-	var menu6 = document.getElementById("menu6");
-	menu6.addEventListener("click", function()
-	{
-		queryDropDownClick("menu6");
-	})
+		select.className = this.options[this.selectedIndex].className;
+	}
 })
 
 /* sends message with button info to content.js */
