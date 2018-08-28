@@ -99,6 +99,8 @@ function setSortTabsTextFieldBorderColor()
 				break;
 			default:
 				document.getElementById("sortTabsTextField").style.border = "3px solid #000000";
+				document.getElementById("sortTabsTextField").style.backgroundColor = "#AAAFB4";
+				document.getElementById("sortTabsTextField").disabled = true;
 				break;
 		}
 	})
