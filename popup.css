@@ -83,7 +83,7 @@ body
 .sortButton
 {
 	padding: 15px 15px 15px 15px;
-	margin: 5px 5px 10px 5px; /* 3 px bottom */
+	margin: 5px 5px 5px 5px;
 	display: inline-block;
 	height: 30px;
 	width: 30px;
@@ -121,12 +121,11 @@ body
 }
 
 /* select */
-
 #mySelect
 {
-	width: 120px;
+	width: 150px;
 	padding: 0px 0px 0px 5px;
-	margin: 0px 0px 0px 35px;
+	margin: 5px 0px 0px 35px;
 	font-size: 20px;
 }
 
@@ -182,6 +181,16 @@ body
 	border-color: #A020F0;
 	border-radius: 5px;
 	background-color: #A020F0;
+}
+
+#selectTrashButton
+{
+	float: right;
+	height: 30px;
+	width: 30px;
+	border: none;
+	margin: 5px 40px 0px 0px;
+	font-size: 20px;
 }
 
 /* bottom half */

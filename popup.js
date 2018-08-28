@@ -47,8 +47,17 @@ document.addEventListener("DOMContentLoaded", function()
 	var select = document.getElementById("mySelect");
 	select.onchange = function() 
 	{
+		// selects menu1, menu2, etc
 		select.className = this.options[this.selectedIndex].className;
 	}
+
+	/* select trash button */
+	var button = document.getElementById("selectTrashButton");
+	button.addEventListener("click", function()
+	{
+		queryDropDownClick(select.className);
+	})
+
 })
 
 /* sends message with button info to content.js */
