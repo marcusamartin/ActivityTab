@@ -1,6 +1,10 @@
-/* waits for popup button press and then sends message with button info to content.js */
+/* waits for popup color button press and then sends message with button info to content.js */
+// select menu, select trash button, and sortTabsTextField do not send any message
 document.addEventListener("DOMContentLoaded", function()
 {
+	/* sets border color for sort tabs text field */
+	setSortTabsTextFieldBorderColor();
+
 	/* red button */
 	var button = document.getElementById("redButton");
 	button.addEventListener("click", function()
@@ -57,8 +61,48 @@ document.addEventListener("DOMContentLoaded", function()
 	{
 		queryDropDownClick(select.className);
 	})
-
 })
+
+/* checks current tab's favicon url and determines if sort tabs text field color should be changed */
+function setSortTabsTextFieldBorderColor()
+{
+	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+	// checks current tab's favicon url
+	chrome.tabs.query({active: true, currentWindow: true}, function (tab)
+	{
+		console.log("tab.favIconUrl: " + tab[0].favIconUrl);
+		switch(tab[0].favIconUrl)
+		{
+			case redURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #FF0000";
+				break;
+			case greenURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #00FF00";
+				break;
+			case blueURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #0000FF";
+				break;
+			case yellowURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #FFFF00";
+				break;
+			case orangeURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #FFA500";
+				break;
+			case purpleURL:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #A020F0";
+				break;
+			default:
+				document.getElementById("sortTabsTextField").style.border = "3px solid #000000";
+				break;
+		}
+	})
+}
 
 /* sends message with button info to content.js */
 function queryButtonClick(buttonPress, color)
@@ -67,6 +111,8 @@ function queryButtonClick(buttonPress, color)
 	{
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+		// refreshes popup to change sort tabs text field's border color to correct color
+		window.location.reload();
 	})
 }
 
@@ -79,7 +125,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("red");
+				checkAndRemoveFaviconURL("red");
 			}
             break;
         case "menu2":
@@ -87,7 +133,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("green");
+				checkAndRemoveFaviconURL("green");
 			}
             break;
         case "menu3":
@@ -95,7 +141,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("blue");
+				checkAndRemoveFaviconURL("blue");
 			}
             break;
         case "menu4":
@@ -103,7 +149,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("yellow");
+				checkAndRemoveFaviconURL("yellow");
 			}
             break;
         case "menu5":
@@ -111,7 +157,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("orange");
+				checkAndRemoveFaviconURL("orange");
 			}
             break;
         case "menu6":
@@ -119,7 +165,7 @@ function queryDropDownClick(menuItem)
 
 			if (confirmDelete)
 			{
-				checkFaviconURL("purple");
+				checkAndRemoveFaviconURL("purple");
 			}
             break;
         default:
@@ -127,7 +173,7 @@ function queryDropDownClick(menuItem)
     }
 }
 
-function checkFaviconURL(color)
+function checkAndRemoveFaviconURL(color)
 {
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
 	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
@@ -397,13 +443,3 @@ function renameTab()
 		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
 	})
 }
-
-/* When the user clicks on the button, 
-toggle between hiding and showing the dropdown content */
-
-// Close the dropdown menu if the user clicks outside of it
-// alert(document.getElementsByClassName("dropbtn"));
-// document.getElementsByClassName("dropdown-content").onclick = function()
-// {
-// 	console.log('ok');
-// }
