@@ -355,15 +355,18 @@ function sameColorTabs(command)
 	})
 }
 
-/* sends message with command info to content.js */
+/* sends messages with command info */
 function queryKeys(item)
 {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		console.log("queryKeys, sending COMMAND message, tabs[0].id: " + tabs[0].id);
+		// console.log("queryKeys, sending COMMAND message, tabs[0].id: " + tabs[0].id);
+		// sends command to content script
 		// selected tab, {command property = command}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {command: item}, function(response) {});
-		console.log("queryKeys, sending message, tabs[0].id: " + tabs[0].id);
+		// sends a message to popup script so sort tabs text field's border color will update from command
+		chrome.runtime.sendMessage({msg: "color command"});
+		// console.log("queryKeys, sending message, tabs[0].id: " + tabs[0].id);
 	})
 }
 

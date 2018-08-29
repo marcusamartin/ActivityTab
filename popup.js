@@ -452,3 +452,12 @@ function renameTab()
 		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
 	})
 }
+
+/* correctly updates sort tabs text field's border color from command */
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+{
+	if (request.msg === "color command") 
+	{
+		window.location.reload();
+	}
+})
