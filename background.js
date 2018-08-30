@@ -423,6 +423,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 				}
 
 				/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
+				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
 				chrome.tabs.getSelected(null, function(tab)
 				{
 					var currentFaviconURL = tab.favIconUrl;
@@ -481,6 +482,223 @@ function storeSortTabsTextField(storeSortTabsTextField)
 			})
 		}
 	})
+}
+
+function storeAllTabsTextField(storeAllTabsTextField)
+{
+	chrome.storage.local.get("groupCount", function(group)
+	{
+		// current count of groups
+		var groupCount = group.groupCount;
+
+		// console.log("before group name");
+
+		var promptUser = storeAllTabsTextField;
+
+		// limit text so the text can fit in the button
+		promptUser = promptUser.substr(0, 26);
+
+		/* checks if name is invalid */
+		if (promptUser == "")
+		{
+			alert("Please enter a name for the group!");
+			storeAllTabsTextField(command);
+		}
+		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		else
+		{
+			var groupObject = {};
+
+			/* stores all of the tab's information into an object and then puts object into storage */
+			chrome.windows.getAll({populate: true}, function(windows)
+			{
+				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.url));
+				var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
+				var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
+
+				var tabCount = new Array(windows.length);
+				var tabCounter = 0;
+				var windowCounter = 0;
+				
+				/* store tab count for each window */
+				windows.forEach(function(window)
+				{
+					window.tabs.forEach(function(tab)
+					{
+						tabCounter++;
+					})
+					tabCount[windowCounter] = tabCounter;
+					console.log("windowCounter: " + windowCounter);
+					console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
+					// reset tabCounter for next window
+					tabCounter = 0;
+					// for iterating through windows
+					windowCounter++;
+				})
+
+				console.log("tabCount[0]: " + tabCount[0]);
+				console.log("tabCount[1]: " + tabCount[1]);
+
+				console.log("tabUrlsArr: " + tabUrlsArr);
+				console.log("tabUrlsArr[0]: " + tabUrlsArr[0]);
+				console.log("tabUrlsArr[0].length: " + tabUrlsArr[0].length);
+				console.log("tabUrlsArr[1][0]: " + tabUrlsArr[1][0]);
+
+				var groupName = "groupName" + groupCount;
+				groupObject[groupName] = promptUser;
+
+				var tabNames = "tabNames" + groupCount;
+				groupObject[tabNames] = tabNamesArr;
+
+				var tabUrls = "tabUrls" + groupCount;
+				groupObject[tabUrls] = tabUrlsArr;
+
+				var tabColor = "tabColor" + groupCount;
+				groupObject[tabColor] = tabColorsArr;
+
+				var tabCount2 = "tabCount" + groupCount;
+				groupObject[tabCount2] = tabCount;
+
+				console.log("groupObject: " + groupObject);
+				// puts object into storage
+				chrome.storage.local.set(groupObject);
+
+				/* checks if duplicate name */
+				// specified command to have duplicate checked the same way as the sort colors command
+				checkDuplicateName(promptUser, groupCount, "same-color-tabs-toggle-feature");
+
+				/* set-up for next group so last group isn't overwritten */
+				// enables empty text to be set
+				chrome.storage.local.set({"groupCount": (groupCount + 1)});
+				// tracks number of buttons so it can display them all even if one is deleted
+				chrome.storage.local.set({"buttonCount": (groupCount + 1)});
+
+
+
+
+
+
+
+
+
+				// var i = 0;
+				// var j = 0;
+
+				/* initializing arrays */
+				// var x = new Array(windows.length);
+
+				// for (var i = 0; i < x.length; i++) 
+				// {
+				// 	x[i] = new Array(3);
+				// }
+
+				// var tabNamesArr = [];
+				// var tabUrlsArr = [];
+				// var tabColorsArr = [];
+
+				// var tabCount = new Array(windows.length);
+				// var tabCounter = 0;
+				// var windowCounter = 0;
+				
+				// /* store tab count for each window */
+				// windows.forEach(function(window)
+				// {
+				// 	window.tabs.forEach(function(tab)
+				// 	{
+				// 		tabCounter++;
+				// 	})
+				// 	tabCount[windowCounter] = tabCounter;
+				// 	console.log("windowCounter: " + windowCounter);
+				// 	console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
+				// 	windowCounter++;
+				// })
+
+				// windowCounter = 0;
+
+				// windows.forEach(function(window)
+				// {
+				// 	tabNamesArr[windowCounter] = new Array(tabCounter[windowCounter]);
+				// 	tabUrlsArr[windowCounter = new Array(tabCounter[windowCounter])];
+				// 	tabColorsArr[windowCounter = new Array(tabCounter[windowCounter])];
+
+				// 	windowCounter++;
+				// })
+
+				// console.log("tabNamesArr: " + tabNamesArr);
+
+				// console.log("tabNamesArr.length: " + tabNamesArr.length);
+
+				// for (var i = 0; i < tabNamesArr.length; i++) 
+				// {
+				// 	var iterator = tabNamesArr[i];
+				// 	console.log("iterator.length: " + iterator.length);
+				// 	for (var j = 0; j < iterator.length; j++) 
+				// 	{
+				// 		console.log("iterator[j]: " + iterator[j]);
+				// 		iterator[j] = 0;
+				// 		console.log("iterator[" + i + "][" + j + "] = " + iterator[j]);
+				// 	}
+				// }
+
+				/* putting tab info into arrays */
+				// windows.forEach(function(window)
+				// {
+				// 	window.tabs.forEach(function(tab)
+				// 	{
+				// 		console.log("tab.title: " + tab.title);
+				// 		console.log("tab.url : " + tab.url);
+				// 		console.log("tab.favIconUrl: " + tab.favIconUrl);
+				// 		tabNamesArr[i][j] = tab.title;
+				// 		tabUrlsArr[i][j] = tab.url;
+				// 		tabColorsArr[i][j] = tab.favIconUrl;
+				// 		console.log("tabNamesArr[i]: " + tabNamesArr[i][j]);
+				// 		console.log("tabUrlsArr[i]: " + tabUrlsArr[i][j]);
+				// 		console.log("tabColorsArr[i]: " + tabColorsArr[i][j]);
+				// 		j++;
+				// 	})
+				// 	i++;
+				// })
+
+
+				/* iterates through all tabs in windows */
+				// iterates through windows
+				// for (var i = 0; i < windows.length; i++)
+				// {
+				// 	// iterates through tabs in window
+				// 	for (var j = 0; j < windows.tabs.length; j++)
+				// 	{
+				// 		tabNamesArr[i][j] = windows[i][j].title;
+				// 		tabUrlsArr[i][j] = windows[i][j].url;
+				// 		tabColorsArr[i][j] = windows[i][j].favIconUrl;
+				// 	}
+				// }
+
+				// console.log("tabNamesArr[i][j] title: " + tabNamesArr[0][0]);
+				// console.log("tabUrlsArr[i][j] url: " + tabUrlsArr[0][1] + " " + tabUrlsArr[1][1]);
+				// console.log("tabColorsArr[i][j] favicon url: " + tabColorsArr[0][1] + " " + tabColorsArr[1][1]);
+				
+				// /* gets each tab's name and url from an array of tabs and stores them into arrays */
+				// var tabNamesArr = [];
+				// var tabUrlsArr = [];
+				// var tabColorsArr = tabs.map(t => t.favIconUrl);
+				// // var tabColorsArr = [];
+				// var tabCount = 0;
+
+				// for (; tabCount < tabs.length; tabCount++)
+				// {
+				// 	tabNamesArr[tabCount] = tabs[tabCount].title;
+				// 	tabUrlsArr[tabCount] = tabs[tabCount].url;
+				// 	// tabColorsArr[tabCount] = tabs[tabCount].favIconUrl;
+				// }
+			})
+		}
+	})
+}
+
+/* creates tabs for multiple windows */
+function createAllTabs(group, i)
+{
+	// need to find a way to iterate through the maps (ex: tabUrlsArr)
 }
 
 // stores title of tab for later use when tab is fully updated

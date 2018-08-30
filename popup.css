@@ -3,6 +3,9 @@ body
 {
 	min-height: 25px;
 	width: 532px;
+	/* background-color: #C0C0C0; */
+	background-color: #5200FF;
+	/* background-color: #D6D6D6; */
 }
 
 /* top half */
@@ -10,6 +13,8 @@ body
 #topHalf
 {
 	background-color: green;   /* not working? */
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
 }
 
 #textFieldsContainer
@@ -18,7 +23,8 @@ body
 	height: 90px;
 	width: 200px;
 	display: block;
-	margin: 0px 16px 0px 0px;
+	margin: 0px 0px 0px 0px; /* 16 right */
+	padding: 0px 0px 0px 0px;
 }
 
 #customTitleField
@@ -31,7 +37,7 @@ body
     border: 3px solid #000000;
     transition: 0.3s;
 	outline: none;
-	margin: 0px 8px 6px 8px;
+	margin: 5px 8px 6px 8px;
 	font-size: 20px;
 	text-align: left;
 }
@@ -50,7 +56,7 @@ body
     box-sizing: border-box;
 	transition: 0.3s;
 	outline: none;
-	margin: 0px 8px 6px 8px;
+	margin: 0px 5px 6px 8px;
 	font-size: 20px;
 	text-align: left;
 }
@@ -70,7 +76,7 @@ body
 	border: 3px solid #000000;
 	transition: 0.3s;
 	outline: none;
-	margin: 0px 8px 6px 8px;
+	margin: 0px 5px 6px 8px;
 	font-size: 20px;
 	text-align: left;
 }
@@ -83,29 +89,33 @@ body
 #sortArea
 {
 	float: right;
-	height: 127px; /* 85px */
-	width: 285px;
-	margin: 0px 7px 5px 0px;
+	height: 130px; /* 85px , 137*/
+	width: 312px; /* 285, 292 */
+	margin: 0px 0px 7px 0px; /* bottom: 10px */
 
-	background-color: #a9a9a9;
+	background-color: #00ADFF;
+	/* background-color: #F2F4F5; */
+	/* background-color: #a9a9a9; */
 	border-style: outset;
-	padding: 0px 0px 0px 5px;
+	/* padding: 0px 0px 0px 5px; */
+	padding: 0px 0px 0px 0px;
+	/* border: solid 1px #000000; */
 }
 
 .sortButton
 {
-	padding: 15px 10px 15px 10px; /* 10 left right */
-	margin: 10px 3px 5px 6px;
+	padding: 0px 10px 15px 10px;  /* 15px 10px 15px 10px */
+	margin: 2px 3px 5px 6px;  /* 10px 3px 5px 6px */
 	display: inline-block;
-	height: 35px; /* 30 height width */
-	width: 35px;
+	height: 39px; /* 30 height width */
+	width: 39px;
 	border-radius: 75%;
 }
 
 #redButton
 {
 	/* creates equal distance from sides of sort area border as purple button */
-	margin: 10px 3px 5px 5px;
+	margin: 0px 3px 5px 5px;
 	background-color: #FF0000;
 }
 
@@ -139,8 +149,9 @@ body
 {
 	width: 150px;
 	padding: 0px 0px 0px 5px;
-	margin: 5px 0px 0px 35px;
+	margin: 6px 0px 0px 35px;
 	font-size: 20px;
+	height: 30px;
 }
 
 .menu1
@@ -207,11 +218,19 @@ body
 	font-size: 20px;
 }
 
+#ACTIVITYTAB
+{
+	font-size: 30px;
+	font-weight: bold;
+	margin: 5px 0px 0px 60px;
+	padding: 0px 0px 0px 0px;
+}
+
 /* bottom half */
 
 #buttonArea
 {
-	background-color: pink;
+	background-color: #00bbd1;
 }
 
 /* gives appearance that button is popping out of popup */

@@ -326,12 +326,22 @@ function displayTabButton(group, i)
 	/* opens tabs if button is clicked */
 	groupButton.onclick = function()
 	{
-		/* opens the tabs */
-		for (var j = 0; j < group["tabCount" + i]; j++)
+		console.log("group['tabCount' + i][1]: " + group["tabCount" + i][1]);
+		/* if tabs in multiple windows were saved */
+		if (group["tabCount" + i][1] != undefined)
 		{
-			chrome.extension.getBackgroundPage().createTab(group, i, j);
-			// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
-			// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
+			chrome.extension.getBackgroundPage().createAllTabs(group, i);
+		}
+
+		else
+		{
+			/* opens the tabs */
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createTab(group, i, j);
+				// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
+				// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
+			}
 		}
 	}
 }
@@ -436,6 +446,22 @@ document.addEventListener("DOMContentLoaded", function()
 			window.location.reload();
 		}
 	})
+
+	var allTabsTextField = document.getElementById("allTabsTextField");
+	allTabsTextField.addEventListener("keyup", function(enterKey)
+	{
+		if (enterKey.keyCode == 13)
+		{
+			// get text from text field
+			var storeAllTabsTextField = document.getElementById("allTabsTextField").value;
+
+			// refer to background page because popup is automatically closed when a tab is created,
+			// so callback function would never execute
+			chrome.extension.getBackgroundPage().storeAllTabsTextField(storeAllTabsTextField);
+			// reloads popup immediately to display stored tab button
+			window.location.reload();
+		}
+	})
 })
 
 /* gets title from text field and renames the tab */
@@ -461,3 +487,5 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 		window.location.reload();
 	}
 })
+
+{/* <input id = "allTabsTextField" type = "text" placeholder = "Save all tabs"/> */}
