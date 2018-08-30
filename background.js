@@ -86,6 +86,13 @@ function ActivityTabFeatures(command)
 				chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
 				// saves for persistent title through refresh
 				saveTitle[tabs[0].id] = promptUser;
+
+				// chrome.tabs.query({currentWindow: true, active: true}, function(tab)
+				// {
+				// 	console.log("TITLE CHANGED, RELOAD");
+				// 	var code = 'window.location.reload();';
+				// 	chrome.tabs.executeScript(tab.id, {code: code});
+				// })
 			})
 			break;
 		case "same-color-tabs-toggle-feature":
@@ -281,7 +288,10 @@ function replaceAllButton(replacementButton, promptUser)
 				return;
 			}
 
-			var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.url));
+			var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.title));
+
+			console.log("replaceAllButton, tabNamesArr: " + tabNamesArr);
+
 			var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
 			var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
 
@@ -595,7 +605,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 					return;
 				}
 
-				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.url));
+				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.title));
 				var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
 				var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
 
@@ -611,27 +621,19 @@ function storeAllTabsTextField(storeAllTabsTextField)
 						tabCounter++;
 					})
 					tabCount[windowCounter] = tabCounter;
-					console.log("windowCounter: " + windowCounter);
-					console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
 					// reset tabCounter for next window
 					tabCounter = 0;
 					// for iterating through windows
 					windowCounter++;
 				})
 
-				// console.log("tabCount[0]: " + tabCount[0]);
-				// console.log("tabCount[1]: " + tabCount[1]);
-
-				// console.log("tabUrlsArr: " + tabUrlsArr);
-				// console.log("tabUrlsArr[0]: " + tabUrlsArr[0]);
-				// console.log("tabUrlsArr[0].length: " + tabUrlsArr[0].length);
-				// console.log("tabUrlsArr[1][0]: " + tabUrlsArr[1][0]);
-
 				var groupName = "groupName" + groupCount;
 				groupObject[groupName] = promptUser;
 
 				var tabNames = "tabNames" + groupCount;
 				groupObject[tabNames] = tabNamesArr;
+
+				console.log("tabNamesArr: " + tabNamesArr);
 
 				var tabUrls = "tabUrls" + groupCount;
 				groupObject[tabUrls] = tabUrlsArr;
@@ -642,7 +644,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				var tabCount2 = "tabCount" + groupCount;
 				groupObject[tabCount2] = tabCount;
 
-				console.log("groupObject: " + groupObject);
+				// console.log("groupObject: " + groupObject);
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
 
@@ -655,124 +657,6 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				chrome.storage.local.set({"groupCount": (groupCount + 1)});
 				// tracks number of buttons so it can display them all even if one is deleted
 				chrome.storage.local.set({"buttonCount": (groupCount + 1)});
-
-
-
-
-
-
-
-
-
-				// var i = 0;
-				// var j = 0;
-
-				/* initializing arrays */
-				// var x = new Array(windows.length);
-
-				// for (var i = 0; i < x.length; i++) 
-				// {
-				// 	x[i] = new Array(3);
-				// }
-
-				// var tabNamesArr = [];
-				// var tabUrlsArr = [];
-				// var tabColorsArr = [];
-
-				// var tabCount = new Array(windows.length);
-				// var tabCounter = 0;
-				// var windowCounter = 0;
-				
-				// /* store tab count for each window */
-				// windows.forEach(function(window)
-				// {
-				// 	window.tabs.forEach(function(tab)
-				// 	{
-				// 		tabCounter++;
-				// 	})
-				// 	tabCount[windowCounter] = tabCounter;
-				// 	console.log("windowCounter: " + windowCounter);
-				// 	console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
-				// 	windowCounter++;
-				// })
-
-				// windowCounter = 0;
-
-				// windows.forEach(function(window)
-				// {
-				// 	tabNamesArr[windowCounter] = new Array(tabCounter[windowCounter]);
-				// 	tabUrlsArr[windowCounter = new Array(tabCounter[windowCounter])];
-				// 	tabColorsArr[windowCounter = new Array(tabCounter[windowCounter])];
-
-				// 	windowCounter++;
-				// })
-
-				// console.log("tabNamesArr: " + tabNamesArr);
-
-				// console.log("tabNamesArr.length: " + tabNamesArr.length);
-
-				// for (var i = 0; i < tabNamesArr.length; i++) 
-				// {
-				// 	var iterator = tabNamesArr[i];
-				// 	console.log("iterator.length: " + iterator.length);
-				// 	for (var j = 0; j < iterator.length; j++) 
-				// 	{
-				// 		console.log("iterator[j]: " + iterator[j]);
-				// 		iterator[j] = 0;
-				// 		console.log("iterator[" + i + "][" + j + "] = " + iterator[j]);
-				// 	}
-				// }
-
-				/* putting tab info into arrays */
-				// windows.forEach(function(window)
-				// {
-				// 	window.tabs.forEach(function(tab)
-				// 	{
-				// 		console.log("tab.title: " + tab.title);
-				// 		console.log("tab.url : " + tab.url);
-				// 		console.log("tab.favIconUrl: " + tab.favIconUrl);
-				// 		tabNamesArr[i][j] = tab.title;
-				// 		tabUrlsArr[i][j] = tab.url;
-				// 		tabColorsArr[i][j] = tab.favIconUrl;
-				// 		console.log("tabNamesArr[i]: " + tabNamesArr[i][j]);
-				// 		console.log("tabUrlsArr[i]: " + tabUrlsArr[i][j]);
-				// 		console.log("tabColorsArr[i]: " + tabColorsArr[i][j]);
-				// 		j++;
-				// 	})
-				// 	i++;
-				// })
-
-
-				/* iterates through all tabs in windows */
-				// iterates through windows
-				// for (var i = 0; i < windows.length; i++)
-				// {
-				// 	// iterates through tabs in window
-				// 	for (var j = 0; j < windows.tabs.length; j++)
-				// 	{
-				// 		tabNamesArr[i][j] = windows[i][j].title;
-				// 		tabUrlsArr[i][j] = windows[i][j].url;
-				// 		tabColorsArr[i][j] = windows[i][j].favIconUrl;
-				// 	}
-				// }
-
-				// console.log("tabNamesArr[i][j] title: " + tabNamesArr[0][0]);
-				// console.log("tabUrlsArr[i][j] url: " + tabUrlsArr[0][1] + " " + tabUrlsArr[1][1]);
-				// console.log("tabColorsArr[i][j] favicon url: " + tabColorsArr[0][1] + " " + tabColorsArr[1][1]);
-				
-				// /* gets each tab's name and url from an array of tabs and stores them into arrays */
-				// var tabNamesArr = [];
-				// var tabUrlsArr = [];
-				// var tabColorsArr = tabs.map(t => t.favIconUrl);
-				// // var tabColorsArr = [];
-				// var tabCount = 0;
-
-				// for (; tabCount < tabs.length; tabCount++)
-				// {
-				// 	tabNamesArr[tabCount] = tabs[tabCount].title;
-				// 	tabUrlsArr[tabCount] = tabs[tabCount].url;
-				// 	// tabColorsArr[tabCount] = tabs[tabCount].favIconUrl;
-				// }
 			})
 		}
 	})
@@ -781,68 +665,30 @@ function storeAllTabsTextField(storeAllTabsTextField)
 /* creates tabs for multiple windows */
 function createAllTabs(group, i, j)
 {
-	console.log("j: " + j);
-	console.log('group["tabUrls" + i][j]: ' + group["tabUrls" + i][j]);
 	chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
 	{
-		console.log("window: " + window);
-		console.log("j: " + j);
+		console.log("createAllTabs, tabNamesArr: " + group["tabNames" + i]);
+		/* iterates through the tabs of a window to put tab names and tab color */
+		for (var k = 0; k < group["tabUrls" + i][j].length; k++)
+		{
+			/* saves title of tab */
+			var tabTitle = group["tabNames" + i][j][k];
+			console.log("tabTitle: " + tabTitle);
+			console.log("window.tabs[k]: " + window.tabs[k].id);
+			// make sure it's window.tabS as shown in documentation
+			tabIdsToTitles[window.tabs[k].id] = tabTitle;
+	
+			/* saves color of tab */
+			var tabColor = group["tabColor" + i][j][k];
+			tabIdsToColor[window.tabs[k].id] = tabColor;
+		}
+		console.log('group["tabNames" + i]: ' + group["tabNames" + i]);
+		console.log('group["tabColors" + i]: ' + group["tabColors" + i]);
+
+		console.log('group["tabNames" + i][j]: ' + group["tabNames" + i][j]);
+		console.log('group["tabColors" + i][j]: ' + group["tabColors" + i][j]);
+		k++;
 	})
-
-
-	/* traverses through array of windows (ex: [3][1] with 3 tabs in one window and 1 tab in another window) */
-	// for (var k = 0; k < group["tabCount" + i].length; k++)
-	// {
-	// 	console.log("FIRST FOR LOOP");
-	// 	console.log("k: " + k + ", group[tabCount + i].length: " + group["tabCount" + i].length);
-	// 	console.log("group[tabCount + i][0]: " + group["tabCount" + i][0]);
-	// 	/* iterates through array of tabs in window */
-	// 	for (var j = 0; j < group["tabCount" + i][j]; j++)
-	// 	{
-	// 		console.log("SECOND FOR LOOP");
-	// 		console.log("j: " + j + ", group[tabCount + i][j]: " + group["tabCount" + i][j]);
-	// 		// creates a window with first url
-	// 		if (j == 0)
-	// 		{
-	// 			console.log("j == 0, j: " + j + ", k: " + k);
-
-	// 			chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(j, window)
-	// 			{
-	// 				console.log("creating window");
-	// 				console.log("j: " + j + ", k: " + k);
-	// 				// accesses window's array of tabs to access first tab's id
-	// 				var firstTabInWindow = window.tabs[0].id;
-
-	// 				var tabTitle = group["tabNames" + i][j][0];
-	// 				console.log("group[tabNames + i][j][0]: " + tabTitle);
-	// 				tabIdsToTitles[firstTabInWindow] = tabTitle;
-	// 				var tabColor = group["tabColor" + i][j];
-	// 				tabIdsToColor[firstTabInWindow] = tabColor;
-	// 			}.bind(this, j))
-	// 		}
-	// 		else
-	// 		{
-	// 			chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
-	// 			{
-	// 				console.log("creating tab");
-	// 				console.log("j: " + j);
-	// 				// console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
-	// 				var tabTitle = group["tabNames" + i][j];
-	// 				tabIdsToTitles[tab.id] = tabTitle;
-	// 				// console.log("set tabIdsToTitles[tab.id]: " + tabIdsToTitles[tab.id]);
-
-	// 				var tabColor = group["tabColor" + i][j];
-	// 				tabIdsToColor[tab.id] = tabColor;
-	// 				// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
-	// 			})
-	// 		}
-	// 	}
-	// }
-	// group["tabUrls" + i].forEach(function(tab)
-	// {
-	// 	console.log(tab);
-	// })
-
 }
 
 // stores title of tab for later use when tab is fully updated
