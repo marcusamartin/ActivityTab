@@ -308,6 +308,12 @@ function getStorage(i)
 		console.log("getStorage groupCount: " + i);
 
 		displayTabButton(group, i);
+		// does not display window button if save all tabs was used (unnecessary)
+		// if (group["tabCount" + i][1] == undefined)
+		// {
+		// 	// alert('group["tabCount" + i][1]: ' + group["tabCount" + i][1]);
+		// 	displayWindowButton(group, i);
+		// }
 		displayWindowButton(group, i);
 		displayTrashButton(group, i);
 	})
@@ -365,6 +371,12 @@ function displayWindowButton(group, i)
 		{
 			chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
 		}
+	}
+
+	if (group["tabCount" + i][1] != undefined)
+	{
+		console.log("disabled");
+		windowButton.disabled = true;
 	}
 }
 
