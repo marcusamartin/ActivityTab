@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function()
 	var button = document.getElementById("greenButton");
 	button.addEventListener("click", function()
 	{
-		console.log("green button press");
+		// console.log("green button press");
 		queryButtonClick("buttonPress", "green");
 	})
 
@@ -77,7 +77,7 @@ function setSortTabsTextFieldBorderColor()
 	// checks current tab's favicon url
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		console.log("tab.favIconUrl: " + tab[0].favIconUrl);
+		// console.log("tab.favIconUrl: " + tab[0].favIconUrl);
 		switch(tab[0].favIconUrl)
 		{
 			case redURL:
@@ -110,15 +110,16 @@ function setSortTabsTextFieldBorderColor()
 /* sends message with button info to content.js */
 function queryButtonClick(buttonPress, color)
 {
-	console.log("queryButtonClick--------------");
+	// console.log("queryButtonClick--------------");
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		console.log("sending message, button:color" + buttonPress + ":" + color);
+		// console.log("sending message, button:color" + buttonPress + ":" + color);
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
-		console.log("right before deleteSaveColor()");
+		// console.log("right before deleteSaveColor()");
 		chrome.extension.getBackgroundPage().deleteSaveColor(color);
 		// refreshes popup to change sort tabs text field's border color to correct color
+		console.log("RELOAD3----------------------------------------");
 		window.location.reload();
 	})
 }
@@ -274,11 +275,11 @@ function displayButtons()
 		chrome.storage.local.get(null, function(items) 
 		{
 			var allKeys = Object.keys(items);
-			console.log("after displaying all the buttons, storage: " + allKeys);
+			// console.log("after displaying all the buttons, storage: " + allKeys);
 		})
 		chrome.storage.local.get("groupCount", function(groups)
 		{
-			console.log("after displaying all the buttons, groupCount: " + groups.groupCount);
+			// console.log("after displaying all the buttons, groupCount: " + groups.groupCount);
 		})
 	})
 }
@@ -305,7 +306,7 @@ function getStorage(i)
 			return;
 		}
 
-		console.log("getStorage groupCount: " + i);
+		// console.log("getStorage groupCount: " + i);
 
 		displayTabButton(group, i);
 		// does not display window button if save all tabs was used (unnecessary)
@@ -332,7 +333,7 @@ function displayTabButton(group, i)
 	/* opens tabs if button is clicked */
 	groupButton.onclick = function()
 	{
-		console.log("group['tabCount' + i][1]: " + group["tabCount" + i][1]);
+		// console.log("group['tabCount' + i][1]: " + group["tabCount" + i][1]);
 		/* if tabs in multiple windows were saved */
 		if (group["tabCount" + i][1] != undefined)
 		{
@@ -365,6 +366,7 @@ function displayWindowButton(group, i)
 		// set css of button
 		windowButton.id = "windowButton";
 		windowButton.className = "fa fa-external-link";
+		// sizes icon
 		windowButton.style.fontSize = "35px";
 		windowButton.style.width = "80px";
 		// make button size be correct size
@@ -388,6 +390,7 @@ function displayWindowButton(group, i)
 		// set css of button
 		windowButton.id = "windowButton";
 		windowButton.className = "fa fa-external-link";
+		// sizes icon
 		windowButton.style.fontSize = "35px";
 		// make button size be correct size
 		windowButton.style.height = "35px";
@@ -402,7 +405,7 @@ function displayWindowButton(group, i)
 				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
 			}
 		}
-		console.log("disabled");
+		// console.log("disabled");
 		windowButton.disabled = true;
 		windowButton.style.backgroundColor = "#AAB4AF";
 	}
@@ -414,6 +417,9 @@ function displayTrashButton(group, i)
 	var trashButton = document.createElement("button");
 	// set css of button
 	trashButton.id = "trashButton";
+	trashButton.className = "fa fa-trash";
+	// sizes icon
+	trashButton.style.fontSize = "35px";
 	// appends button to corresponding tab button
 	document.getElementById("groupButtons").appendChild(trashButton);
 
@@ -449,6 +455,7 @@ function displayTrashButton(group, i)
 				// subtract one from groupCount for removal of a group
 				chrome.storage.local.set({"groupCount": resetGroupCount}, function()
 				{
+					console.log("RELOAD4----------------------------------------");
 					window.location.reload();
 				})
 			})
@@ -486,6 +493,7 @@ document.addEventListener("DOMContentLoaded", function()
 			// so callback function would never execute
 			chrome.extension.getBackgroundPage().storeSortTabsTextField(storeSortTabsTextField);
 			// reloads popup immediately to display stored tab button
+			console.log("RELOAD5----------------------------------------");
 			window.location.reload();
 		}
 	})
@@ -502,6 +510,7 @@ document.addEventListener("DOMContentLoaded", function()
 			// so callback function would never execute
 			chrome.extension.getBackgroundPage().storeAllTabsTextField(storeAllTabsTextField);
 			// reloads popup immediately to display stored tab button
+			console.log("RELOAD1----------------------------------------");
 			window.location.reload();
 		}
 	})
@@ -527,6 +536,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
 	if (request.msg === "color command") 
 	{
+		console.log("RELOAD2----------------------------------------");
 		window.location.reload();
 	}
 })

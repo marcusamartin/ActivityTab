@@ -129,7 +129,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 		/* iterates through the buttons */
 		for (var i = 0; i < groupCount; i++)
 		{
-			chrome.storage.local.get(["groupName" + i], function(i, anotherGroup)
+			chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
 			{
 				var groupName = anotherGroup["groupName" + i];
 					
@@ -140,7 +140,18 @@ function checkDuplicateName(promptUser, groupCount, command)
 
 					if (duplicatePrompt)
 					{
-						replaceButton(i, promptUser, command);
+						/* if button does launch multiple windows */
+						if (command == "same-color-tabs-toggle-feature")
+						{
+							alert("going to replaceButton");
+							replaceButton(i, promptUser, command);
+						}
+						/* button launches multiple windows */
+						else if (command == "save-all-tabs")
+						{
+							alert("going to replaceAllButton");
+							replaceAllButton(i, promptUser);
+						}
 						// removes added button from asynchronous function since a button is still added
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 					}
@@ -250,6 +261,72 @@ function replaceButton(replacementButton, promptUser, command)
 			// puts object into storage
 			chrome.storage.local.set(groupObject);
 		}
+	})
+}
+
+function replaceAllButton(replacementButton, promptUser)
+{
+	alert("replaceAllButton");
+	chrome.storage.local.get("groupCount", function(group)
+	{
+		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		var groupObject = {};
+
+		/* stores all of the tab's information into an object and then puts object into storage */
+		chrome.windows.getAll({populate: true}, function(windows)
+		{
+			if (windows.length < 2)
+			{
+				alert("Cannot store tabs since there is only one window!");
+				return;
+			}
+
+			var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.url));
+			var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
+			var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
+
+			var tabCount = new Array(windows.length);
+			var tabCounter = 0;
+			var windowCounter = 0;
+				
+			/* store tab count for each window */
+			windows.forEach(function(window)
+			{
+				window.tabs.forEach(function(tab)
+				{
+					tabCounter++;
+				})
+				tabCount[windowCounter] = tabCounter;
+				console.log("windowCounter: " + windowCounter);
+				console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
+				// reset tabCounter for next window
+				tabCounter = 0;
+				// for iterating through windows
+				windowCounter++;
+			})
+
+			var groupName = "groupName" + replacementButton;
+			groupObject[groupName] = promptUser;
+
+			var tabNames = "tabNames" + replacementButton;
+			groupObject[tabNames] = tabNamesArr;
+
+			var tabUrls = "tabUrls" + replacementButton;
+			groupObject[tabUrls] = tabUrlsArr;
+
+			var tabColor = "tabColor" + replacementButton;
+			groupObject[tabColor] = tabColorsArr;
+
+			var tabCount2 = "tabCount" + replacementButton;
+			groupObject[tabCount2] = tabCount;
+
+			console.log("groupObject: " + groupObject);
+			// puts object into storage
+			chrome.storage.local.set(groupObject);
+			
+			// sends a message to popup script so sort tabs text field's border color will update from command
+			chrome.runtime.sendMessage({msg: "color command"});
+		})
 	})
 }
 
@@ -512,6 +589,12 @@ function storeAllTabsTextField(storeAllTabsTextField)
 			/* stores all of the tab's information into an object and then puts object into storage */
 			chrome.windows.getAll({populate: true}, function(windows)
 			{
+				if (windows.length < 2)
+				{
+					alert("Cannot store tabs since there is only one window!");
+					return;
+				}
+
 				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.url));
 				var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
 				var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
@@ -565,7 +648,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
-				checkDuplicateName(promptUser, groupCount, "same-color-tabs-toggle-feature");
+				checkDuplicateName(promptUser, groupCount, "save-all-tabs");
 
 				/* set-up for next group so last group isn't overwritten */
 				// enables empty text to be set

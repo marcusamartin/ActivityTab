@@ -89,8 +89,8 @@ body
 #sortArea
 {
 	float: right;
-	height: 130px; /* 85px , 137*/
-	width: 312px; /* 285, 292 */
+	height: 135px; /* 130 */ /* 135 looks better, top and bottom are even? */
+	width: 312px; /* 312*/
 	margin: 0px 0px 7px 0px; /* bottom: 10px */
 
 	background-color: #00ADFF;
