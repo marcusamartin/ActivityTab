@@ -358,25 +358,53 @@ function displayTabButton(group, i)
 /* display window button */
 function displayWindowButton(group, i)
 {
-	var windowButton = document.createElement("button");
-	// set css of button
-	windowButton.id = "windowButton";
-	// appends button to corresponding tab button
-	document.getElementById("groupButtons").appendChild(windowButton);
-
-	/* creates a new window with saved tabs */
-	windowButton.onclick = function()
+	/* button opens a wingle window */
+	if (group["tabCount" + i][1] == undefined)
 	{
-		for (var j = 0; j < group["tabCount" + i]; j++)
+		var windowButton = document.createElement("button");
+		// set css of button
+		windowButton.id = "windowButton";
+		windowButton.className = "fa fa-external-link";
+		windowButton.style.fontSize = "35px";
+		windowButton.style.width = "80px";
+		// make button size be correct size
+		// windowButton.style.height = "35px";
+		// appends button to corresponding tab button
+		document.getElementById("groupButtons").appendChild(windowButton);
+	
+		/* creates a new window with saved tabs */
+		windowButton.onclick = function()
 		{
-			chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			}
 		}
 	}
-
-	if (group["tabCount" + i][1] != undefined)
+	/* button opens multiple windows */
+	else if (group["tabCount" + i][1] != undefined)
 	{
+		var windowButton = document.createElement("form");
+		// set css of button
+		windowButton.id = "windowButton";
+		windowButton.className = "fa fa-external-link";
+		windowButton.style.fontSize = "35px";
+		// make button size be correct size
+		windowButton.style.height = "35px";
+		// appends button to corresponding tab button
+		document.getElementById("groupButtons").appendChild(windowButton);
+
+		/* creates a new window with saved tabs */
+		windowButton.onclick = function()
+		{
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			}
+		}
 		console.log("disabled");
 		windowButton.disabled = true;
+		windowButton.style.backgroundColor = "#AAB4AF";
 	}
 }
 
