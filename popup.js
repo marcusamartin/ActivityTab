@@ -330,9 +330,12 @@ function displayTabButton(group, i)
 		/* if tabs in multiple windows were saved */
 		if (group["tabCount" + i][1] != undefined)
 		{
-			chrome.extension.getBackgroundPage().createAllTabs(group, i);
+			/* traverses the windows */
+			for (var j = 0; j < group["tabCount" + i].length; j++)
+			{
+				chrome.extension.getBackgroundPage().createAllTabs(group, i, j);
+			}
 		}
-
 		else
 		{
 			/* opens the tabs */
@@ -487,5 +490,3 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 		window.location.reload();
 	}
 })
-
-{/* <input id = "allTabsTextField" type = "text" placeholder = "Save all tabs"/> */}

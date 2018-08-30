@@ -536,13 +536,13 @@ function storeAllTabsTextField(storeAllTabsTextField)
 					windowCounter++;
 				})
 
-				console.log("tabCount[0]: " + tabCount[0]);
-				console.log("tabCount[1]: " + tabCount[1]);
+				// console.log("tabCount[0]: " + tabCount[0]);
+				// console.log("tabCount[1]: " + tabCount[1]);
 
-				console.log("tabUrlsArr: " + tabUrlsArr);
-				console.log("tabUrlsArr[0]: " + tabUrlsArr[0]);
-				console.log("tabUrlsArr[0].length: " + tabUrlsArr[0].length);
-				console.log("tabUrlsArr[1][0]: " + tabUrlsArr[1][0]);
+				// console.log("tabUrlsArr: " + tabUrlsArr);
+				// console.log("tabUrlsArr[0]: " + tabUrlsArr[0]);
+				// console.log("tabUrlsArr[0].length: " + tabUrlsArr[0].length);
+				// console.log("tabUrlsArr[1][0]: " + tabUrlsArr[1][0]);
 
 				var groupName = "groupName" + groupCount;
 				groupObject[groupName] = promptUser;
@@ -696,9 +696,70 @@ function storeAllTabsTextField(storeAllTabsTextField)
 }
 
 /* creates tabs for multiple windows */
-function createAllTabs(group, i)
+function createAllTabs(group, i, j)
 {
-	// need to find a way to iterate through the maps (ex: tabUrlsArr)
+	console.log("j: " + j);
+	console.log('group["tabUrls" + i][j]: ' + group["tabUrls" + i][j]);
+	chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+	{
+		console.log("window: " + window);
+		console.log("j: " + j);
+	})
+
+
+	/* traverses through array of windows (ex: [3][1] with 3 tabs in one window and 1 tab in another window) */
+	// for (var k = 0; k < group["tabCount" + i].length; k++)
+	// {
+	// 	console.log("FIRST FOR LOOP");
+	// 	console.log("k: " + k + ", group[tabCount + i].length: " + group["tabCount" + i].length);
+	// 	console.log("group[tabCount + i][0]: " + group["tabCount" + i][0]);
+	// 	/* iterates through array of tabs in window */
+	// 	for (var j = 0; j < group["tabCount" + i][j]; j++)
+	// 	{
+	// 		console.log("SECOND FOR LOOP");
+	// 		console.log("j: " + j + ", group[tabCount + i][j]: " + group["tabCount" + i][j]);
+	// 		// creates a window with first url
+	// 		if (j == 0)
+	// 		{
+	// 			console.log("j == 0, j: " + j + ", k: " + k);
+
+	// 			chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(j, window)
+	// 			{
+	// 				console.log("creating window");
+	// 				console.log("j: " + j + ", k: " + k);
+	// 				// accesses window's array of tabs to access first tab's id
+	// 				var firstTabInWindow = window.tabs[0].id;
+
+	// 				var tabTitle = group["tabNames" + i][j][0];
+	// 				console.log("group[tabNames + i][j][0]: " + tabTitle);
+	// 				tabIdsToTitles[firstTabInWindow] = tabTitle;
+	// 				var tabColor = group["tabColor" + i][j];
+	// 				tabIdsToColor[firstTabInWindow] = tabColor;
+	// 			}.bind(this, j))
+	// 		}
+	// 		else
+	// 		{
+	// 			chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+	// 			{
+	// 				console.log("creating tab");
+	// 				console.log("j: " + j);
+	// 				// console.log("Created url: " + group["tabUrls" + i][j] + ", " + group["tabNames" + i][j]);
+	// 				var tabTitle = group["tabNames" + i][j];
+	// 				tabIdsToTitles[tab.id] = tabTitle;
+	// 				// console.log("set tabIdsToTitles[tab.id]: " + tabIdsToTitles[tab.id]);
+
+	// 				var tabColor = group["tabColor" + i][j];
+	// 				tabIdsToColor[tab.id] = tabColor;
+	// 				// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
+	// 			})
+	// 		}
+	// 	}
+	// }
+	// group["tabUrls" + i].forEach(function(tab)
+	// {
+	// 	console.log(tab);
+	// })
+
 }
 
 // stores title of tab for later use when tab is fully updated
