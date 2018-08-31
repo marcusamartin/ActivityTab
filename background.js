@@ -136,8 +136,9 @@ function checkDuplicateName(promptUser, groupCount, command)
 		/* iterates through the buttons */
 		for (var i = 0; i < groupCount; i++)
 		{
-			chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
+			chrome.storage.local.get(["groupName" + i, "tabCount" + i, "groupCount"], function(i, anotherGroup)
 			{
+				alert("checkDuplicateName, groupCount: " + anotherGroup.groupCount);
 				var groupName = anotherGroup["groupName" + i];
 					
 				if (groupName == promptUser)
@@ -156,6 +157,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 						/* button launches multiple windows */
 						else if (command == "save-all-tabs")
 						{
+							alert("before replaceAllButton, groupCount: " + anotherGroup.groupCount);
 							replaceAllButton(i, promptUser);
 							// chrome.runtime.sendMessage({msg: i});
 						}
@@ -181,6 +183,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 /* updates correct button with tab information AND REPLACES BUTTON */
 function replaceButton(replacementButton, promptUser, command)
 {
+	alert("replaceButton");
 	var groupObject = {};
 
 	/* stores all of the tab's information into an object and then puts object into storage */
@@ -299,18 +302,32 @@ function replaceButton(replacementButton, promptUser, command)
 
 function replaceAllButton(replacementButton, promptUser)
 {
+	alert("in replaceAllButton");
 	chrome.storage.local.get("groupCount", function(group)
 	{
+		alert("replaceAllButton, groupCount: " + group.groupCount);
+		group.groupCount -= 1;
+		alert("replaceAllButton, groupCount: " + group.groupCount);
+		chrome.storage.local.set({"groupCount": group.groupCount});
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		var groupObject = {};
 
 		/* stores all of the tab's information into an object and then puts object into storage */
 		chrome.windows.getAll({populate: true}, function(windows)
 		{
+			// if (windows.length < 2)
+			// {
+			// 	alert("Cannot store tabs since there is only one window!");
+			// 	return;
+			// }
+
+			/* used to decide storing of a single window or multiple windows */
+			var oneWindow = false;
 			if (windows.length < 2)
 			{
-				alert("Cannot store tabs since there is only one window!");
-				return;
+				oneWindow = true;
+				// alert("Cannot store tabs since there is only one window!");
+				// return;
 			}
 
 			var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.title));
@@ -323,22 +340,38 @@ function replaceAllButton(replacementButton, promptUser)
 			var tabCount = new Array(windows.length);
 			var tabCounter = 0;
 			var windowCounter = 0;
-				
-			/* store tab count for each window */
-			windows.forEach(function(window)
+			
+			if (oneWindow)
 			{
-				window.tabs.forEach(function(tab)
+				alert("oneWindow");
+				windows.forEach(function(tab)
 				{
 					tabCounter++;
 				})
 				tabCount[windowCounter] = tabCounter;
-				console.log("windowCounter: " + windowCounter);
-				console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
-				// reset tabCounter for next window
-				tabCounter = 0;
-				// for iterating through windows
 				windowCounter++;
-			})
+				tabCount[windowCounter] = 0;
+				alert("windowCounter++: " + windowCounter);
+				console.log("tabCount[windowCounter++]: " + tabCount[windowCounter]);
+			}
+			else
+			{
+				/* store tab count for each window */
+				windows.forEach(function(window)
+				{
+					window.tabs.forEach(function(tab)
+					{
+						tabCounter++;
+					})
+					tabCount[windowCounter] = tabCounter;
+					console.log("windowCounter: " + windowCounter);
+					console.log("TabCount[windowCounter]: " + tabCount[windowCounter]);
+					// reset tabCounter for next window
+					tabCounter = 0;
+					// for iterating through windows
+					windowCounter++;
+				})
+			}
 
 			var groupName = "groupName" + replacementButton;
 			groupObject[groupName] = promptUser;
@@ -454,6 +487,7 @@ function sameColorTabs(command)
 					chrome.storage.local.set(groupObject);
 
 					/* checks if duplicate name */
+					alert("checkDuplicateName1");
 					checkDuplicateName(promptUser, groupCount, command);
 
 					/* set-up for next group so last group isn't overwritten */
@@ -510,7 +544,8 @@ function storeSortTabsTextField(storeSortTabsTextField)
 		if (promptUser == "")
 		{
 			alert("Please enter a name for the group!");
-			storeSortTabsTextField(command);
+			// storeSortTabsTextField(command);
+			return;
 		}
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		else
@@ -583,6 +618,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 					/* checks if duplicate name */
 					// specified command to have duplicate checked the same way as the sort colors command
+					alert("checkDuplicateName2");
 					checkDuplicateName(promptUser, groupCount, "same-color-tabs-toggle-feature");
 
 					/* set-up for next group so last group isn't overwritten */
@@ -614,7 +650,8 @@ function storeAllTabsTextField(storeAllTabsTextField)
 		if (promptUser == "")
 		{
 			alert("Please enter a name for the group!");
-			storeAllTabsTextField(command);
+			return;
+			// storeAllTabsTextField(command);
 		}
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		else
@@ -624,10 +661,13 @@ function storeAllTabsTextField(storeAllTabsTextField)
 			/* stores all of the tab's information into an object and then puts object into storage */
 			chrome.windows.getAll({populate: true}, function(windows)
 			{
+				/* used to decide storing of a single window or multiple windows */
+				var oneWindow = false;
 				if (windows.length < 2)
 				{
-					alert("Cannot store tabs since there is only one window!");
-					return;
+					oneWindow = true;
+					// alert("Cannot store tabs since there is only one window!");
+					// return;
 				}
 
 				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.title));
@@ -637,20 +677,36 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				var tabCount = new Array(windows.length);
 				var tabCounter = 0;
 				var windowCounter = 0;
-				
-				/* store tab count for each window */
-				windows.forEach(function(window)
+
+				if (oneWindow)
 				{
-					window.tabs.forEach(function(tab)
+					alert("oneWindow");
+					windows.forEach(function(tab)
 					{
 						tabCounter++;
 					})
 					tabCount[windowCounter] = tabCounter;
-					// reset tabCounter for next window
-					tabCounter = 0;
-					// for iterating through windows
 					windowCounter++;
-				})
+					tabCount[windowCounter] = 0;
+					alert("windowCounter++: " + windowCounter);
+					console.log("tabCount[windowCounter++]: " + tabCount[windowCounter]);
+				}
+				else
+				{
+					/* store tab count for each window */
+					windows.forEach(function(window)
+					{
+						window.tabs.forEach(function(tab)
+						{
+							tabCounter++;
+						})
+						tabCount[windowCounter] = tabCounter;
+						// reset tabCounter for next window
+						tabCounter = 0;
+						// for iterating through windows
+						windowCounter++;
+					})
+				}
 
 				var groupName = "groupName" + groupCount;
 				groupObject[groupName] = promptUser;
@@ -675,6 +731,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
+				alert("checkDuplicateName3");
 				checkDuplicateName(promptUser, groupCount, "save-all-tabs");
 
 				/* set-up for next group so last group isn't overwritten */
@@ -724,6 +781,7 @@ var tabIdsToColor = {};
 /* creates the tabs */
 function createTab(group, i, j)
 {
+	// console.log('group["tabUrls" + i]; ' + group["tabUrls" + i]);
     chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
     {
 		/* saves title of tab */

@@ -330,17 +330,23 @@ function displayTabButton(group, i)
 	/* opens tabs if button is clicked */
 	groupButton.onclick = function()
 	{
-		/* if tabs in multiple windows were saved */
-		if (group["tabCount" + i][1] != undefined)
+		/* if tabs in multiple windows were saved */ // for one window save all tabs
+		if (group["tabCount" + i][1] != undefined || group["tabCount" + i][1] == 0)
 		{
 			/* traverses the windows */
 			for (var j = 0; j < group["tabCount" + i].length; j++)
 			{
+				// 0 shows that it is a single window, so cannot access a valid url at j = 1
+				if (group["tabCount" + i][j] == 0)
+				{
+					return;
+				}
 				chrome.extension.getBackgroundPage().createAllTabs(group, i, j);
 			}
 		}
 		else
 		{
+			console.log("opens the tabs");
 			/* opens the tabs */
 			for (var j = 0; j < group["tabCount" + i]; j++)
 			{
@@ -445,26 +451,26 @@ function displayTrashButton(group, i)
 				}
 			})
 
-			/* debugging */
-			chrome.storage.local.get("groupCount", function(group)
+			chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
 			{
-				chrome.storage.local.get(null, function(items) 
-				{
-					var allKeys = Object.keys(items);
-				})
-
+				alert("before groupCount reset: " + group.groupCount);
 				var resetGroupCount = group.groupCount - 1;
+				var resetButtonCount = group.buttonCount - 1;
 				// subtract one from groupCount for removal of a group
-				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group)
+				chrome.storage.local.set({"groupCount": resetGroupCount, "buttonCount": resetButtonCount}, function(group)
 				{
-					console.log("RELOAD4----------------------------------------");
+					alert("RELOAD4----------------------------------------");
 					window.location.reload();
 				})
+				
+				alert("after groupCount reset: " + group.groupCount);
 
 				/* sets empty text if removal of group results in zero buttons */
-				chrome.storage.local.get("groupCount", function(group)
+				chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
 				{
-					if (group.groupCount == 0)
+					alert("group.groupCount: " + group.groupCount);
+					alert("group.buttonCount: " + group.buttonCount);
+					if (group.groupCount == 0 || group.buttonCount == 0)
 					{
 						setEmptyText();
 					}
