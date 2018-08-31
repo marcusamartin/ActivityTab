@@ -309,12 +309,6 @@ function getStorage(i)
 		// console.log("getStorage groupCount: " + i);
 
 		displayTabButton(group, i);
-		// does not display window button if save all tabs was used (unnecessary)
-		// if (group["tabCount" + i][1] == undefined)
-		// {
-		// 	// alert('group["tabCount" + i][1]: ' + group["tabCount" + i][1]);
-		// 	displayWindowButton(group, i);
-		// }
 		displayWindowButton(group, i);
 		displayTrashButton(group, i);
 	})
@@ -330,10 +324,12 @@ function displayTabButton(group, i)
 	// puts button in popup
 	document.getElementById("groupButtons").appendChild(groupButton);
 
+	// colors tab button
+	colorButton(groupButton, group, i);
+
 	/* opens tabs if button is clicked */
 	groupButton.onclick = function()
 	{
-		// console.log("group['tabCount' + i][1]: " + group["tabCount" + i][1]);
 		/* if tabs in multiple windows were saved */
 		if (group["tabCount" + i][1] != undefined)
 		{
@@ -373,6 +369,9 @@ function displayWindowButton(group, i)
 		// windowButton.style.height = "35px";
 		// appends button to corresponding tab button
 		document.getElementById("groupButtons").appendChild(windowButton);
+
+		// colors window button
+		colorButton(windowButton, group, i);
 	
 		/* creates a new window with saved tabs */
 		windowButton.onclick = function()
@@ -423,6 +422,9 @@ function displayTrashButton(group, i)
 	// appends button to corresponding tab button
 	document.getElementById("groupButtons").appendChild(trashButton);
 
+	// colors trash button
+	colorButton(trashButton, group, i);
+
 	/* deletes group if trash icon is clicked  */
 	trashButton.onclick = function()
 	{
@@ -453,10 +455,19 @@ function displayTrashButton(group, i)
 
 				var resetGroupCount = group.groupCount - 1;
 				// subtract one from groupCount for removal of a group
-				chrome.storage.local.set({"groupCount": resetGroupCount}, function()
+				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group)
 				{
 					console.log("RELOAD4----------------------------------------");
 					window.location.reload();
+				})
+
+				/* sets empty text if removal of group results in zero buttons */
+				chrome.storage.local.get("groupCount", function(group)
+				{
+					if (group.groupCount == 0)
+					{
+						setEmptyText();
+					}
 				})
 			})
 		}
@@ -539,4 +550,50 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 		console.log("RELOAD2----------------------------------------");
 		window.location.reload();
 	}
+	/* colors buttons after button is replaced; request.msg = i (to identify group) */
+	else
+	{
+		// chrome.storage.local.get(["tabColor" + i], function(group)
+		// {
+		// 	colorButton("trashButton")
+		// })
+	}
 })
+
+function colorButton(button, group, i)
+{
+	/* colors buttons */
+	// just needs to check first tab since all tabs are colored
+	console.log('group["tabColor" + i][0]: ' + group["tabColor" + i][0]);
+	var tabColor = group["tabColor" + i][0];
+	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+	var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+	switch(tabColor)
+	{
+		case redURL:
+			button.style.backgroundColor = "#FF0000";
+			break;
+		case greenURL:
+			button.style.backgroundColor = "#00FF00";
+			break;
+		case blueURL:
+			button.style.backgroundColor = "#0000FF";
+			break;
+		case yellowURL:
+			button.style.backgroundColor = "#FFFF00";
+			break;
+		case orangeURL:
+			button.style.backgroundColor = "#FFA500";
+			break;
+		case purpleURL:
+			button.style.backgroundColor = "#A020F0";
+			break;
+		default:
+			break;
+	}
+}

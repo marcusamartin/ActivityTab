@@ -150,14 +150,14 @@ function checkDuplicateName(promptUser, groupCount, command)
 						/* if button does launch multiple windows */
 						if (command == "same-color-tabs-toggle-feature")
 						{
-							alert("going to replaceButton");
 							replaceButton(i, promptUser, command);
+
 						}
 						/* button launches multiple windows */
 						else if (command == "save-all-tabs")
 						{
-							alert("going to replaceAllButton");
 							replaceAllButton(i, promptUser);
+							// chrome.runtime.sendMessage({msg: i});
 						}
 						// removes added button from asynchronous function since a button is still added
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
@@ -178,7 +178,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 	}
 }
 
-/* updates correct button with tab information but does not replace button */
+/* updates correct button with tab information AND REPLACES BUTTON */
 function replaceButton(replacementButton, promptUser, command)
 {
 	var groupObject = {};
@@ -228,6 +228,20 @@ function replaceButton(replacementButton, promptUser, command)
 					}
 				}
 
+				// removes info of button to be replaced
+				chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
+
+				/* button is deleted, so button counter can be decreased by 1 */
+				chrome.storage.local.get("buttonCount", function(group2)
+				{
+					// (i + 1) == last button
+					if ((i + 1) == group2.buttonCount)
+					{
+						var subtractOne = (group2.buttonCount) - 1;
+						chrome.storage.local.set({"buttonCount": subtractOne});
+					}
+				})
+
 				var groupName = "groupName" + replacementButton;
 				groupObject[groupName] = promptUser;
 
@@ -245,9 +259,21 @@ function replaceButton(replacementButton, promptUser, command)
 
 				// puts object into storage
 				chrome.storage.local.set(groupObject);
+
+				/* set-up for next group so last group isn't overwritten */
+				// enables empty text to be set
+				chrome.storage.local.get("buttonCount", function(group2)
+				{
+					if (group2.buttonCount != 0)
+					{
+						chrome.storage.local.set({"groupCount": (replacementButton + 1)});
+						// tracks number of buttons so it can display them all even if one is deleted
+						chrome.storage.local.set({"buttonCount": (replacementButton + 1)});
+					}
+				})
 			})
 		}
-		/* command from store tabs text field */
+		/* command from store tabs text field (feature removed)*/
 		else
 		{
 			var groupName = "groupName" + replacementButton;
@@ -273,7 +299,6 @@ function replaceButton(replacementButton, promptUser, command)
 
 function replaceAllButton(replacementButton, promptUser)
 {
-	alert("replaceAllButton");
 	chrome.storage.local.get("groupCount", function(group)
 	{
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
@@ -405,7 +430,7 @@ function sameColorTabs(command)
 							tabUrlsArr.splice(i, 1);
 							// decrements tab count as differe colored tab is removed
 							tabCount--;
-							// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
+							// decrement count since array length changed when tab was deleted (ex: [1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 							i--;
 						}
 					}
@@ -708,7 +733,39 @@ function createTab(group, i, j)
 		/* saves color of tab */
 		var tabColor = group["tabColor" + i][j];
 		tabIdsToColor[tab.id] = tabColor;
-		// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
+
+		/* colors popup buttons if tab is colored */
+
+		// var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+		// var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+		// var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+		// var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+		// var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+		// var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+		// switch(tabColor)
+		// {
+		// 	case redURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: red"});
+		// 		break;
+		// 	case greenURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: green"});
+		// 		break;
+		// 	case blueURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: blue"});
+		// 		break;
+		// 	case yellowURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: yellow"});
+		// 		break;
+		// 	case orangeURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: orange"});
+		// 		break;
+		// 	case purpleURL:
+		// 		chrome.runtime.sendMessage({msg: "color buttons: purple"});
+		// 		break;
+		// 	default:
+		// 		break;
+		// }
     })
 }
 

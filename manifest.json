@@ -61,12 +61,12 @@
         {
             "suggested_key":
             {
-                "windows": "Ctrl + M",
-                "mac": "Command + M",
-                "chromeos": "Ctrl + M",
-                "linux": "Ctrl + M"
+                "windows": "Ctrl + Down",
+                "mac": "Command + Down",
+                "chromeos": "Ctrl + Down",
+                "linux": "Ctrl + Down"
             },
-            "description": "ActivityTab Feature (Ctrl/Command + M)"
+            "description": "ActivityTab Feature (Ctrl/Command + Down Arrow Key)"
         }
     },
     "web_accessible_resources": 
