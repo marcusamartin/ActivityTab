@@ -257,7 +257,7 @@ function displayButtons()
 		
 		/* checks if there are no buttons to display empty text */
 		// if (groupCount == 0)
-		if (groupCount < 0 || buttonCount == 0)
+		if (groupCount == 0 || buttonCount == 0)
 		{
 			setEmptyText();
 			// sets button count to 0 since there are no buttons
@@ -442,19 +442,6 @@ function displayTrashButton(group, i)
 			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
 
 			/* last button is deleted, so button counter can be decreased by 1 */
-			// groupCount should always be 1 less than buttonCount
-			chrome.storage.local.get(["buttonCount", "groupCount"], function(group2)
-			{
-				alert("groupCount should be 1 less than buttonCount");
-				alert("groupCount: " + group2.groupCount);
-				alert("buttonCount: " + group2.buttonCount);
-				// (i + 1) == last button
-				if ((i + 1) == group2.buttonCount)
-				{
-					var subtractOne = (group2.buttonCount) - 1;
-					chrome.storage.local.set({"buttonCount": subtractOne});
-				}
-			})
 
 			chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
 			{
@@ -462,7 +449,7 @@ function displayTrashButton(group, i)
 				var resetGroupCount = group.groupCount - 1;
 				// var resetButtonCount = group.buttonCount - 1;
 				// subtract one from groupCount for removal of a group
-				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group)
+				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group) // buttonCount: resetButtonCount
 				{
 					alert("RELOAD4----------------------------------------");
 					window.location.reload();
