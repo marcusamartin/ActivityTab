@@ -256,7 +256,8 @@ function displayButtons()
 		buttonCount = group.buttonCount;
 		
 		/* checks if there are no buttons to display empty text */
-		if (groupCount == 0)
+		// if (groupCount == 0)
+		if (groupCount < 0 || buttonCount == 0)
 		{
 			setEmptyText();
 			// sets button count to 0 since there are no buttons
@@ -441,8 +442,12 @@ function displayTrashButton(group, i)
 			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
 
 			/* last button is deleted, so button counter can be decreased by 1 */
-			chrome.storage.local.get("buttonCount", function(group2)
+			// groupCount should always be 1 less than buttonCount
+			chrome.storage.local.get(["buttonCount", "groupCount"], function(group2)
 			{
+				alert("groupCount should be 1 less than buttonCount");
+				alert("groupCount: " + group2.groupCount);
+				alert("buttonCount: " + group2.buttonCount);
 				// (i + 1) == last button
 				if ((i + 1) == group2.buttonCount)
 				{
@@ -455,9 +460,9 @@ function displayTrashButton(group, i)
 			{
 				alert("before groupCount reset: " + group.groupCount);
 				var resetGroupCount = group.groupCount - 1;
-				var resetButtonCount = group.buttonCount - 1;
+				// var resetButtonCount = group.buttonCount - 1;
 				// subtract one from groupCount for removal of a group
-				chrome.storage.local.set({"groupCount": resetGroupCount, "buttonCount": resetButtonCount}, function(group)
+				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group)
 				{
 					alert("RELOAD4----------------------------------------");
 					window.location.reload();
@@ -468,10 +473,11 @@ function displayTrashButton(group, i)
 				/* sets empty text if removal of group results in zero buttons */
 				chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
 				{
-					alert("group.groupCount: " + group.groupCount);
-					alert("group.buttonCount: " + group.buttonCount);
+					alert("groupCount SETEMPTY: " + group.groupCount);
+					alert("buttonCountSETEMPTY: " + group.buttonCount);
 					if (group.groupCount == 0 || group.buttonCount == 0)
 					{
+						alert("yesSETEMPTY");
 						setEmptyText();
 					}
 				})
@@ -539,6 +545,12 @@ function renameTab()
 	// get text from text field
 	var customTitleField = document.getElementById("customTitleField").value;
 	
+	if (customTitleField == "")
+	{
+		alert("Please enter a name for the tab!");
+		return;
+	}
+	
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs)
 	{
 		// title sent to content script
@@ -551,7 +563,7 @@ function renameTab()
 /* correctly updates sort tabs text field's border color from command */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
-	if (request.msg === "color command") 
+	if (request.msg === "color command")
 	{
 		console.log("RELOAD2----------------------------------------");
 		window.location.reload();
@@ -559,6 +571,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	/* colors buttons after button is replaced; request.msg = i (to identify group) */
 	else
 	{
+		// window.local.reload();
 		// chrome.storage.local.get(["tabColor" + i], function(group)
 		// {
 		// 	colorButton("trashButton")

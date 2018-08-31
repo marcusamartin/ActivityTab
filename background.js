@@ -41,8 +41,17 @@ function onInstall()
 	// 	console.log("storage: " + allKeys);
 	// })
 
-	chrome.storage.local.set({"groupCount": 0});   // FIXME: will this delete tabs if extension is updated?
-	chrome.storage.local.set({"buttonCount": 0});
+	chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+	{
+		if (group.groupCount < 0 || group.groupCount == undefined)
+		{
+			chrome.storage.local.set({"groupCount": 0});
+			// can also set buttonCount here?
+			chrome.storage.local.set({"buttonCount": 0});
+		}
+	})
+	// chrome.storage.local.set({"groupCount": 0});
+	// chrome.storage.local.set({"buttonCount": 0});
 
 	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
@@ -81,6 +90,11 @@ function ActivityTabFeatures(command)
 			chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
 			{
 				var promptUser = prompt("Rename tab:");
+
+				if (promptUser == "")
+				{
+					alert("Please enter a name for the tab!");
+				}
 
 				// title sent to content script
 				chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
@@ -135,10 +149,11 @@ function checkDuplicateName(promptUser, groupCount, command)
 	{
 		/* iterates through the buttons */
 		for (var i = 0; i < groupCount; i++)
-		{
-			chrome.storage.local.get(["groupName" + i, "tabCount" + i, "groupCount"], function(i, anotherGroup)
+		{																// groupcount buttoncount for debugging
+			chrome.storage.local.get(["groupName" + i, "tabCount" + i, "groupCount", "buttonCount"], function(i, anotherGroup)
 			{
 				alert("checkDuplicateName, groupCount: " + anotherGroup.groupCount);
+				alert("checkDuplicateName, buttonCount: " + anotherGroup.buttonCount);
 				var groupName = anotherGroup["groupName" + i];
 					
 				if (groupName == promptUser)
@@ -161,7 +176,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 							replaceAllButton(i, promptUser);
 							// chrome.runtime.sendMessage({msg: i});
 						}
-						// removes added button from asynchronous function since a button is still added
+						// removes added button from asynchronous function since a button is still added ****NOT NEEDED ANYMORE****
 						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 					}
 					else
@@ -224,26 +239,29 @@ function replaceButton(replacementButton, promptUser, command)
 						tabNamesArr.splice(i, 1);
 						// removes url of array as well
 						tabUrlsArr.splice(i, 1);
-						// decrements tab count as differe colored tab is removed
+						// decrements tab count as different colored tab is removed
 						tabCount--;
 						// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 						i--;
 					}
 				}
 
-				// removes info of button to be replaced
-				chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
-
-				/* button is deleted, so button counter can be decreased by 1 */
-				chrome.storage.local.get("buttonCount", function(group2)
-				{
-					// (i + 1) == last button
-					if ((i + 1) == group2.buttonCount)
-					{
-						var subtractOne = (group2.buttonCount) - 1;
-						chrome.storage.local.set({"buttonCount": subtractOne});
-					}
-				})
+				// /* button and group counter can be decreased by 1 since return to storeTabsTextField will increment groupCount and buttonCount */
+				// chrome.storage.local.get(["groupCount", "buttonCount"], function(group2)
+				// {
+				// 	chrome.storage.local.set({"groupCount": group2.groupCount--, "buttonCount": group2.buttonCount--}, function(group)
+				// 	{
+				// 		alert("changed groupCount: " + group.groupCount);
+				// 		alert("changed buttonCount: " + group.buttonCount);
+				// 	})
+				// 	// alert("buttonCount: " + group2.buttonCount);
+				// 	// // (i + 1) == last button
+				// 	// if ((i + 1) == group2.buttonCount)
+				// 	// {
+				// 	// 	var subtractOne = (group2.buttonCount) - 1;
+				// 	// 	chrome.storage.local.set({"buttonCount": subtractOne});
+				// 	// }
+				// })
 
 				var groupName = "groupName" + replacementButton;
 				groupObject[groupName] = promptUser;
@@ -269,11 +287,32 @@ function replaceButton(replacementButton, promptUser, command)
 				{
 					if (group2.buttonCount != 0)
 					{
-						chrome.storage.local.set({"groupCount": (replacementButton + 1)});
+						// chrome.storage.local.set({"groupCount": (replacementButton + 1)});
 						// tracks number of buttons so it can display them all even if one is deleted
-						chrome.storage.local.set({"buttonCount": (replacementButton + 1)});
+						// chrome.storage.local.set({"buttonCount": (replacementButton + 1)});
 					}
 				})
+			})
+
+			/* button and group counter can be decreased by 1 since return to storeTabsTextField will increment groupCount and buttonCount */
+			chrome.storage.local.get(["groupCount", "buttonCount"], function(group2)
+			{
+				alert("before changed groupCount: " + group2.groupCount);
+				alert("before changed buttonCount: " + group2.buttonCount);
+				var groupCountMinus1 = group2.groupCount - 1;
+				var buttonCountMinus1 = group2.buttonCount - 1;
+				chrome.storage.local.set({"groupCount": groupCountMinus1, "buttonCount": buttonCountMinus1}, function(group)
+				{
+					alert("changed groupCount: " + group.groupCount);
+					alert("changed buttonCount: " + group.buttonCount);
+				})
+				// alert("buttonCount: " + group2.buttonCount);
+				// // (i + 1) == last button
+				// if ((i + 1) == group2.buttonCount)
+				// {
+				// 	var subtractOne = (group2.buttonCount) - 1;
+				// 	chrome.storage.local.set({"buttonCount": subtractOne});
+				// }
 			})
 		}
 		/* command from store tabs text field (feature removed)*/
@@ -305,10 +344,6 @@ function replaceAllButton(replacementButton, promptUser)
 	alert("in replaceAllButton");
 	chrome.storage.local.get("groupCount", function(group)
 	{
-		alert("replaceAllButton, groupCount: " + group.groupCount);
-		group.groupCount -= 1;
-		alert("replaceAllButton, groupCount: " + group.groupCount);
-		chrome.storage.local.set({"groupCount": group.groupCount});
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		var groupObject = {};
 
@@ -391,6 +426,20 @@ function replaceAllButton(replacementButton, promptUser)
 			console.log("groupObject: " + groupObject);
 			// puts object into storage
 			chrome.storage.local.set(groupObject);
+
+			/* button and group counter can be decreased by 1 since return to storeAllTabsTextField will increment groupCount and buttonCount */
+			chrome.storage.local.get(["groupCount", "buttonCount"], function(group2)
+			{
+				alert("before changed groupCount: " + group2.groupCount);
+				alert("before changed buttonCount: " + group2.buttonCount);
+				var groupCountMinus1 = group2.groupCount - 1;
+				var buttonCountMinus1 = group2.buttonCount - 1;
+				chrome.storage.local.set({"groupCount": groupCountMinus1, "buttonCount": buttonCountMinus1}, function(group)
+				{
+					alert("changed groupCount: " + group.groupCount);
+					alert("changed buttonCount: " + group.buttonCount);
+				})
+			})
 			
 			// sends a message to popup script so sort tabs text field's border color will update from command
 			chrome.runtime.sendMessage({msg: "color command"});
@@ -402,6 +451,11 @@ function sameColorTabs(command)
 {
 	chrome.storage.local.get("groupCount", function(group)
 	{
+		// groupCount will go below zero if buttons are made and then all buttons are deleted
+		if (group.groupCount < 0)
+		{
+			group.groupCount = 0;
+		}
 		// current count of groups
 		var groupCount = group.groupCount;
 
@@ -530,6 +584,11 @@ function storeSortTabsTextField(storeSortTabsTextField)
 {
 	chrome.storage.local.get("groupCount", function(group)
 	{
+		// groupCount will go below zero if buttons are made and then all buttons are deleted
+		if (group.groupCount < 0)
+		{
+			group.groupCount = 0;
+		}
 		// current count of groups
 		var groupCount = group.groupCount;
 
@@ -616,11 +675,13 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					// puts object into storage
 					chrome.storage.local.set(groupObject);
 
+					alert("groupCount of button: " + groupCount);
+
 					/* checks if duplicate name */
 					// specified command to have duplicate checked the same way as the sort colors command
-					alert("checkDuplicateName2");
 					checkDuplicateName(promptUser, groupCount, "same-color-tabs-toggle-feature");
 
+					// PROBLEM IF DUPLICATE NAME
 					/* set-up for next group so last group isn't overwritten */
 					// enables empty text to be set
 					chrome.storage.local.set({"groupCount": (groupCount + 1)});
@@ -636,6 +697,11 @@ function storeAllTabsTextField(storeAllTabsTextField)
 {
 	chrome.storage.local.get("groupCount", function(group)
 	{
+		// groupCount will go below zero if buttons are made and then all buttons are deleted
+		if (group.groupCount < 0)
+		{
+			group.groupCount = 0;
+		}
 		// current count of groups
 		var groupCount = group.groupCount;
 
