@@ -1,10 +1,226 @@
-/* waits for popup color button press and then sends message with button info to content.js */
+// calls function continuously to populate buttons for popup
+displayButtons();
+
+/* Display buttons in popup */
+function displayButtons()
+{
+	var groupCount;
+	var buttonCount;
+
+	chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+	{
+		groupCount = group.groupCount;
+		buttonCount = group.buttonCount;
+		
+		/* checks if there are no buttons to display empty text */
+		// if (groupCount == 0)
+		if (groupCount == 0 || buttonCount == 0)
+		{
+			setEmptyText();
+			// sets button count to 0 since there are no buttons
+			chrome.storage.local.set({"buttonCount": 0});
+		}
+		/* creates the buttons */
+		else
+		{
+			for (var i = 0; i < buttonCount; i++)
+			{
+				getStorage(i);
+			}
+		}
+	})
+}
+
+/* displays empty text when there are no buttons to display */
+function setEmptyText()
+{
+	document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
+	document.getElementById("groupButtons").style.color = "blue";
+	document.getElementById("groupButtons").style.width = "532px";
+	document.getElementById("groupButtons").style.fontWeight = "900";
+	document.getElementById("groupButtons").style.fontSize = 20;
+	document.getElementById("groupButtons").style.textAlign = "center";
+}
+
+/* gets and displays tab, window, and trash buttons from storage */
+// i == groupCount
+function getStorage(i)
+{
+	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
+	{
+		/* checks  if storage is empty or if a group was deleted (still checks group number if deleted) 
+		   to maximize efficiency from the inefficiency of using buttonCount */
+		if (group["groupName" + i] == null)
+		{
+			return;
+		}
+
+		/* displays the buttons related to the tabs */
+		displayTabButton(group, i);
+		displayWindowButton(group, i);
+		displayTrashButton(group, i);
+	})
+}
+
+/* display tab button */
+function displayTabButton(group, i)
+{
+	var groupButton = document.createElement("button");
+
+	/* set css of button */
+	groupButton.id = "groupButton";
+	groupButton.innerHTML = group["groupName" + i];
+	// colors tab button
+	colorButton(groupButton, group, i);
+
+	// puts button in popup
+	document.getElementById("groupButtons").appendChild(groupButton);
+
+	/* opens tabs if button is clicked */
+	groupButton.onclick = function()
+	{
+		/* if tabs in multiple windows were saved and if tabs in one window were saved */
+		// 0 is the flag to know that the user saved all their tabs with only one window open
+		if (group["tabCount" + i][1] != undefined || group["tabCount" + i][1] == 0)
+		{
+			/* traverses the windows */
+			for (var j = 0; j < group["tabCount" + i].length; j++)
+			{
+				// 0 shows that it is a single window, so cannot access a valid url when j equals 1
+				if (group["tabCount" + i][j] == 0)
+				{
+					return;
+				}
+				chrome.extension.getBackgroundPage().createAllTabs(group, i, j);
+			}
+		}
+		else
+		{
+			console.log("opens the tabs");
+			/* opens the tabs */
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createTab(group, i, j);
+				// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
+				// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
+			}
+		}
+	}
+}
+
+/* display window button */
+function displayWindowButton(group, i)
+{
+	/* button opens a single window */
+	if (group["tabCount" + i][1] == undefined)
+	{
+		var windowButton = document.createElement("button");
+
+		// set css of button
+		windowButton.id = "windowButton";
+		windowButton.className = "fa fa-external-link";
+		// sizes icon
+		windowButton.style.fontSize = "35px";
+		windowButton.style.width = "80px";
+
+		// appends button to corresponding tab button
+		document.getElementById("groupButtons").appendChild(windowButton);
+
+		// colors window button
+		colorButton(windowButton, group, i);
+	
+		/* creates a new window with saved tabs */
+		windowButton.onclick = function()
+		{
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			}
+		}
+	}
+	/* button opens multiple windows */
+	else if (group["tabCount" + i][1] != undefined)
+	{
+		var windowButton = document.createElement("form");
+		// set css of button
+		windowButton.id = "windowButton";
+		windowButton.className = "fa fa-external-link";
+		// sizes icon
+		windowButton.style.fontSize = "35px";
+		// make button size be correct size
+		windowButton.style.height = "35px";
+
+		// appends button to corresponding tab button
+		document.getElementById("groupButtons").appendChild(windowButton);
+
+		/* creates a new window with saved tabs */
+		windowButton.onclick = function()
+		{
+			for (var j = 0; j < group["tabCount" + i]; j++)
+			{
+				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
+			}
+		}
+
+		// disables button as it is unnecessary when the tabs button opens multiple windows already
+		windowButton.disabled = true;
+		// sets background color of button to reflect that the button is disabled
+		windowButton.style.backgroundColor = "#AAB4AF";
+	}
+}
+
+/* display trash button */
+function displayTrashButton(group, i)
+{
+	var trashButton = document.createElement("button");
+
+	// set css of button
+	trashButton.id = "trashButton";
+	trashButton.className = "fa fa-trash";
+	// colors trash button
+	colorButton(trashButton, group, i);
+	// sizes icon
+	trashButton.style.fontSize = "35px";
+
+	// appends button to corresponding tab button
+	document.getElementById("groupButtons").appendChild(trashButton);
+
+	/* deletes group if trash icon is clicked  */
+	trashButton.onclick = function()
+	{
+		var confirmDelete = confirm("Are you sure you want to delete " + group["groupName" + i] + "?");
+		if (confirmDelete)
+		{
+			// removes the group name, tab names, tab urls, and number of tabs from storage
+			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
+
+			/* button is deleted, so button counter can be decreased by 1 */
+			chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+			{
+				// subtract one from groupCount for removal of a group
+				var resetGroupCount = group.groupCount - 1;
+				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group)
+				{
+					window.location.reload();
+				})
+
+				/* sets empty text if removal of group results in zero buttons */
+				chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+				{
+					if (group.groupCount == 0 || group.buttonCount == 0)
+					{
+						setEmptyText();
+					}
+				})
+			})
+		}
+	}
+}
+
+/* waits for popup color button press and then sends message with button info to content script to change the tab color */
 // select menu, select trash button, and sortTabsTextField do not send any message
 document.addEventListener("DOMContentLoaded", function()
 {
-	/* sets border color for sort tabs text field */
-	setSortTabsTextFieldBorderColor();
-
 	/* red button */
 	var button = document.getElementById("redButton");
 	button.addEventListener("click", function()
@@ -48,25 +264,152 @@ document.addEventListener("DOMContentLoaded", function()
 		queryButtonClick("buttonPress", "purple");
 	})
 
-	/* changes select button color */
-	var select = document.getElementById("mySelect");
+	// title text field is selected when popup is displayed
+	document.getElementById("customTitleField").focus();
+	/* registers enter key press for title text field */
+	var customTitleTextField = document.getElementById("customTitleField");
+	customTitleTextField.addEventListener("keyup", function(enterKey)
+	{
+		if (enterKey.keyCode == 13) 
+		{
+			renameTab();
+			// reloads popup immediately to show that tab was retitled
+			window.location.reload();
+		}
+	})
+
+	var sortTabsTextField = document.getElementById("sortTabsTextField");
+	sortTabsTextField.addEventListener("keyup", function(enterKey)
+	{
+		if (enterKey.keyCode == 13)
+		{
+			// get text from text field
+			var storeSortTabsTextField = document.getElementById("sortTabsTextField").value;
+
+			// refer to background page because popup is automatically closed when a tab is created,
+			// so callback function would never execute
+			chrome.extension.getBackgroundPage().storeSortTabsTextField(storeSortTabsTextField);
+			// reloads popup immediately to display stored tab button
+			window.location.reload();
+		}
+	})
+
+	/* sets border color for sort tabs text field */
+	setSortTabsTextFieldBorderColor();
+
+	var allTabsTextField = document.getElementById("allTabsTextField");
+	allTabsTextField.addEventListener("keyup", function(enterKey)
+	{
+		if (enterKey.keyCode == 13)
+		{
+			// get text from text field
+			var storeAllTabsTextField = document.getElementById("allTabsTextField").value;
+
+			// refer to background page because popup is automatically closed when a tab is created,
+			// so callback function would never execute
+			chrome.extension.getBackgroundPage().storeAllTabsTextField(storeAllTabsTextField);
+			// reloads popup immediately to display stored tab button
+			window.location.reload();
+		}
+	})
+
+	/* changes select button color when dropdown menu is selected */
+	var select = document.getElementById("selectMenu");
 	select.onchange = function() 
 	{
-		// selects menu1, menu2, etc
+		// gets selected dropdown menu's className to get it's properties
 		select.className = this.options[this.selectedIndex].className;
+		// color select menu's trash button
+		colorSelectMenuTrashButton(button, select.className);
 	}
 
 	/* select trash button */
-	var button = document.getElementById("selectTrashButton");
+	var button = document.getElementById("selectMenuTrashButton");
+	colorSelectMenuTrashButton(button, select.className);
 	button.addEventListener("click", function()
 	{
 		queryDropDownClick(select.className);
 	})
 })
 
+/* sends message with button info to content script */
+function queryButtonClick(buttonPress, color)
+{
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+	{
+		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
+		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+		// deletes and reinitializes color in saveColor so tab color will be correct and persist through tab refresh
+		chrome.extension.getBackgroundPage().deleteSaveColor(color);
+		// refreshes popup to change sort tabs text field's border color to correct color
+		window.location.reload();
+	})
+}
+
+/* sets the background color of the button to correspond with it's tab colors */
+function colorButton(button, group, i)
+{
+	/* colors buttons */
+	// just needs to check first tab since all tabs are colored (from saveColorTabs)
+	var tabColor = group["tabColor" + i][0];
+	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+	var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+	/* changes the button's background color */
+	switch(tabColor)
+	{
+		case redURL:
+			button.style.backgroundColor = "#FF0000";
+			break;
+		case greenURL:
+			button.style.backgroundColor = "#00FF00";
+			break;
+		case blueURL:
+			button.style.backgroundColor = "#0000FF";
+			break;
+		case yellowURL:
+			button.style.backgroundColor = "#FFE303";
+			break;
+		case orangeURL:
+			button.style.backgroundColor = "#FFA500";
+			break;
+		case purpleURL:
+			button.style.backgroundColor = "#A020F0";
+			break;
+		default:
+			break;
+	}
+}
+
+/* gets title from text field and renames the tab */
+function renameTab()
+{
+	// get text from text field
+	var customTitleField = document.getElementById("customTitleField").value;
+	
+	if (customTitleField == "")
+	{
+		alert("Please enter a name for the tab!");
+		return;
+	}
+	
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs)
+	{
+		// title sent to content script
+		chrome.tabs.sendMessage(tabs[0].id, {name: customTitleField}, function(response){});
+		// title sent to background script
+		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
+	})
+}
+
 /* checks current tab's favicon url and determines if sort tabs text field color should be changed */
 function setSortTabsTextFieldBorderColor()
 {
+	/* urls of color favicons */
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
 	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
     var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
@@ -77,7 +420,6 @@ function setSortTabsTextFieldBorderColor()
 	// checks current tab's favicon url
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		// console.log("tab.favIconUrl: " + tab[0].favIconUrl);
 		switch(tab[0].favIconUrl)
 		{
 			case redURL:
@@ -90,7 +432,7 @@ function setSortTabsTextFieldBorderColor()
 				document.getElementById("sortTabsTextField").style.border = "3px solid #0000FF";
 				break;
 			case yellowURL:
-				document.getElementById("sortTabsTextField").style.border = "3px solid #FFFF00";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #FFE303";
 				break;
 			case orangeURL:
 				document.getElementById("sortTabsTextField").style.border = "3px solid #FFA500";
@@ -107,21 +449,42 @@ function setSortTabsTextFieldBorderColor()
 	})
 }
 
-/* sends message with button info to content.js */
-function queryButtonClick(buttonPress, color)
+/* reloads popup after sort tabs text field's border color was changed */
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
-	// console.log("queryButtonClick--------------");
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+	if (request.msg === "color command")
 	{
-		// console.log("sending message, button:color" + buttonPress + ":" + color);
-		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
-		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
-		// console.log("right before deleteSaveColor()");
-		chrome.extension.getBackgroundPage().deleteSaveColor(color);
-		// refreshes popup to change sort tabs text field's border color to correct color
-		console.log("RELOAD3----------------------------------------");
 		window.location.reload();
-	})
+	}
+})
+
+/* colors select menu's trash button with corresponding color to select menu */
+function colorSelectMenuTrashButton(button, menuItem)
+{
+	console.log("menuItem: " + menuItem);
+	switch(menuItem)
+    {
+		case "menu1":
+			button.style.backgroundColor = "#FF0000";
+			break;
+        case "menu2":
+			button.style.backgroundColor = "#00FF00";
+            break;
+        case "menu3":
+			button.style.backgroundColor = "#0000FF";
+            break;
+        case "menu4":
+			button.style.backgroundColor = "#FFE303";
+            break;
+		case "menu5":
+			button.style.backgroundColor = "#FFA500";
+			break;
+		case "menu6":
+			button.style.backgroundColor = "#A020F0";
+            break;
+        default:
+            break;
+    }
 }
 
 /* deletes tabs of specified color */
@@ -185,6 +548,7 @@ function queryDropDownClick(menuItem)
 /* iterates through current tabs in window and deletes tabs of specified color */
 function checkAndRemoveFaviconURL(color)
 {
+	/* urls of color favicons */
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
 	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
     var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
@@ -192,7 +556,7 @@ function checkAndRemoveFaviconURL(color)
     var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
 	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
-	chrome.tabs.query({currentWindow: true}, function (tabs)
+	chrome.tabs.query({currentWindow: true}, function(tabs)
 	{
 		for (var i = 0; i < tabs.length; i++)
 		{
@@ -239,367 +603,4 @@ function checkAndRemoveFaviconURL(color)
 			}
 		}
 	})
-}
-
-// calls function continuously to populate buttons for popup
-displayButtons();
-
-/* Display buttons in popup */
-function displayButtons()
-{
-	var groupCount;
-	var buttonCount;
-
-	chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
-	{
-		groupCount = group.groupCount;
-		buttonCount = group.buttonCount;
-		
-		/* checks if there are no buttons to display empty text */
-		// if (groupCount == 0)
-		if (groupCount == 0 || buttonCount == 0)
-		{
-			setEmptyText();
-			// sets button count to 0 since there are no buttons
-			chrome.storage.local.set({"buttonCount": 0});
-		}
-		/* creates the buttons */
-		else
-		{
-			for (var i = 0; i < buttonCount; i++)
-			{
-				getStorage(i);
-			}
-		}
-
-		/* debugging */
-		chrome.storage.local.get(null, function(items) 
-		{
-			var allKeys = Object.keys(items);
-			// console.log("after displaying all the buttons, storage: " + allKeys);
-		})
-		chrome.storage.local.get("groupCount", function(groups)
-		{
-			// console.log("after displaying all the buttons, groupCount: " + groups.groupCount);
-		})
-	})
-}
-
-function setEmptyText()
-{
-	document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
-	document.getElementById("groupButtons").style.color = "blue";
-	document.getElementById("groupButtons").style.width = "532px";
-	document.getElementById("groupButtons").style.fontWeight = "900";
-	document.getElementById("groupButtons").style.fontSize = 20;
-	document.getElementById("groupButtons").style.textAlign = "center";
-}
-
-/* gets and displays tab, window, and trash buttons from storage */
-// i == groupCount
-function getStorage(i)
-{
-	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
-	{
-		/* checks  if storage is empty or if a group was deleted (still checks group number if deleted) */
-		if (group["groupName" + i] == null)
-		{
-			return;
-		}
-
-		// console.log("getStorage groupCount: " + i);
-
-		displayTabButton(group, i);
-		displayWindowButton(group, i);
-		displayTrashButton(group, i);
-	})
-}
-
-/* display tab button */
-function displayTabButton(group, i)
-{
-	var groupButton = document.createElement("button");
-	/* set css of button */
-	groupButton.id = "groupButton";
-	groupButton.innerHTML = group["groupName" + i];
-	// puts button in popup
-	document.getElementById("groupButtons").appendChild(groupButton);
-
-	// colors tab button
-	colorButton(groupButton, group, i);
-
-	/* opens tabs if button is clicked */
-	groupButton.onclick = function()
-	{
-		/* if tabs in multiple windows were saved */ // for one window save all tabs
-		if (group["tabCount" + i][1] != undefined || group["tabCount" + i][1] == 0)
-		{
-			/* traverses the windows */
-			for (var j = 0; j < group["tabCount" + i].length; j++)
-			{
-				// 0 shows that it is a single window, so cannot access a valid url at j = 1
-				if (group["tabCount" + i][j] == 0)
-				{
-					return;
-				}
-				chrome.extension.getBackgroundPage().createAllTabs(group, i, j);
-			}
-		}
-		else
-		{
-			console.log("opens the tabs");
-			/* opens the tabs */
-			for (var j = 0; j < group["tabCount" + i]; j++)
-			{
-				chrome.extension.getBackgroundPage().createTab(group, i, j);
-				// cannot use callback function because popup is immediately closed upon tab creation, have to use background script
-				// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false});
-			}
-		}
-	}
-}
-
-/* display window button */
-function displayWindowButton(group, i)
-{
-	/* button opens a wingle window */
-	if (group["tabCount" + i][1] == undefined)
-	{
-		var windowButton = document.createElement("button");
-		// set css of button
-		windowButton.id = "windowButton";
-		windowButton.className = "fa fa-external-link";
-		// sizes icon
-		windowButton.style.fontSize = "35px";
-		windowButton.style.width = "80px";
-		// make button size be correct size
-		// windowButton.style.height = "35px";
-		// appends button to corresponding tab button
-		document.getElementById("groupButtons").appendChild(windowButton);
-
-		// colors window button
-		colorButton(windowButton, group, i);
-	
-		/* creates a new window with saved tabs */
-		windowButton.onclick = function()
-		{
-			for (var j = 0; j < group["tabCount" + i]; j++)
-			{
-				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
-			}
-		}
-	}
-	/* button opens multiple windows */
-	else if (group["tabCount" + i][1] != undefined)
-	{
-		var windowButton = document.createElement("form");
-		// set css of button
-		windowButton.id = "windowButton";
-		windowButton.className = "fa fa-external-link";
-		// sizes icon
-		windowButton.style.fontSize = "35px";
-		// make button size be correct size
-		windowButton.style.height = "35px";
-		// appends button to corresponding tab button
-		document.getElementById("groupButtons").appendChild(windowButton);
-
-		/* creates a new window with saved tabs */
-		windowButton.onclick = function()
-		{
-			for (var j = 0; j < group["tabCount" + i]; j++)
-			{
-				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
-			}
-		}
-		// console.log("disabled");
-		windowButton.disabled = true;
-		windowButton.style.backgroundColor = "#AAB4AF";
-	}
-}
-
-/* display trash button */
-function displayTrashButton(group, i)
-{
-	var trashButton = document.createElement("button");
-	// set css of button
-	trashButton.id = "trashButton";
-	trashButton.className = "fa fa-trash";
-	// sizes icon
-	trashButton.style.fontSize = "35px";
-	// appends button to corresponding tab button
-	document.getElementById("groupButtons").appendChild(trashButton);
-
-	// colors trash button
-	colorButton(trashButton, group, i);
-
-	/* deletes group if trash icon is clicked  */
-	trashButton.onclick = function()
-	{
-		var confirmDelete = confirm("Are you sure you want to delete " + group["groupName" + i] + "?");
-		if (confirmDelete)
-		{
-			// removes the group name, tab names, tab urls, and number of tabs from storage
-			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
-
-			/* last button is deleted, so button counter can be decreased by 1 */
-
-			chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
-			{
-				alert("before groupCount reset: " + group.groupCount);
-				var resetGroupCount = group.groupCount - 1;
-				// var resetButtonCount = group.buttonCount - 1;
-				// subtract one from groupCount for removal of a group
-				chrome.storage.local.set({"groupCount": resetGroupCount}, function(group) // buttonCount: resetButtonCount
-				{
-					alert("RELOAD4----------------------------------------");
-					window.location.reload();
-				})
-				
-				alert("after groupCount reset: " + group.groupCount);
-
-				/* sets empty text if removal of group results in zero buttons */
-				chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
-				{
-					alert("groupCount SETEMPTY: " + group.groupCount);
-					alert("buttonCountSETEMPTY: " + group.buttonCount);
-					if (group.groupCount == 0 || group.buttonCount == 0)
-					{
-						alert("yesSETEMPTY");
-						setEmptyText();
-					}
-				})
-			})
-		}
-	}
-}
-
-/* for titling tabs */
-document.addEventListener("DOMContentLoaded", function()
-{
-	// text field is selected when extension icon is clicked
-	document.getElementById("customTitleField").focus();
-
-	/* registers enter key press for title text field */
-	var customTitleTextField = document.getElementById("customTitleField");
-	customTitleTextField.addEventListener("keyup", function(enterKey)
-	{
-		if (enterKey.keyCode == 13) 
-		{
-			renameTab();
-			// reloads popup immediately to show that tab was retitled
-			window.location.reload();
-		}
-	})
-
-	var sortTabsTextField = document.getElementById("sortTabsTextField");
-	sortTabsTextField.addEventListener("keyup", function(enterKey)
-	{
-		if (enterKey.keyCode == 13)
-		{
-			// get text from text field
-			var storeSortTabsTextField = document.getElementById("sortTabsTextField").value;
-
-			// refer to background page because popup is automatically closed when a tab is created,
-			// so callback function would never execute
-			chrome.extension.getBackgroundPage().storeSortTabsTextField(storeSortTabsTextField);
-			// reloads popup immediately to display stored tab button
-			console.log("RELOAD5----------------------------------------");
-			window.location.reload();
-		}
-	})
-
-	var allTabsTextField = document.getElementById("allTabsTextField");
-	allTabsTextField.addEventListener("keyup", function(enterKey)
-	{
-		if (enterKey.keyCode == 13)
-		{
-			// get text from text field
-			var storeAllTabsTextField = document.getElementById("allTabsTextField").value;
-
-			// refer to background page because popup is automatically closed when a tab is created,
-			// so callback function would never execute
-			chrome.extension.getBackgroundPage().storeAllTabsTextField(storeAllTabsTextField);
-			// reloads popup immediately to display stored tab button
-			console.log("RELOAD1----------------------------------------");
-			window.location.reload();
-		}
-	})
-})
-
-/* gets title from text field and renames the tab */
-function renameTab()
-{
-	// get text from text field
-	var customTitleField = document.getElementById("customTitleField").value;
-	
-	if (customTitleField == "")
-	{
-		alert("Please enter a name for the tab!");
-		return;
-	}
-	
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs)
-	{
-		// title sent to content script
-		chrome.tabs.sendMessage(tabs[0].id, {name: customTitleField}, function(response){});
-		// title sent to background script
-		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
-	})
-}
-
-/* correctly updates sort tabs text field's border color from command */
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
-{
-	if (request.msg === "color command")
-	{
-		console.log("RELOAD2----------------------------------------");
-		window.location.reload();
-	}
-	/* colors buttons after button is replaced; request.msg = i (to identify group) */
-	else
-	{
-		// window.local.reload();
-		// chrome.storage.local.get(["tabColor" + i], function(group)
-		// {
-		// 	colorButton("trashButton")
-		// })
-	}
-})
-
-function colorButton(button, group, i)
-{
-	/* colors buttons */
-	// just needs to check first tab since all tabs are colored
-	console.log('group["tabColor" + i][0]: ' + group["tabColor" + i][0]);
-	var tabColor = group["tabColor" + i][0];
-	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-	var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-	var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-	var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
-
-	switch(tabColor)
-	{
-		case redURL:
-			button.style.backgroundColor = "#FF0000";
-			break;
-		case greenURL:
-			button.style.backgroundColor = "#00FF00";
-			break;
-		case blueURL:
-			button.style.backgroundColor = "#0000FF";
-			break;
-		case yellowURL:
-			button.style.backgroundColor = "#FFFF00";
-			break;
-		case orangeURL:
-			button.style.backgroundColor = "#FFA500";
-			break;
-		case purpleURL:
-			button.style.backgroundColor = "#A020F0";
-			break;
-		default:
-			break;
-	}
 }

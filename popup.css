@@ -3,19 +3,10 @@ body
 {
 	min-height: 25px;
 	width: 532px;
-	/* background-color: #C0C0C0; */
 	background-color: #5200FF;
-	/* background-color: #D6D6D6; */
 }
 
 /* top half */
-
-#topHalf
-{
-	background-color: green;   /* not working? */
-	margin: 0px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
-}
 
 #textFieldsContainer
 {
@@ -23,8 +14,6 @@ body
 	height: 90px;
 	width: 200px;
 	display: block;
-	margin: 0px 0px 0px 0px; /* 16 right */
-	padding: 0px 0px 0px 0px;
 }
 
 #customTitleField
@@ -89,25 +78,20 @@ body
 #sortArea
 {
 	float: right;
-	height: 135px; /* 130 */ /* 135 looks better, top and bottom are even? */
-	width: 312px; /* 312*/
-	margin: 0px 0px 7px 0px; /* bottom: 10px */
+	height: 135px;
+	width: 312px;
+	margin: 0px 0px 7px 0px;
 
 	background-color: #00ADFF;
-	/* background-color: #F2F4F5; */
-	/* background-color: #a9a9a9; */
 	border-style: outset;
-	/* padding: 0px 0px 0px 5px; */
-	padding: 0px 0px 0px 0px;
-	/* border: solid 1px #000000; */
 }
 
 .sortButton
 {
-	padding: 0px 10px 15px 10px;  /* 15px 10px 15px 10px */
-	margin: 2px 3px 5px 6px;  /* 10px 3px 5px 6px */
+	padding: 0px 10px 15px 10px;
+	margin: 2px 3px 5px 6px;
 	display: inline-block;
-	height: 39px; /* 30 height width */
+	height: 39px;
 	width: 39px;
 	border-radius: 75%;
 }
@@ -115,7 +99,7 @@ body
 #redButton
 {
 	/* creates equal distance from sides of sort area border as purple button */
-	margin: 0px 3px 5px 5px;
+	margin: 0px 3px 5px 8px;
 	background-color: #FF0000;
 }
 
@@ -131,7 +115,7 @@ body
 
 #yellowButton
 {
-	background-color: #FFFF00;
+	background-color: #FFE303;
 }
 
 #orangeButton
@@ -145,15 +129,16 @@ body
 }
 
 /* select */
-#mySelect
+#selectMenu
 {
 	width: 150px;
 	padding: 0px 0px 0px 5px;
 	margin: 6px 0px 0px 35px;
 	font-size: 20px;
-	height: 30px;
+	height: 34px;
 }
 
+/* select dropdowns */
 .menu1
 {
 	border-width: 3px;
@@ -167,7 +152,7 @@ body
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color:#00FF00;
+	border-color: #00FF00;
 	border-radius: 5px;
 	background-color: #00FF00;
 }
@@ -176,7 +161,7 @@ body
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color:#0000FF;
+	border-color: #0000FF;
 	border-radius: 5px;
 	background-color: #0000FF;
 }
@@ -185,16 +170,16 @@ body
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color:#FFFF00;
+	border-color: #FFE303;
 	border-radius: 5px;
-	background-color: #FFFF00;
+	background-color: #FFE303;
 }
 
 .menu5
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color:#FFA500;
+	border-color: #FFA500;
 	border-radius: 5px;
 	background-color: #FFA500;
 }
@@ -208,14 +193,25 @@ body
 	background-color: #A020F0;
 }
 
-#selectTrashButton
+#selectMenuTrashButton
 {
 	float: right;
-	height: 30px;
-	width: 30px;
+	height: 35px;
+	width: 35px;
 	border: none;
 	margin: 5px 40px 0px 0px;
+	font-size: 30px;
+	/* default color is red since select menu's default selection is red */
+	background-color: #FF0000;
+
+	/* float: center;
+	height: 40px;
+	width: 40px;
+	border: none;
+	margin: 7px 8px 7px 30px;
 	font-size: 20px;
+	text-align: center;
+	border-radius: 4px; */
 }
 
 #ACTIVITYTAB
@@ -223,7 +219,6 @@ body
 	font-size: 30px;
 	font-weight: bold;
 	margin: 5px 0px 0px 60px;
-	padding: 0px 0px 0px 0px;
 }
 
 /* bottom half */
@@ -246,8 +241,9 @@ button:hover
 {
 	border: none;
     background-color: lightblue;
-    text-decoration: none;
-    display: inline-block;   /* makes buttons be on one line */
+	text-decoration: none;
+	/* makes buttons be on one line */
+    display: inline-block;
 }
 
 /* tabs button */
@@ -257,12 +253,13 @@ button:hover
 	height: 40px;
 	width: 300px;
 	border: none;
-	margin: 7px 8px 7px 8px;   /* top right bottom left */
+	margin: 7px 8px 7px 8px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;
 }
 
+/* window button */
 #windowButton
 {
 	float: left;
@@ -275,8 +272,6 @@ button:hover
 	border-radius: 4px;
 }
 
-
-
 .fa-external-link
 {
 	float: center;
@@ -286,16 +281,6 @@ button:hover
 	padding: 5px 10px 0px 10px;
 }
 
-.fa-trash
-{
-	float: center;
-	border: none;
-	margin: 7px 8px 7px 30px;
-	font-size: 20px;
-	text-align: center;
-	border-radius: 4px;
-}
-
 /* trash button */
 #trashButton
 {
@@ -303,7 +288,17 @@ button:hover
 	height: 40px;
 	width: 40px;
 	border: none;
-	margin: 7px 8px 7px 30px;   /* top right bottom left */
+	margin: 7px 8px 7px 30px;
+	font-size: 20px;
+	text-align: center;
+	border-radius: 4px;
+}
+
+.fa-trash
+{
+	float: center;
+	border: none;
+	margin: 7px 8px 7px 30px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;
