@@ -44,12 +44,13 @@ function onInstall()
 	chrome.contextMenus.create({"id": "orangeFavicon", "title": "Orange"});
 	chrome.contextMenus.create({"id": "yellowFavicon", "title": "Yellow"});
 	chrome.contextMenus.create({"id": "purpleFavicon", "title": "Purple"});
-	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
+	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"}); //, contexts: ["selection"]
 	chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 
 	// launches chrome's extension shortcut tab so user can customize their shortcuts
     //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
 }
+
 
 // when command is executed, determine which command was executed
 chrome.commands.onCommand.addListener(ActivityTabFeatures);
@@ -61,7 +62,7 @@ chrome.contextMenus.onClicked.addListener(ActivityTabFeatures);
 function ActivityTabFeatures(command)
 {
 	/* commands */
-	switch(command)
+	switch (command)
 	{
 		/* color change to left */
 		case "left-key-toggle-feature":
@@ -82,7 +83,6 @@ function ActivityTabFeatures(command)
 	}
 
 	/* context menus */
-	// var command = command.menuItemId;
 	switch (command.menuItemId)
 	{
 		case "renameTab":
@@ -90,21 +90,33 @@ function ActivityTabFeatures(command)
 			break;
 		/* change tab color */
 		case "redFavicon":
+			// updates "sameColorTabs" context menu if "Red" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Red Tabs"});
 			queryContextMenu("buttonPress", "red");
 			break;
 		case "greenFavicon":
+			// updates "sameColorTabs" context menu if "Green" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Green Tabs"});
 			queryContextMenu("buttonPress", "green");
 			break;
 		case "blueFavicon":
+			// updates "sameColorTabs" context menu if "Blue" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Blue Tabs"});
 			queryContextMenu("buttonPress", "blue");
 			break;
 		case "yellowFavicon":
+			// updates "sameColorTabs" context menu if "Yellow" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Yellow Tabs"});
 			queryContextMenu("buttonPress", "yellow");
 			break;
 		case "orangeFavicon":
+			// updates "sameColorTabs" context menu if "Orange" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Orange Tabs"});
 			queryContextMenu("buttonPress", "orange");
 			break;
 		case "purpleFavicon":
+			// updates "sameColorTabs" context menu if "Purple" context menu is clicked
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Purple Tabs"});
 			queryContextMenu("buttonPress", "purple");
 			break;
 		/* save tabs of current tab color */
@@ -837,15 +849,41 @@ var saveTitle = {};
 // for keeping color through tab refresh
 var saveColor = {};
 
-/* saves the tab's color into saveColor */
+/* FIXME: add description for function */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
+	/* saves the tab's color into saveColor */
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
 		// request is the name of the color
 		saveColor[tab[0].id] = request;
 	})
+
+	/* updates "sameColorTabs" context menu command that changes color is used */
+	switch (request)
+	{
+		case "red":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Red Tabs"});
+			break;
+		case "green":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Green Tabs"});
+			break;
+		case "blue":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Blue Tabs"});
+			break;
+		case "yellow":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Yellow Tabs"});
+			break;
+		case "orange":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Orange Tabs"});
+			break;
+		case "purple":
+			chrome.contextMenus.update("sameColorTabs", {"title": "Save Purple Tabs"});
+			break;
+		default:
+			break;
+	}
 
 	sendResponse();
 })

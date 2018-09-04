@@ -360,7 +360,7 @@ function colorButton(button, group, i)
 	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
 	/* changes the button's background color */
-	switch(tabColor)
+	switch (tabColor)
 	{
 		case redURL:
 			button.style.backgroundColor = "#FF0000";
@@ -420,7 +420,7 @@ function setSortTabsTextFieldBorderColor()
 	// checks current tab's favicon url
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		switch(tab[0].favIconUrl)
+		switch (tab[0].favIconUrl)
 		{
 			case redURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save red tabs";
@@ -469,7 +469,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 function colorSelectMenuTrashButton(button, menuItem)
 {
 	console.log("menuItem: " + menuItem);
-	switch(menuItem)
+	switch (menuItem)
     {
 		case "menu1":
 			button.style.backgroundColor = "#FF0000";
@@ -497,7 +497,7 @@ function colorSelectMenuTrashButton(button, menuItem)
 /* deletes tabs of specified color */
 function queryDropDownClick(menuItem)
 {
-	switch(menuItem)
+	switch (menuItem)
     {
 		case "menu1":
 			var confirmDelete = confirm("Are you sure you want to delete all red tabs?");
@@ -567,7 +567,7 @@ function checkAndRemoveFaviconURL(color)
 	{
 		for (var i = 0; i < tabs.length; i++)
 		{
-			switch(color)
+			switch (color)
 			{
 				case "red":
 					if (tabs[i].favIconUrl == redURL)

@@ -69,7 +69,7 @@ function leftArrowKeyTabColor()
     }
 
     /* cycle through colors */
-    switch(currentFaviconURL)
+    switch (currentFaviconURL)
     {
         case purpleURL:
             return "orange";
@@ -111,7 +111,7 @@ function rightArrowKeyTabColor()
     }
 
     /* cycle through colors */
-    switch(currentFaviconURL)
+    switch (currentFaviconURL)
     {
         case redURL:
             return "green";
@@ -140,31 +140,39 @@ function setFaviconURL(color)
     link.rel = "shortcut icon";
     
     /* sets tab's color according to specified color */
-    switch(color)
+    switch (color)
     {
         case "red":
             // changes sort tab's popup text placeholder to correct color
             chrome.runtime.sendMessage({msg: "color command"});
+            // updates "sameColorTabs" context menu if command that changes color is used
+            chrome.runtime.sendMessage("red", function(response){});
+            // updates favicon of tab to specified color
             link.href = chrome.runtime.getURL("img/red-circle-16.png");
             break;
         case "green":
             chrome.runtime.sendMessage({msg: "color command"});
+            chrome.runtime.sendMessage("green", function(response){});
             link.href = chrome.runtime.getURL("img/green-circle-16.png");
             break;
         case "blue":
             chrome.runtime.sendMessage({msg: "color command"});
+            chrome.runtime.sendMessage("blue", function(response){});
             link.href = chrome.runtime.getURL("img/blue-circle-16.png");
             break;
         case "yellow":
             chrome.runtime.sendMessage({msg: "color command"});
+            chrome.runtime.sendMessage("yellow", function(response){});
             link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
             break;
         case "orange":
             chrome.runtime.sendMessage({msg: "color command"});
+            chrome.runtime.sendMessage("orange", function(response){});
             link.href = chrome.runtime.getURL("img/orange-circle-16.png");
             break;
         case "purple":
             chrome.runtime.sendMessage({msg: "color command"});
+            chrome.runtime.sendMessage("purple", function(response){});
             link.href = chrome.runtime.getURL("img/purple-circle-16.png");
             break;
         default:
@@ -189,7 +197,7 @@ function setFaviconURLFromURL(colorURL)
     var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
     
     /* sets tab's color according to specified color */
-    switch(colorURL)
+    switch (colorURL)
     {
         case redURL:
             link.href = chrome.runtime.getURL("img/red-circle-16.png");
