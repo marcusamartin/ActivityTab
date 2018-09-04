@@ -483,11 +483,11 @@ function checkDuplicateName(promptUser, groupCount, command)
 					else
 					{
 						alert("Please enter a different name for the group!");
-						/* only if command had activated prompt, not the save tabs text field */
-						alert("command: " + command);
+						// removes added button from asynchronous function since a button is still added
+						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						/* only if command had activated prompt, not the text fields */
 						if (command != "same-color-text-field" && command != "save-all-tabs-text-field")
 						{
-							alert("activityTabFeatures");
 							ActivityTabFeatures(command);
 						}
 					}
