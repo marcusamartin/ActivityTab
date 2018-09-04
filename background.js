@@ -44,7 +44,8 @@ function onInstall()
 	chrome.contextMenus.create({"id": "orangeFavicon", "title": "Orange"});
 	chrome.contextMenus.create({"id": "yellowFavicon", "title": "Yellow"});
 	chrome.contextMenus.create({"id": "purpleFavicon", "title": "Purple"});
-	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"}); //, contexts: ["selection"]
+	// only created on tabs that are colored
+	// chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
 	chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 
 	// launches chrome's extension shortcut tab so user can customize their shortcuts
@@ -191,7 +192,6 @@ function sameColorTabs(command)
 			// for context menu
 			if (command.menuItemId != null)
 			{
-				alert("not null");
 				sameColorTabs(command.menuItemId);
 			}
 			// for command
@@ -864,22 +864,37 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	switch (request)
 	{
 		case "red":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Red Tabs"});
+			// remove "allTabs" context menu so it can be recreated under "Save Red Tabs" context menu (aesthetic reason)
+			chrome.contextMenus.remove("allTabs");
+			// create "saveColorTabs" context menu since tab is colored
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Red Tabs"});
+			// recreate  "allTabs" context menu
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		case "green":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Green Tabs"});
+			chrome.contextMenus.remove("allTabs");
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Green Tabs"});
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		case "blue":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Blue Tabs"});
+			chrome.contextMenus.remove("allTabs");
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Blue Tabs"});
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		case "yellow":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Yellow Tabs"});
+			chrome.contextMenus.remove("allTabs");
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Yellow Tabs"});
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		case "orange":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Orange Tabs"});
+			chrome.contextMenus.remove("allTabs");
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Orange Tabs"});
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		case "purple":
-			chrome.contextMenus.update("sameColorTabs", {"title": "Save Purple Tabs"});
+			chrome.contextMenus.remove("allTabs");
+			chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Purple Tabs"});
+			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		default:
 			break;
