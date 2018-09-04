@@ -695,8 +695,6 @@ function replaceButton(replacementButton, promptUser)
 			var tabNames = "tabNames" + replacementButton;
 			groupObject[tabNames] = tabNamesArr;
 
-			console.log("tabNamesArr: " + tabNamesArr);
-
 			var tabUrls = "tabUrls" + replacementButton;
 			groupObject[tabUrls] = tabUrlsArr;
 

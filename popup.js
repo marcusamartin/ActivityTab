@@ -423,21 +423,27 @@ function setSortTabsTextFieldBorderColor()
 		switch(tab[0].favIconUrl)
 		{
 			case redURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save red tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #FF0000";
 				break;
 			case greenURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save green tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #00FF00";
 				break;
 			case blueURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save blue tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #0000FF";
 				break;
 			case yellowURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save yellow tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #FFE303";
 				break;
 			case orangeURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save orange tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #FFA500";
 				break;
 			case purpleURL:
+				document.getElementById("sortTabsTextField").placeholder = "Save purple tabs";
 				document.getElementById("sortTabsTextField").style.border = "3px solid #A020F0";
 				break;
 			default:
@@ -454,6 +460,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
 	if (request.msg === "color command")
 	{
+
 		window.location.reload();
 	}
 })

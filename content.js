@@ -143,21 +143,28 @@ function setFaviconURL(color)
     switch(color)
     {
         case "red":
+            // changes sort tab's popup text placeholder to correct color
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/red-circle-16.png");
             break;
         case "green":
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/green-circle-16.png");
             break;
         case "blue":
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/blue-circle-16.png");
             break;
         case "yellow":
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
             break;
         case "orange":
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/orange-circle-16.png");
             break;
         case "purple":
+            chrome.runtime.sendMessage({msg: "color command"});
             link.href = chrome.runtime.getURL("img/purple-circle-16.png");
             break;
         default:
