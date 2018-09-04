@@ -37,13 +37,15 @@ function onInstall()
 	chrome.storage.local.set({"groupCount": 0});
 	chrome.storage.local.set({"buttonCount": 0});
 
-	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
+	chrome.contextMenus.create({"id": "renameTab", "title": "Rename Tab"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
 	chrome.contextMenus.create({"id": "greenFavicon", "title": "Green"});
 	chrome.contextMenus.create({"id": "blueFavicon", "title": "Blue"});
 	chrome.contextMenus.create({"id": "orangeFavicon", "title": "Orange"});
 	chrome.contextMenus.create({"id": "yellowFavicon", "title": "Yellow"});
 	chrome.contextMenus.create({"id": "purpleFavicon", "title": "Purple"});
+	chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
+	chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 
 	// launches chrome's extension shortcut tab so user can customize their shortcuts
     //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
@@ -71,20 +73,7 @@ function ActivityTabFeatures(command)
 			break;
 		/* retitle current tab */
 		case "custom-title-toggle-feature":
-			chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
-			{
-				var promptUser = prompt("Rename tab:");
-
-				if (promptUser == "")
-				{
-					alert("Please enter a name for the tab!");
-				}
-
-				// title sent to content script
-				chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
-				// saves for persistent title through refresh
-				saveTitle[tabs[0].id] = promptUser;
-			})
+			renameTab();
 			break;
 		/* save tabs of current tab color */
 		case "same-color-tabs-toggle-feature":
@@ -93,11 +82,11 @@ function ActivityTabFeatures(command)
 	}
 
 	/* context menus */
+	// var command = command.menuItemId;
 	switch (command.menuItemId)
 	{
-		/* save tabs of current tab color */
-		case "sameColorTabs":
-			sameColorTabs(command)
+		case "renameTab":
+			renameTab();
 			break;
 		/* change tab color */
 		case "redFavicon":
@@ -118,7 +107,33 @@ function ActivityTabFeatures(command)
 		case "purpleFavicon":
 			queryContextMenu("buttonPress", "purple");
 			break;
+		/* save tabs of current tab color */
+		case "sameColorTabs":
+			sameColorTabs(command)
+			break;
+		case "allTabs":
+			allTabs(command);
+			break;
 	}
+}
+
+/* gets title from prompt and renames tab */
+function renameTab()
+{
+	chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
+	{
+		var promptUser = prompt("Rename the tab:");
+
+		if (promptUser == "")
+		{
+			alert("Please enter a name for the tab!");
+		}
+
+		// title sent to content script
+		chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
+		// saves for persistent title through refresh
+		saveTitle[tabs[0].id] = promptUser;
+	})
 }
 
 /* sends messages with command info */
@@ -160,8 +175,18 @@ function sameColorTabs(command)
 		if (promptUser == "")
 		{
 			alert("Please enter a name for the group!");
-			// enables user to restart process
-			sameColorTabs(command);
+			/* enables user to restart process */
+			// for context menu
+			if (command.menuItemId != null)
+			{
+				alert("not null");
+				sameColorTabs(command.menuItemId);
+			}
+			// for command
+			else
+			{
+				sameColorTabs(command);
+			}
 		}
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		else
@@ -335,6 +360,127 @@ function storeSortTabsTextField(storeSortTabsTextField)
 	})
 }
 
+/* responds to context menu for save all tabs */
+function allTabs(command)
+{
+	chrome.storage.local.get("groupCount", function(group)
+	{
+		// current count of groups
+		var groupCount = group.groupCount;
+
+		var promptUser = prompt("Group name: ");
+		// limit text so the text can fit in the button
+		promptUser = promptUser.substr(0, 26);
+
+		/* checks if name is invalid */
+		if (promptUser == "")
+		{
+			alert("Please enter a name for the group!");
+			/* returns so user can re-enter text into text field */
+			// for context menu
+			if (command.menuItemId != null)
+			{
+				allTabs(command.menuItemId);
+			}
+			// for command
+			// else
+			// {
+			// 	allTabs(command);
+			// }
+		}
+		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		else
+		{
+			var groupObject = {};
+
+			/* stores all of the tab's information into an object and then puts object into storage */
+			chrome.windows.getAll({populate: true}, function(windows)
+			{
+				// used to decide storing of a single window or multiple windows
+				var singleWindow = false;
+
+				/* checks if saving single window */
+				if (windows.length < 2)
+				{
+					singleWindow = true;
+				}
+
+				/* initializing name, url, and color array */
+				var tabNamesArr = windows.map(w => w.tabs.map(tab => tab.title));
+				var tabUrlsArr = windows.map(w => w.tabs.map(tab => tab.url));
+				var tabColorsArr = windows.map(w => w.tabs.map(tab => tab.favIconUrl));
+
+				// stores each window's tab count into an array
+				var tabCount = new Array(windows.length);
+				var tabCounter = 0;
+				var windowCounter = 0;
+
+				/* fills tabCount with a single window's tab number */
+				if (singleWindow)
+				{
+					/* iterates through the tabs in the window */
+					windows.forEach(function(tab)
+					{
+						tabCounter++;
+					})
+					tabCount[windowCounter] = tabCounter;
+					
+					windowCounter++;
+					// tabCount[1] will contain a flag that there is only a single window stored, with 0 as the flag
+					tabCount[windowCounter] = 0;
+				}
+				/* fills tabCount with several window tab numbers */
+				else
+				{
+					/* iterates through each window */
+					windows.forEach(function(window)
+					{
+						/* iterates through the tabs of the current window */
+						window.tabs.forEach(function(tab)
+						{
+							tabCounter++;
+						})
+						tabCount[windowCounter] = tabCounter;
+						// reset tabCounter for next window
+						tabCounter = 0;
+						// for storing windows in tabCount
+						windowCounter++;
+					})
+				}
+
+				/* initialize object content */
+				var groupName = "groupName" + groupCount;
+				groupObject[groupName] = promptUser;
+
+				var tabNames = "tabNames" + groupCount;
+				groupObject[tabNames] = tabNamesArr;
+
+				var tabUrls = "tabUrls" + groupCount;
+				groupObject[tabUrls] = tabUrlsArr;
+
+				var tabColor = "tabColor" + groupCount;
+				groupObject[tabColor] = tabColorsArr;
+
+				var tabCount2 = "tabCount" + groupCount;
+				groupObject[tabCount2] = tabCount;
+
+				// puts object into storage
+				chrome.storage.local.set(groupObject);
+
+				/* checks if duplicate name */
+				// specified command to have duplicate checked the same way as the sort colors command
+				checkDuplicateName(promptUser, groupCount, command);
+
+				/* set-up for next group so last group isn't overwritten */
+				// enables empty text to be set
+				chrome.storage.local.set({"groupCount": (groupCount + 1)});
+				// tracks number of buttons so it can display them all even if one is deleted
+				chrome.storage.local.set({"buttonCount": (groupCount + 1)});
+			})
+		}
+	})
+}
+
 /* stores all tabs */
 function storeAllTabsTextField(storeAllTabsTextField)
 {
@@ -468,12 +614,13 @@ function checkDuplicateName(promptUser, groupCount, command)
 					if (duplicatePrompt)
 					{
 						/* if button does not launch multiple windows */
-						if (command == "same-color-tabs-toggle-feature" || command == "same-color-text-field")
+						if (command == "same-color-tabs-toggle-feature" || command == "same-color-text-field" || command.menuItemId == "sameColorTabs")
+						// if (command != "save-all-tabs" && command != "save-all-tabs-text-field")
 						{
 							replaceButton(i, promptUser);
 						}
 						/* button launches multiple windows */
-						else if (command == "save-all-tabs" || command == "save-all-tabs-text-field")
+						else if (command == "save-all-tabs" || command == "save-all-tabs-text-field" || command.menuItemId == "allTabs")
 						{
 							replaceAllButton(i, promptUser);
 						}
@@ -547,6 +694,8 @@ function replaceButton(replacementButton, promptUser)
 
 			var tabNames = "tabNames" + replacementButton;
 			groupObject[tabNames] = tabNamesArr;
+
+			console.log("tabNamesArr: " + tabNamesArr);
 
 			var tabUrls = "tabUrls" + replacementButton;
 			groupObject[tabUrls] = tabUrlsArr;
