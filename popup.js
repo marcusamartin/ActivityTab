@@ -56,118 +56,10 @@ function getStorage(i)
 		}
 
 		/* displays the buttons related to the tabs */
-		displayURLButton(i);
 		displayTabButton(group, i);
 		displayWindowButton(group, i);
 		displayTrashButton(group, i);
 	})
-}
-
-function displayURLButton(i)
-{
-	var urlButton = document.createElement("button");
-
-	/* set css of button */
-	urlButton.id = "urlButton";
-
-	// puts button in popup
-	document.getElementById("groupButtons").appendChild(urlButton);
-
-	urlButton.onclick = function()
-	{
-		console.log("clicked, setting css of div");
-		// urlButton's dropdown (myDiv) is put into popup in displayTrashButton()
-		var getDiv = document.getElementById("myDiv" + i);
-		/* set css for dropdown from urlButton */
-		getDiv.style.width = "80%";
-		getDiv.style.padding = "50px";
-		getDiv.style.textAlign = "center";
-		getDiv.style.backgroundColor = "lightblue";
-		getDiv.style.margin = "0px 0px 10px 10px";
-
-		/* myDiv + i's display is not initialized to anything for the first click, set it equal to none */
-		if (getDiv.style.display != "none")
-		{
-			/* determines whether first click of url button */
-			if (getDiv.style.display != "block")
-			{
-				getDiv.style.display = "none";
-			}
-		}
-		
-		console.log("getDiv display: " + getDiv.style.display);
-
-		if (getDiv.style.display === "none")
-		{
-			console.log("block");
-			getDiv.style.display = "block";
-
-			/* display storage of urls for corresponding button 
-			   (ONLY FOR SINGLE WINDOW RIGHT NOW, ex: color window) */
-			chrome.storage.local.get(["tabNames" + i, "tabUrls" + i, "tabColor" + i], function(group)
-			{
-				var list = document.createElement("ul");
-
-				var li = document.createElement('li');
-
-				/* for favicon image */
-				var img = document.createElement('img');
-				img.id = "img" + i;
-				console.log("img.id: " + img.id);
-				img.height = "13px";
-				img.width = "13px";
-				
-				/* for tab name and tab url */
-				var span = document.createElement('span');
-				
-				document.getElementById("urlButton").appendChild(list);
-				/* append elements to be able to find elements in for loop */
-				list.appendChild(li);
-				li.appendChild(img);
-				li.appendChild(span);
-
-				for (var j = 0; j < group["tabUrls" + i].length; j++)
-				{
-					var tabFavicon = group["tabColor" + i][j];
-					var tabName = group["tabNames" + i][j];
-					var tabUrl = group["tabUrls" + i][j];
-
-					console.log("tabFavicon: " + tabFavicon);
-					console.log("i: " + i);
-					var findImg = document.getElementById("img" + i);
-					findImg.src = tabFavicon;
-					findImg.height = "100px";
-					findImg.width = "100px";
-
-					console.log("findImg.src: " + findImg.src);
-					
-					var title = tabName;
-					var t = document.createTextNode(title);
-
-					/* image not appearing? */
-					li.appendChild(findImg);
-					li.appendChild(t);
-					
-					var href = tabUrl;
-					t = document.createTextNode(href);
-					
-					span.appendChild(t);
-					li.appendChild(span);
-					// document.getElementById("urlButton").appendChild(list);
-					// list.appendChild(li);
-				}
-			})
-		}
-		else
-		{
-			console.log("none");
-			getDiv.style.display = "none";
-
-			/* resize sortArea since last urlButton would leave extra space in popup */
-			// reloading works, but it causes all urls from urlButton to be closed
-			// window.location.reload();
-		}
-	}
 }
 
 /* display tab button */
@@ -292,11 +184,6 @@ function displayTrashButton(group, i)
 
 	// appends button to corresponding tab button
 	document.getElementById("groupButtons").appendChild(trashButton);
-
-	/* div for url button (placed here so div area goes below url button due to groupButton's childs) */
-	var div = document.createElement("div");
-	div.id = "myDiv" + i;
-	document.getElementById("groupButtons").appendChild(div);
 
 	/* deletes group if trash icon is clicked  */
 	trashButton.onclick = function()

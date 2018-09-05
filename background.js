@@ -1,10 +1,5 @@
-/* TODO:
- * add context menu for saving all tabs
-*/
-
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
- * setting groupCount on installation might delete user's tabs if extension is updated, fix
  * change favicon colors to match button colors
  * use favIconUrl instead of "shortcut icon" to better change favicon url?
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
@@ -27,13 +22,6 @@ chrome.runtime.onInstalled.addListener(onInstall);
 /* runs on installation of extension */
 function onInstall()
 {
-	// chrome.storage.local.clear();
-	// chrome.storage.local.get(null, function(items) 
-	// {
-	// 	var allKeys = Object.keys(items);
-	// 	console.log("storage: " + allKeys);
-	// })
-
 	/* initializes groupCount and buttonCount if extension is being installed for the first time;
 	   if the extension is being updated or refreshed, the user's storage will not be reset */
 	chrome.storage.local.get(chrome.storage.local.get["groupCount", "buttonCount"], function(group)
@@ -48,9 +36,6 @@ function onInstall()
 			chrome.storage.local.set({"buttonCount": 0});
 		}
 	})
-
-	// chrome.storage.local.set({"groupCount": 0});
-	// chrome.storage.local.set({"buttonCount": 0});
 
 	chrome.contextMenus.create({"id": "renameTab", "title": "Rename the Tab"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
@@ -629,7 +614,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 		/* iterates through the buttons */
 		for (var i = 0; i < groupCount; i++)
 		{
-			chrome.storage.local.get(chrome.storage.local.get["groupName" + i, "tabCount" + i], function(i, anotherGroup)
+			chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
 			{
 				var groupName = anotherGroup["groupName" + i];
 					
