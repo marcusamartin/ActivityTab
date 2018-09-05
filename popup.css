@@ -246,6 +246,26 @@ button:hover
     display: inline-block;
 }
 
+/* url button */
+#urlButton
+{
+	float: left;
+	height: 40px;
+	width: 40px;
+	border: none;
+	margin: 7px 4px 7px 8px;
+	border-radius: 4px;
+}
+
+#myDiv
+{
+	width: 80%;
+    padding: 50px;
+    text-align: center;
+	background-color: lightblue;
+	margin: 0px 0px 10px 10px;
+}
+
 /* tabs button */
 #groupButton
 {
@@ -266,7 +286,7 @@ button:hover
 	height: 40px;
 	width: 60px;
 	border: none;
-	margin: 7px 8px 7px 30px;
+	margin: 7px 8px 7px 10px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;
@@ -288,7 +308,7 @@ button:hover
 	height: 40px;
 	width: 40px;
 	border: none;
-	margin: 7px 8px 7px 30px;
+	margin: 7px 8px 7px 10px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;

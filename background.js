@@ -27,15 +27,30 @@ chrome.runtime.onInstalled.addListener(onInstall);
 /* runs on installation of extension */
 function onInstall()
 {
-	chrome.storage.local.clear();
+	// chrome.storage.local.clear();
 	// chrome.storage.local.get(null, function(items) 
 	// {
 	// 	var allKeys = Object.keys(items);
 	// 	console.log("storage: " + allKeys);
 	// })
 
-	chrome.storage.local.set({"groupCount": 0});
-	chrome.storage.local.set({"buttonCount": 0});
+	/* initializes groupCount and buttonCount if extension is being installed for the first time;
+	   if the extension is being updated or refreshed, the user's storage will not be reset */
+	chrome.storage.local.get(chrome.storage.local.get["groupCount", "buttonCount"], function(group)
+	{
+		console.log("groupCount: " + group.groupCount);
+		console.log("buttonCount: " + group.buttonCount);
+
+		if (group.groupCount == undefined && group.buttonCount == undefined)
+		{
+			console.log("setting groupCount and buttonCount");
+			chrome.storage.local.set({"groupCount": 0});
+			chrome.storage.local.set({"buttonCount": 0});
+		}
+	})
+
+	// chrome.storage.local.set({"groupCount": 0});
+	// chrome.storage.local.set({"buttonCount": 0});
 
 	chrome.contextMenus.create({"id": "renameTab", "title": "Rename the Tab"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
@@ -614,7 +629,7 @@ function checkDuplicateName(promptUser, groupCount, command)
 		/* iterates through the buttons */
 		for (var i = 0; i < groupCount; i++)
 		{
-			chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
+			chrome.storage.local.get(chrome.storage.local.get["groupName" + i, "tabCount" + i], function(i, anotherGroup)
 			{
 				var groupName = anotherGroup["groupName" + i];
 					
