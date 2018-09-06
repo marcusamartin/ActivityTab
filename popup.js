@@ -4,18 +4,14 @@ displayButtons();
 /* Display buttons in popup */
 function displayButtons()
 {
-	chrome.storage.local.get(["objectArr"], function(group)
+	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
 	{
-		var objectArr = group.objectArr;
-		var tabUrls = group.objectArr["tabUrls" + 0];
-
-		console.log("typeof group.objectArr: " + typeof group.objectArr);
-		console.log("objectArr: " + group.objectArr);
-		console.log("objectArr.length: " + objectArr.length);
-		console.log("tabUrls: " + tabUrls);
+		var groupCount = group.groupCount;
+		groupCount--;
+		console.log("groupCount: " + groupCount);
+		console.log("group[objectArr][0][tabUrls + groupCount][0]: " + group["objectArr"][0]["tabUrls" + groupCount][0]);
 		
 		/* checks if there are no buttons to display empty text */
-		// if (groupCount == 0)
 		if (objectArr.length == 0)
 		{
 			console.log("setEmptyText");
@@ -27,7 +23,7 @@ function displayButtons()
 			console.log("create the buttons");
 			for (var i = 0; i < objectArr.length; i++)
 			{
-				getStorage(i);
+				getStorage(group, i);
 			}
 		}
 	})
@@ -46,20 +42,23 @@ function setEmptyText()
 
 /* gets and displays tab, window, and trash buttons from storage */
 // i == groupCount
-function getStorage(i)
+function getStorage(group, i)
 {
-	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
-	{
-		/* displays the buttons related to the tabs */
-		displayTabButton(group, i);
-		displayWindowButton(group, i);
-		displayTrashButton(group, i);
-	})
+	/* displays the buttons related to the tabs */
+	displayTabButton(group, i);
+	displayWindowButton(group, i);
+	displayTrashButton(group, i);
 }
 
 /* display tab button */
 function displayTabButton(group, i)
 {
+	console.log("group[objectArr][0][tabUrls + groupCount][0]: " + group["objectArr"][0]["tabUrls" + groupCount][0]);
+
+
+
+
+
 	var groupButton = document.createElement("button");
 
 	/* set css of button */
@@ -190,6 +189,9 @@ function displayTrashButton(group, i)
 			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
 
 			/* button is deleted, so group count can be decreased by 1 */
+			// PROBLEM: NEXT BUTTON ADDED REPLACES EXISTING BUTTON
+			// NOT DECREMENTING GROUPCOUNT FIXES THE PROBLEM
+			// BUT THEN SETEMPTYTEXT IS NEVER SET
 			chrome.storage.local.get(["groupCount", "objectArr"], function(group)
 			{
 				// subtract one from groupCount for removal of a group
