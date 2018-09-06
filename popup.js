@@ -4,26 +4,28 @@ displayButtons();
 /* Display buttons in popup */
 function displayButtons()
 {
-	var groupCount;
-	var buttonCount;
-
-	chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+	chrome.storage.local.get(["objectArr"], function(group)
 	{
-		groupCount = group.groupCount;
-		buttonCount = group.buttonCount;
+		var objectArr = group.objectArr;
+		var tabUrls = group.objectArr["tabUrls" + 0];
+
+		console.log("typeof group.objectArr: " + typeof group.objectArr);
+		console.log("objectArr: " + group.objectArr);
+		console.log("objectArr.length: " + objectArr.length);
+		console.log("tabUrls: " + tabUrls);
 		
 		/* checks if there are no buttons to display empty text */
 		// if (groupCount == 0)
-		if (groupCount == 0 || buttonCount == 0)
+		if (objectArr.length == 0)
 		{
+			console.log("setEmptyText");
 			setEmptyText();
-			// sets button count to 0 since there are no buttons
-			chrome.storage.local.set({"buttonCount": 0});
 		}
 		/* creates the buttons */
 		else
 		{
-			for (var i = 0; i < buttonCount; i++)
+			console.log("create the buttons");
+			for (var i = 0; i < objectArr.length; i++)
 			{
 				getStorage(i);
 			}
@@ -48,13 +50,6 @@ function getStorage(i)
 {
 	chrome.storage.local.get(["groupName" + i, "tabCount" + i, "tabUrls" + i, "tabNames" + i, "tabColor" + i], function(group)
 	{
-		/* checks  if storage is empty or if a group was deleted (still checks group number if deleted) 
-		   to maximize efficiency from the inefficiency of using buttonCount */
-		if (group["groupName" + i] == null)
-		{
-			return;
-		}
-
 		/* displays the buttons related to the tabs */
 		displayTabButton(group, i);
 		displayWindowButton(group, i);
@@ -194,8 +189,8 @@ function displayTrashButton(group, i)
 			// removes the group name, tab names, tab urls, and number of tabs from storage
 			chrome.storage.local.remove(["groupName" + i, "tabNames" + i, "tabUrls" + i, "tabColor" + i, "tabCount" + i]);
 
-			/* button is deleted, so button counter can be decreased by 1 */
-			chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+			/* button is deleted, so group count can be decreased by 1 */
+			chrome.storage.local.get(["groupCount", "objectArr"], function(group)
 			{
 				// subtract one from groupCount for removal of a group
 				var resetGroupCount = group.groupCount - 1;
@@ -205,9 +200,9 @@ function displayTrashButton(group, i)
 				})
 
 				/* sets empty text if removal of group results in zero buttons */
-				chrome.storage.local.get(["groupCount", "buttonCount"], function(group)
+				chrome.storage.local.get(["objectArr"], function(group)
 				{
-					if (group.groupCount == 0 || group.buttonCount == 0)
+					if (group.objectArr.length == 0)
 					{
 						setEmptyText();
 					}
