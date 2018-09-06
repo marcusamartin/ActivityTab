@@ -139,6 +139,7 @@ function renameTab()
 		if (promptUser == "")
 		{
 			alert("Please enter a name for the tab!");
+			renameTab();
 		}
 
 		// title sent to content script
@@ -363,11 +364,20 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					console.log("groupObject: " + groupObject);
 					console.log("groupObject[tabUrls]: " + groupObject[tabUrls]);
 
+					// console.log("before push, group.objectArr.length: " + group.objectArr.length);
+					// var objectArr = group.objectArr.push(groupObject);
+					// console.log("after push, group.objectArr.length: " + group.objectArr.length);
+					// console.log("typeof group.objectArr: " + typeof group.objectArr);
+					// console.log("typeof group.objectArr.push(groupObject): " + typeof objectArr);
+					
 					console.log("before push, group.objectArr.length: " + group.objectArr.length);
-					var objectArr = group.objectArr.push(groupObject);
+					// var objectArr = group.objectArr.push(groupObject); assinged 1...
+					group.objectArr.push(groupObject);
+					var objectArr = group.objectArr;
 					console.log("after push, group.objectArr.length: " + group.objectArr.length);
 					console.log("typeof group.objectArr: " + typeof group.objectArr);
 					console.log("typeof group.objectArr.push(groupObject): " + typeof objectArr);
+
 					// updates storage with new objectArr with groupObject
 					chrome.storage.local.set({"objectArr": objectArr});
 

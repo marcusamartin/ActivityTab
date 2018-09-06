@@ -3,7 +3,9 @@ body
 {
 	min-height: 25px;
 	width: 532px;
-	background-color: #5200FF;
+	/* background-color: #5200FF; */
+	/* background-color: #F7F7F9; */
+	background-color: #5842f4;
 }
 
 /* top half */
@@ -82,7 +84,9 @@ body
 	width: 312px;
 	margin: 0px 0px 7px 0px;
 
-	background-color: #00ADFF;
+	/* background-color: #00ADFF; */
+	/* background-color: #C4C4C4; */
+	background-color: #4285f4;
 	border-style: outset;
 }
 

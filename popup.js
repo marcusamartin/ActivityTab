@@ -37,7 +37,7 @@ function displayButtons()
 function setEmptyText()
 {
 	document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
-	document.getElementById("groupButtons").style.color = "blue";
+	document.getElementById("groupButtons").style.color = "#7DF9FF";
 	document.getElementById("groupButtons").style.width = "532px";
 	document.getElementById("groupButtons").style.fontWeight = "900";
 	document.getElementById("groupButtons").style.fontSize = 20;
