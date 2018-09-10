@@ -16,13 +16,6 @@
  * tabCount: number of tabs in the window
 */
 
-/* prints everything in storage */
-// chrome.storage.local.get(null, function(items) 
-// {
-// 	var allKeys = Object.keys(items);
-// 	console.log("storage: " + allKeys);
-// })
-
 // opens shortcut url upon extension installation
 chrome.runtime.onInstalled.addListener(onInstall);
 
@@ -30,7 +23,8 @@ chrome.runtime.onInstalled.addListener(onInstall);
 function onInstall()
 {
 	// objectArr will store the group objects and will allow the popup buttons to be displayed exactly
-	var objectArr = new Array();
+	// FIXME: fix to not override existing storage (if undefined)
+	var objectArr = [];
 	chrome.storage.local.set({"objectArr": objectArr});
 
 	/* initializes groupCount if extension is being installed for the first time;
@@ -42,6 +36,13 @@ function onInstall()
 			chrome.storage.local.set({"groupCount": 0});
 		}
 	})
+
+	/* prints everything in storage */
+	// chrome.storage.local.get(null, function(items) 
+	// {
+	// 	var allKeys = Object.keys(items);
+	// 	console.log("storage: " + allKeys);
+	// })
 
 	chrome.contextMenus.create({"id": "renameTab", "title": "Rename the Tab"});
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
@@ -266,8 +267,8 @@ function sameColorTabs(command)
 					var tabCount2 = "tabCount" + groupCount;
 					groupObject[tabCount2] = tabCount;
 
+
 					group.objectArr.push(groupObject);
-					// objectArr set to arr with new groupObject added
 					var objectArr = group.objectArr;
 
 					// updates storage with new objectArr with groupObject
@@ -363,12 +364,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					var tabCount2 = "tabCount" + groupCount;
 					groupObject[tabCount2] = tabCount;
 
-					console.log("groupCount: " + groupCount);
-					console.log("groupObject[tabUrls + groupCount][0]: " + groupObject["tabUrls" + groupCount][0]);
 					group.objectArr.push(groupObject);
-					console.log("group[objectArr][0][tabUrls + groupCount][0]: " + group["objectArr"][0]["tabUrls" + groupCount][0]);
-					console.log("group[objectArr][0][tabUrls + 0][0]: " + group["objectArr"][0]["tabUrls" + 0][0]);
-					// objectArr set to arr with new groupObject added
 					var objectArr = group.objectArr;
 
 					// updates storage with new objectArr with groupObject
@@ -486,7 +482,6 @@ function allTabs(command)
 				groupObject[tabCount2] = tabCount;
 
 				group.objectArr.push(groupObject);
-				// objectArr set to arr with new groupObject added
 				var objectArr = group.objectArr;
 
 				// updates storage with new objectArr with groupObject
@@ -599,7 +594,6 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				groupObject[tabCount2] = tabCount;
 
 				group.objectArr.push(groupObject);
-				// objectArr set to arr with new groupObject added
 				var objectArr = group.objectArr;
 
 				// updates storage with new objectArr with groupObject
@@ -729,12 +723,16 @@ function replaceButton(replacementButton, promptUser)
 				var tabCount2 = "tabCount" + replacementButton;
 				groupObject[tabCount2] = tabCount;
 	
-				group.objectArr.push(groupObject);
-				// objectArr set to arr with new groupObject added
-				var objectArr = group.objectArr;
-
+				var objectArr = group.objectArr.push(groupObject);
 				// updates storage with new objectArr with groupObject
 				chrome.storage.local.set({"objectArr": objectArr});
+	
+				/* debugging */
+				chrome.storage.local.get(null, function(items) 
+				{
+					var allKeys = Object.keys(items);
+					console.log("storage: " + allKeys);
+				})
 			})
 	
 			/* group count can be decreased by 1 since return to storeTabsTextField will increment groupCount */
@@ -826,12 +824,16 @@ function replaceAllButton(replacementButton, promptUser)
 			var tabCount2 = "tabCount" + replacementButton;
 			groupObject[tabCount2] = tabCount;
 
-			group.objectArr.push(groupObject);
-			// objectArr set to arr with new groupObject added
-			var objectArr = group.objectArr;
-
+			var objectArr = group.objectArr.push(groupObject);
 			// updates storage with new objectArr with groupObject
 			chrome.storage.local.set({"objectArr": objectArr});
+	
+			/* debugging */
+			chrome.storage.local.get(null, function(items) 
+			{
+				var allKeys = Object.keys(items);
+				console.log("storage: " + allKeys);
+			})
 
 			/* group count can be decreased by 1 since return to storeAllTabsTextField will increment groupCount */
 			chrome.storage.local.get("groupCount", function(group2)
