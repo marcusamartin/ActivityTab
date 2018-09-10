@@ -709,11 +709,10 @@ function replaceButton(replacementButton, promptUser)
 				group.objectArr.splice(group.objectArr.length - 1, 1);
 				var objectArr = group.objectArr;
 				// updates storage with new objectArr with groupObject
-				chrome.storage.local.set({"objectArr": objectArr}, function()
-				{
-					// refresh popup so added duplicate button is not displayed (caused by asynchronous function)
-					chrome.runtime.sendMessage({msg: "color command"});
-				});
+				chrome.storage.local.set({"objectArr": objectArr});
+
+				// refresh popup so added duplicate button is not displayed (caused by asynchronous function)
+				chrome.runtime.sendMessage({msg: "color command"});
 			})
 		})
 	})
@@ -798,7 +797,12 @@ function replaceAllButton(replacementButton, promptUser)
 			var tabCount2 = "tabCount";
 			groupObject[tabCount2] = tabCount;
 
-			group.objectArr.push(groupObject);
+			// replacement button updated with new tab information
+			group.objectArr.splice(replacementButton, 0, groupObject);
+			// removes added button right after replacement button (caused by asynchronous function)
+			group.objectArr.splice(replacementButton + 1, 1);
+			// removes added button from end (caused by asynchronous function)
+			group.objectArr.splice(group.objectArr.length - 1, 1);
 			var objectArr = group.objectArr;
 			// updates storage with new objectArr with groupObject
 			chrome.storage.local.set({"objectArr": objectArr});
