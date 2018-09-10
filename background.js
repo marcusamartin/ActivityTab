@@ -836,15 +836,20 @@ var saveTitle = {};
 // for keeping color through tab refresh
 var saveColor = {};
 
-/* FIXME: add description for function */
+/* saves color and title of tab to keep them through tab refresh */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
 {
-	/* saves the tab's color into saveColor */
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		// request is the name of the color
+		// request is the name of the color, saved into saveColor
 		saveColor[tab[0].id] = request;
+		// tab title from text field sent to be saved into saveTitle
+		if (request.name)
+		{
+			alert(tab[0].id);
+			saveTitle[tab[0].id] = request.name;
+		}
 	})
 
 	/* updates "sameColorTabs" context menu command that changes color is used */

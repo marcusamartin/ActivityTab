@@ -19,6 +19,7 @@ function displayButtons()
 		else
 		{
 			console.log("create the buttons");
+			console.log("objectArr.length: " + objectArr.length);
 			for (var i = 0; i < objectArr.length; i++)
 			{
 				getStorage(group, i);
@@ -74,7 +75,7 @@ function displayTabButton(group, i)
 		/* if tabs in multiple windows were saved and if tabs in one window were saved */
 		// 0 is the flag to know that the user saved all their tabs with only one window open
 		// if (group["tabCount" + i][1] != undefined || group["tabCount" + i][1] == 0)
-		if (objectArr[i]["tabCount"[1] != undefined || objectArr[i]["tabCount"][1] == 0])
+		if (objectArr[i]["tabCount"][1] != undefined || objectArr[i]["tabCount"][1] == 0)
 		{
 			/* traverses the windows */
 			// for (var j = 0; j < group["tabCount" + i].length; j++)
@@ -94,7 +95,6 @@ function displayTabButton(group, i)
 			console.log("opens the tabs");
 			/* opens the tabs */
 			// for (var j = 0; j < group["tabCount" + i]; j++)
-			console.log('objectArr[i]["tabCount"]: ' + objectArr[i]["tabCount"]);
 			for (var j = 0; j < objectArr[i]["tabCount"]; j++)
 			{
 				chrome.extension.getBackgroundPage().createTab(group, i, j);
