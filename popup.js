@@ -94,6 +94,7 @@ function displayTabButton(group, i)
 			console.log("opens the tabs");
 			/* opens the tabs */
 			// for (var j = 0; j < group["tabCount" + i]; j++)
+			console.log('objectArr[i]["tabCount"]: ' + objectArr[i]["tabCount"]);
 			for (var j = 0; j < objectArr[i]["tabCount"]; j++)
 			{
 				chrome.extension.getBackgroundPage().createTab(group, i, j);

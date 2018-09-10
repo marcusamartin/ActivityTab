@@ -262,7 +262,7 @@ function sameColorTabs(command)
 					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
-					checkDuplicateName(promptUser, command);
+					checkDuplicateName(promptUser, objectArr, command);
 				})
 			})
 		}
@@ -299,11 +299,15 @@ function storeSortTabsTextField(storeSortTabsTextField)
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
 				var tabCount = 0;
 
+				console.log("tabs.length: " + tabs.length);
 				for (; tabCount < tabs.length; tabCount++)
 				{
+					console.log("hi");
 					tabNamesArr[tabCount] = tabs[tabCount].title;
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
 				}
+
+				console.log("tabCount: " + tabCount);
 
 				/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
 				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
@@ -322,7 +326,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 							tabNamesArr.splice(i, 1);
 							// removes url of array as well
 							tabUrlsArr.splice(i, 1);
-							// decrements tab count as differe colored tab is removed
+							// decrements tab count as different colored tab is removed
 							tabCount--;
 							// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 							i--;
@@ -335,6 +339,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 					var tabNames = "tabNames";
 					groupObject[tabNames] = tabNamesArr;
+					console.log("groupObject[tabNames]: " + groupObject[tabNames]);
 
 					var tabUrls = "tabUrls";
 					groupObject[tabUrls] = tabUrlsArr;
@@ -344,6 +349,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 					var tabCount2 = "tabCount";
 					groupObject[tabCount2] = tabCount;
+					console.log("groupObject[tabCount2: " + groupObject[tabCount2]);
 
 					group.objectArr.push(groupObject);
 					var objectArr = group.objectArr;
@@ -353,7 +359,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 					/* checks if duplicate name */
 					// specified command to have duplicate checked the same way as the sort colors command since sortTabsTextField has the same purpose
-					checkDuplicateName(promptUser, "same-color-text-field");
+					checkDuplicateName(promptUser, objectArr, "same-color-text-field");
 				})
 			})
 		}
@@ -464,7 +470,7 @@ function allTabs(command)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
-				checkDuplicateName(promptUser, command);
+				checkDuplicateName(promptUser, objectArr, command);
 			})
 		}
 	})
@@ -570,7 +576,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
-				checkDuplicateName(promptUser,"save-all-tabs-text-field");
+				checkDuplicateName(promptUser, objectArr, "save-all-tabs-text-field");
 			})
 		}
 	})
@@ -579,16 +585,24 @@ function storeAllTabsTextField(storeAllTabsTextField)
 /* checks if there is a duplicate name and then removes the button at the end that is still
    added because of the first ~asynchronous~ function in sameColorTabs() and storeTabsTextField() */
    // FIXME: groupCount
-function checkDuplicateName(promptUser, groupCount, command)
+function checkDuplicateName(promptUser, objectArr, command)
 {
-	if (promptUser != "" && groupCount != 0)
+	console.log("checkDuplicate, objectArr: " + objectArr);
+	// if (promptUser != "" && groupCount != 0)
+	if (promptUser != "" && objectArr.length != 1)
 	{
 		/* iterates through the buttons */
-		for (var i = 0; i < groupCount; i++)
+		console.log("objectArr.length: " + objectArr.length);
+		// added "- 1" because button is already populated and it is catching it as a duplicate when it is just the same button
+		for (var i = 0; i < objectArr.length - 1; i++)
 		{
-			chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
+			// chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
+			chrome.storage.local.get("objectArr", function(i, anotherGroup)
 			{
-				var groupName = anotherGroup["groupName" + i];
+				// var groupName = anotherGroup["groupName" + i];
+				var groupName = anotherGroup.objectArr[i]["groupName"];
+				console.log("groupName: " + groupName);
+				console.log("promptUser: " + promptUser);
 					
 				if (groupName == promptUser)
 				{
@@ -609,13 +623,34 @@ function checkDuplicateName(promptUser, groupCount, command)
 							replaceAllButton(i, promptUser);
 						}
 						// removes added button from asynchronous function since a button is still added
-						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						// chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+
+
 					}
 					else
 					{
 						alert("Please enter a different name for the group!");
 						// removes added button from asynchronous function since a button is still added
-						chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						// chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						anotherGroup.objectArr.splice(i, 1);
+						var objectArr = anotherGroup.objectArr;
+
+						/* prints everything in storage */
+						chrome.storage.local.get(null, function(items) 
+						{
+							var allKeys = Object.keys(items);
+							console.log("storage: " + allKeys);
+						})
+
+						chrome.storage.local.set({"objectArr": objectArr});
+
+						/* prints everything in storage */
+						chrome.storage.local.get(null, function(items) 
+						{
+							var allKeys = Object.keys(items);
+							console.log("storage: " + allKeys);
+						})
+
 						/* only if command had activated prompt, not the text fields */
 						if (command != "same-color-text-field" && command != "save-all-tabs-text-field")
 						{
@@ -675,38 +710,25 @@ function replaceButton(replacementButton, promptUser)
 				}
 	
 				/* initialize object content */
-				var groupName = "groupName" + replacementButton;
+				var groupName = "groupName";
 				groupObject[groupName] = promptUser;
 	
-				var tabNames = "tabNames" + replacementButton;
+				var tabNames = "tabNames";
 				groupObject[tabNames] = tabNamesArr;
 	
-				var tabUrls = "tabUrls" + replacementButton;
+				var tabUrls = "tabUrls";
 				groupObject[tabUrls] = tabUrlsArr;
 	
-				var tabColor = "tabColor" + replacementButton;
+				var tabColor = "tabColor";
 				groupObject[tabColor] = tabColorsArr;
 	
-				var tabCount2 = "tabCount" + replacementButton;
+				var tabCount2 = "tabCount";
 				groupObject[tabCount2] = tabCount;
 	
-				var objectArr = group.objectArr.push(groupObject);
+				group.objectArr.push(groupObject);
+				var objectArr = group.objectArr;
 				// updates storage with new objectArr with groupObject
 				chrome.storage.local.set({"objectArr": objectArr});
-	
-				/* debugging */
-				chrome.storage.local.get(null, function(items) 
-				{
-					var allKeys = Object.keys(items);
-					console.log("storage: " + allKeys);
-				})
-			})
-	
-			/* group count can be decreased by 1 since return to storeTabsTextField will increment groupCount */
-			chrome.storage.local.get("groupCount", function(group2)
-			{
-				var groupCountMinus1 = group2.groupCount - 1;
-				chrome.storage.local.set({"groupCount": groupCountMinus1});
 			})
 		})
 	})
@@ -715,7 +737,7 @@ function replaceButton(replacementButton, promptUser)
 /* updates correct "ALL TABS" button with tab information AND REPLACES BUTTON */
 function replaceAllButton(replacementButton, promptUser)
 {
-	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		var groupObject = {};
@@ -776,38 +798,25 @@ function replaceAllButton(replacementButton, promptUser)
 			}
 
 			/* initialize object content */
-			var groupName = "groupName" + replacementButton;
+			var groupName = "groupName";
 			groupObject[groupName] = promptUser;
 
-			var tabNames = "tabNames" + replacementButton;
+			var tabNames = "tabNames";
 			groupObject[tabNames] = tabNamesArr;
 
-			var tabUrls = "tabUrls" + replacementButton;
+			var tabUrls = "tabUrls";
 			groupObject[tabUrls] = tabUrlsArr;
 
-			var tabColor = "tabColor" + replacementButton;
+			var tabColor = "tabColor";
 			groupObject[tabColor] = tabColorsArr;
 
-			var tabCount2 = "tabCount" + replacementButton;
+			var tabCount2 = "tabCount";
 			groupObject[tabCount2] = tabCount;
 
-			var objectArr = group.objectArr.push(groupObject);
+			group.objectArr.push(groupObject);
+			var objectArr = group.objectArr;
 			// updates storage with new objectArr with groupObject
 			chrome.storage.local.set({"objectArr": objectArr});
-	
-			/* debugging */
-			chrome.storage.local.get(null, function(items) 
-			{
-				var allKeys = Object.keys(items);
-				console.log("storage: " + allKeys);
-			})
-
-			/* group count can be decreased by 1 since return to storeAllTabsTextField will increment groupCount */
-			chrome.storage.local.get("groupCount", function(group2)
-			{
-				var decrementedGroupCount = group2.groupCount - 1;
-				chrome.storage.local.set({"groupCount": decrementedGroupCount});
-			})
 			
 			// sends a message to popup script so sort tabs text field's border color will update from command
 			chrome.runtime.sendMessage({msg: "color command"});
@@ -940,13 +949,19 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 function createTab(group, i, j)
 {
 	/* creates the tabs */
-    chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+	// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+	chrome.tabs.create({"url": group.objectArr[i]["tabUrls"][j], "active": false}, function(tab)
     {
+		console.log('created the tab, group.objectArr[i]["tabUrls"][j]: ' + group.objectArr[i]["tabUrls"][j]);
 		/* saves title of tab */
-        var tabTitle = group["tabNames" + i][j];
+		// var tabTitle = group["tabNames" + i][j];
+		var tabTitle = group.objectArr[i]["tabNames"][j];
+		console.log("tabTitle: " + tabTitle);
 		tabIdsToTitles[tab.id] = tabTitle;
 		/* saves color of tab */
-		var tabColor = group["tabColor" + i][j];
+		// var tabColor = group["tabColor" + i][j];
+		var tabColor = group.objectArr[i]["tabColor"][j];
+		console.log("tabColor: " + tabColor);
 		tabIdsToColor[tab.id] = tabColor;
     })
 }
@@ -955,16 +970,20 @@ function createTab(group, i, j)
 function createAllTabs(group, i, j)
 {
 	// creates all of the tabs of the current window
-	chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+	// chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+	chrome.windows.create({"url": group.objectArr[i]["tabUrls"][j], "state": "maximized"}, function(window)
 	{
 		/* iterates through the tabs of a window to put tab names and tab color */
-		for (var k = 0; k < group["tabUrls" + i][j].length; k++)
+		// for (var k = 0; k < group["tabUrls" + i][j].length; k++)
+		for (var k = 0; k < group.objectArr[i]["tabUrls"][j].length; k++)
 		{
 			/* saves title of tab */
-			var tabTitle = group["tabNames" + i][j][k];
+			// var tabTitle = group["tabNames" + i][j][k];
+			var tabTitle = group.objectArr[i]["tabNames"][j][k];
 			tabIdsToTitles[window.tabs[k].id] = tabTitle;
 			/* saves color of tab */
-			var tabColor = group["tabColor" + i][j][k];
+			// var tabColor = group["tabColor" + i][j][k];
+			var tabColor = group.objectArr[i]["tabColor"][j][k];
 			tabIdsToColor[window.tabs[k].id] = tabColor;
 		}
 	})
@@ -976,29 +995,35 @@ function createWindowTabs(group, i, j)
 	/* creates a window with the first tab */
 	if (j == 0)
 	{
-		chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+		// chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
+		chrome.windows.create({"url": group.objectArr[i]["tabUrls"][j], "state": "maximized"}, function(window)
 		{
 			// accesses window's array of tabs to access first tab's id
 			var firstTabInWindow = window.tabs[0].id;
 
 			/* saves title of tab */
-			var tabTitle = group["tabNames" + i][j];
+			// var tabTitle = group["tabNames" + i][j];
+			var tabTitle = group.objectArr[i]["tabNames"][j];
 			tabIdsToTitles[firstTabInWindow] = tabTitle;
 			/* saves color of tab */
-			var tabColor = group["tabColor" + i][j];
+			// var tabColor = group["tabColor" + i][j];
+			var tabColor = group.objectArr[i]["tabColor"][j];
 			tabIdsToColor[firstTabInWindow] = tabColor;
 		})
 	}
 	else
 	{
 		/* creates the tabs */
-		chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+		// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+		chrome.tabs.create({"url": group.objectArr[i]["tabUrls"][j], "active": false}, function(tab)
 		{
 			/* saves title of tab */
-			var tabTitle = group["tabNames" + i][j];
+			// var tabTitle = group["tabNames" + i][j];
+			var tabTitle = group.objectArr[i]["tabNames"][j];
 			tabIdsToTitles[tab.id] = tabTitle;
 			/* saves color of tab */
-			var tabColor = group["tabColor" + i][j];
+			// var tabColor = group["tabColor" + i][j];
+			var tabColor = group.objectArr[i]["tabColor"][j];
 			tabIdsToColor[tab.id] = tabColor;
 			// console.log("set tabIdsToColor[tab.id]: " + tabIdsToColor[tab.id]);
 		})
