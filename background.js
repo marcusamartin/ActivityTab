@@ -847,7 +847,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 		// tab title from text field sent to be saved into saveTitle
 		if (request.name)
 		{
-			alert(tab[0].id);
 			saveTitle[tab[0].id] = request.name;
 		}
 	})
@@ -900,6 +899,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	}
 
 	sendResponse();
+})
+
+/* removes color and title from saveColor and saveTitle once tab is closed */
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
+{
+	delete saveColor[tabId];
+	delete saveTitle[tabId];
 })
 
 /* deletes tab color that is saved in saveColor if color button is pressed;
