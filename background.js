@@ -1,6 +1,6 @@
 /* FIXME:
  * buttonCount is inefficient, fix by using an array of object and .length
- * change favicon colors to match button colors
+ * might want to change sameSortTextField to get colored tabs from all windows like saveAllTabs
  * use favIconUrl instead of "shortcut icon" to better change favicon url?
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
    however, if bookmark icon is clicked again, icon will reset
@@ -26,16 +26,6 @@ function onInstall()
 	// FIXME: fix to not override existing storage (if undefined)
 	var objectArr = [];
 	chrome.storage.local.set({"objectArr": objectArr});
-
-	/* initializes groupCount if extension is being installed for the first time;
-	   if the extension is being updated or refreshed, the user's storage will not be reset */
-	chrome.storage.local.get("groupCount", function(group)
-	{
-		if (group.groupCount == undefined)
-		{
-			chrome.storage.local.set({"groupCount": 0});
-		}
-	})
 
 	/* prints everything in storage */
 	// chrome.storage.local.get(null, function(items) 
@@ -183,11 +173,8 @@ function queryContextMenu(buttonPress, color)
 /* save tabs of current tab color */
 function sameColorTabs(command)
 {
-	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
-		// current count of groups
-		var groupCount = group.groupCount;
-
 		var promptUser = prompt("Group name: ");
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
@@ -252,19 +239,19 @@ function sameColorTabs(command)
 					}
 
 					/* initialize object content */
-					var groupName = "groupName" + groupCount;
+					var groupName = "groupName";
 					groupObject[groupName] = promptUser;
 
-					var tabNames = "tabNames" + groupCount;
+					var tabNames = "tabNames";
 					groupObject[tabNames] = tabNamesArr;
 
-					var tabUrls = "tabUrls" + groupCount;
+					var tabUrls = "tabUrls";
 					groupObject[tabUrls] = tabUrlsArr;
 
-					var tabColor = "tabColor" + groupCount;
+					var tabColor = "tabColor";
 					groupObject[tabColor] = tabColorsArr;
 
-					var tabCount2 = "tabCount" + groupCount;
+					var tabCount2 = "tabCount";
 					groupObject[tabCount2] = tabCount;
 
 
@@ -275,10 +262,7 @@ function sameColorTabs(command)
 					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
-					checkDuplicateName(promptUser, groupCount, command);
-
-					// set-up for next group so last group isn't overwritten
-					chrome.storage.local.set({"groupCount": (groupCount + 1)});
+					checkDuplicateName(promptUser, command);
 				})
 			})
 		}
@@ -288,11 +272,8 @@ function sameColorTabs(command)
 /* store tabs of the same color of the current tab */
 function storeSortTabsTextField(storeSortTabsTextField)
 {
-	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
-		// current count of groups
-		var groupCount = group.groupCount;
-
 		var promptUser = storeSortTabsTextField;
 		// text limit so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
@@ -349,19 +330,19 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					}
 
 					/* initialize object content */
-					var groupName = "groupName" + groupCount;
+					var groupName = "groupName";
 					groupObject[groupName] = promptUser;
 
-					var tabNames = "tabNames" + groupCount;
+					var tabNames = "tabNames";
 					groupObject[tabNames] = tabNamesArr;
 
-					var tabUrls = "tabUrls" + groupCount;
+					var tabUrls = "tabUrls";
 					groupObject[tabUrls] = tabUrlsArr;
 
-					var tabColor = "tabColor" + groupCount;
+					var tabColor = "tabColor";
 					groupObject[tabColor] = tabColorsArr;
 
-					var tabCount2 = "tabCount" + groupCount;
+					var tabCount2 = "tabCount";
 					groupObject[tabCount2] = tabCount;
 
 					group.objectArr.push(groupObject);
@@ -372,10 +353,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 					/* checks if duplicate name */
 					// specified command to have duplicate checked the same way as the sort colors command since sortTabsTextField has the same purpose
-					checkDuplicateName(promptUser, groupCount, "same-color-text-field");
-
-					// set-up for next group so last group isn't overwritten
-					chrome.storage.local.set({"groupCount": (groupCount + 1)});
+					checkDuplicateName(promptUser, "same-color-text-field");
 				})
 			})
 		}
@@ -385,11 +363,8 @@ function storeSortTabsTextField(storeSortTabsTextField)
 /* responds to context menu for save all tabs */
 function allTabs(command)
 {
-	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
-		// current count of groups
-		var groupCount = group.groupCount;
-
 		var promptUser = prompt("Group name: ");
 		// limit text so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
@@ -466,19 +441,19 @@ function allTabs(command)
 				}
 
 				/* initialize object content */
-				var groupName = "groupName" + groupCount;
+				var groupName = "groupName";
 				groupObject[groupName] = promptUser;
 
-				var tabNames = "tabNames" + groupCount;
+				var tabNames = "tabNames";
 				groupObject[tabNames] = tabNamesArr;
 
-				var tabUrls = "tabUrls" + groupCount;
+				var tabUrls = "tabUrls";
 				groupObject[tabUrls] = tabUrlsArr;
 
-				var tabColor = "tabColor" + groupCount;
+				var tabColor = "tabColor";
 				groupObject[tabColor] = tabColorsArr;
 
-				var tabCount2 = "tabCount" + groupCount;
+				var tabCount2 = "tabCount";
 				groupObject[tabCount2] = tabCount;
 
 				group.objectArr.push(groupObject);
@@ -489,10 +464,7 @@ function allTabs(command)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
-				checkDuplicateName(promptUser, groupCount, command);
-
-				// set-up for next group so last group isn't overwritten
-				chrome.storage.local.set({"groupCount": (groupCount + 1)});
+				checkDuplicateName(promptUser, command);
 			})
 		}
 	})
@@ -501,11 +473,8 @@ function allTabs(command)
 /* stores all tabs */
 function storeAllTabsTextField(storeAllTabsTextField)
 {
-	chrome.storage.local.get(["groupCount", "objectArr"], function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
-		// current count of groups
-		var groupCount = group.groupCount;
-
 		var promptUser = storeAllTabsTextField;
 		// limit text so the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
@@ -578,19 +547,19 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				}
 
 				/* initialize object content */
-				var groupName = "groupName" + groupCount;
+				var groupName = "groupName";
 				groupObject[groupName] = promptUser;
 
-				var tabNames = "tabNames" + groupCount;
+				var tabNames = "tabNames";
 				groupObject[tabNames] = tabNamesArr;
 
-				var tabUrls = "tabUrls" + groupCount;
+				var tabUrls = "tabUrls";
 				groupObject[tabUrls] = tabUrlsArr;
 
-				var tabColor = "tabColor" + groupCount;
+				var tabColor = "tabColor";
 				groupObject[tabColor] = tabColorsArr;
 
-				var tabCount2 = "tabCount" + groupCount;
+				var tabCount2 = "tabCount";
 				groupObject[tabCount2] = tabCount;
 
 				group.objectArr.push(groupObject);
@@ -601,10 +570,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
-				checkDuplicateName(promptUser, groupCount, "save-all-tabs-text-field");
-
-				// set-up for next group so last group isn't overwritten
-				chrome.storage.local.set({"groupCount": (groupCount + 1)});
+				checkDuplicateName(promptUser,"save-all-tabs-text-field");
 			})
 		}
 	})
@@ -612,6 +578,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 /* checks if there is a duplicate name and then removes the button at the end that is still
    added because of the first ~asynchronous~ function in sameColorTabs() and storeTabsTextField() */
+   // FIXME: groupCount
 function checkDuplicateName(promptUser, groupCount, command)
 {
 	if (promptUser != "" && groupCount != 0)
