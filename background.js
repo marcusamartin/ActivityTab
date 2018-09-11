@@ -1028,3 +1028,12 @@ function createWindowTabs(group, i, j)
 		})
 	}
 }
+
+/* changes the sort colors context menu text to reflect the color of the current tab */
+chrome.tabs.onActivated.addListener(function(activeInfo)
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+	{
+		chrome.tabs.sendMessage(tabs[0].id, {"changeContextMenu": "changeContextMenu"}, function(response){});
+	})
+})

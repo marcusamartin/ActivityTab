@@ -45,6 +45,57 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     {
         setFaviconURL(request.color);
     }
+    /* changes sort color context menu's text based on tab color */
+    else if (request.changeContextMenu)
+    {
+        var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+
+        /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+        if (currentFaviconURL == null)
+        {
+            currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+        }
+
+        // stores color of tab
+        var color;
+        /* urls of color favicons */
+        var redURL = chrome.runtime.getURL("img/red-circle-16.png");
+        var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
+        var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
+        var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
+        var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
+        var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+
+        for (var i = 0; i < currentFaviconURL.length; i++)
+        {
+            switch(currentFaviconURL[i].href)
+            {
+                case redURL:
+                    color = "red";
+                    break;
+                case greenURL:
+                    color = "green";
+                    break;
+                case blueURL:
+                    color = "blue";
+                    break;
+                case yellowURL:
+                    color = "yellow";
+                    break;
+                case orangeURL:
+                    color = "orange";
+                    break;
+                case purpleURL:
+                    color = "purple";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // sends tab color to backgrounds script to change context menu
+        chrome.runtime.sendMessage(color, function(response){});
+    }
 })
 
 /* left arrow key: returns correct tab color by looking at favicon url */
