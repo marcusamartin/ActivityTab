@@ -913,20 +913,22 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
 
 /* deletes tab color that is saved in saveColor if color button is pressed;
    if not deleted, asynchronous function calls would make saveColor override color from the button */
-function deleteSaveColor(color)
-{
-	// looks at current tab
-	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
-	{
-		// only deletes and changes tab color if the tab color is going to change to a different color
-		if (saveColor[tab[0].id] != color)
-		{
-			delete saveColor[tab[0].id];
-			// sets saveColor[tab[0].id] to changed color so that the new color is saved
-			saveColor[tab[0].id] = color;
-		}
-	})
-}
+// might not be necessary? keeping just in case
+// function deleteSaveColor(color)
+// {
+// 	// alert('hi');
+// 	// looks at current tab
+// 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+// 	{
+// 		// only deletes and changes tab color if the tab color is going to change to a different color
+// 		if (saveColor[tab[0].id] != color)
+// 		{
+// 			delete saveColor[tab[0].id];
+// 			// sets saveColor[tab[0].id] to changed color so that the new color is saved
+// 			saveColor[tab[0].id] = color;
+// 		}
+// 	})
+// }
 
 /* changes tab's title and color after tab refresh if applicable */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
