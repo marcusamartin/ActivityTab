@@ -167,7 +167,7 @@ function displayWindowButton(group, i)
 		// disables button as it is unnecessary when the tabs button opens multiple windows already
 		windowButton.disabled = true;
 		// sets background color of button to reflect that the button is disabled
-		windowButton.style.backgroundColor = "#AAB4AF";
+		windowButton.style.backgroundColor = "#AAAFB4";
 	}
 }
 
@@ -370,7 +370,6 @@ function colorButton(button, group, i)
 	{
 		case redURL:
 			button.style.backgroundColor = "#FF3333";
-			// button.style.borderColor = "#FF3333";
 			break;
 		case greenURL:
 			button.style.backgroundColor = "#5DE619";
@@ -431,7 +430,6 @@ function setSortTabsTextFieldBorderColor()
 		{
 			case redURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save red tabs";
-				// document.getElementById("sortTabsTextField").style.backgroundColor = "#FF7F66";
 				document.getElementById("sortTabsTextField").style.border = "1px solid #FF3333";
 				break;
 			case greenURL:
@@ -456,7 +454,7 @@ function setSortTabsTextFieldBorderColor()
 				document.getElementById("sortTabsTextField").style.border = "1px solid #B152E0";
 				break;
 			default:
-				document.getElementById("sortTabsTextField").style.border = "1px solid #AAAFB4"; // 3B3B3B
+				document.getElementById("sortTabsTextField").style.border = "1px solid #AAAFB4";
 				document.getElementById("sortTabsTextField").style.backgroundColor = "#AAAFB4";
 				document.getElementById("sortTabsTextField").disabled = true;
 				break;
@@ -496,7 +494,7 @@ function colorSelectMenuTrashButton(button, menuItem)
 		case "menu6":
 			button.style.backgroundColor = "#B152E0";
             break;
-        default:
+		default:
             break;
     }
 }

@@ -50,8 +50,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 /* left arrow key: returns correct tab color by looking at favicon url */
 function leftArrowKeyTabColor()
 {
-    // current favicon url of page
-    var currentFaviconURL = document.querySelector("link[rel*='shortcut icon']").href;
+    // current favicon url of page; gets all selectors of "icon"
+    var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+
+    /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+    if (currentFaviconURL == null)
+    {
+        currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+    }
+
     /* urls of color favicons */
     var redURL = chrome.runtime.getURL("img/red-circle-16.png");
     var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
@@ -60,40 +67,51 @@ function leftArrowKeyTabColor()
     var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
     var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
-    /* sets favicon url depending on current favicon url */
-    if (currentFaviconURL != redURL && currentFaviconURL != greenURL && currentFaviconURL != blueURL &&
-        currentFaviconURL != yellowURL && currentFaviconURL != orangeURL && currentFaviconURL != purpleURL)
+    /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+    for (var i = 0; i < currentFaviconURL.length; i++)
     {
-        // set default color if tab had no previous color
-        return "purple";
-    }
-
-    /* cycle through colors */
-    switch (currentFaviconURL)
-    {
-        case purpleURL:
-            return "orange";
-        case orangeURL:
-            return "yellow";
-        case yellowURL:
-            return "blue";
-        case blueURL:
-            return "green";
-        case greenURL:
-            return "red";
-        // cycle back to purple
-        case redURL:
+        /* sets favicon url depending on current favicon url */
+        if (currentFaviconURL[i].href != redURL && currentFaviconURL[i].href != greenURL && currentFaviconURL[i].href != blueURL &&
+            currentFaviconURL[i].href != yellowURL && currentFaviconURL[i].href != orangeURL && currentFaviconURL[i].href != purpleURL)
+        {
+            // set default color if tab had no previous color
             return "purple";
-        default:
-            return;
+        }
+
+        /* cycle through colors */
+        switch (currentFaviconURL[i].href)
+        {
+            case purpleURL:
+                return "orange";
+            case orangeURL:
+                return "yellow";
+            case yellowURL:
+                return "blue";
+            case blueURL:
+                return "green";
+            case greenURL:
+                return "red";
+            // cycle back to purple
+            case redURL:
+                return "purple";
+            default:
+                return;
+        }
     }
 }
 
 /* right arrow key: returns correct tab color by looking at favicon url */
 function rightArrowKeyTabColor()
 {
-    // current favicon url of page
-    var currentFaviconURL = document.querySelector("link[rel*='shortcut icon']").href;
+    // current favicon url of page; gets all selectors of "icon"
+    var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+    
+    /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+    if (currentFaviconURL == null)
+    {
+        currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+    }
+
     /* urls of color favicons */
     var redURL = chrome.runtime.getURL("img/red-circle-16.png");
     var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
@@ -102,40 +120,51 @@ function rightArrowKeyTabColor()
     var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
     var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
 
-    /* sets favicon url depending on current favicon url */
-    if (currentFaviconURL != redURL && currentFaviconURL != greenURL && currentFaviconURL != blueURL &&
-        currentFaviconURL != yellowURL && currentFaviconURL != orangeURL && currentFaviconURL != purpleURL)
+    /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+    for (var i = 0; i < currentFaviconURL.length; i++)
     {
-        // set default color if tab had no previous color
-        return "red";
-    }
-
-    /* cycle through colors */
-    switch (currentFaviconURL)
-    {
-        case redURL:
-            return "green";
-        case greenURL:
-            return "blue";
-        case blueURL:
-            return "yellow";
-        case yellowURL:
-            return "orange";
-        case orangeURL:
-            return "purple";
-        // cycle back to red
-        case purpleURL:
+        /* sets favicon url depending on current favicon url */
+        if (currentFaviconURL[i].href != redURL && currentFaviconURL[i].href != greenURL && currentFaviconURL[i].href != blueURL &&
+            currentFaviconURL[i].href != yellowURL && currentFaviconURL[i].href != orangeURL && currentFaviconURL[i].href != purpleURL)
+        {
+            // set default color if tab had no previous color
             return "red";
-        default:
-            return;
+        }
+
+        /* cycle through colors */
+        switch (currentFaviconURL[i].href)
+        {
+            case redURL:
+                return "green";
+            case greenURL:
+                return "blue";
+            case blueURL:
+                return "yellow";
+            case yellowURL:
+                return "orange";
+            case orangeURL:
+                return "purple";
+            // cycle back to red
+            case purpleURL:
+                return "red";
+            default:
+                return;
+        }
     }
 }
 
 /* sets favicon url from a color */
 function setFaviconURL(color)
 {
-    /* finds the tab's current favicon by DOM */
-    var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
+    // current favicon of page; gets all selectors of "icon"
+    var link = document.querySelectorAll("link[rel*='icon']");
+
+    /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+    if (link == null)
+    {
+        link = document.querySelectorAll("link[rel*='shortcut icon']");
+    }
+
     link.type = "image/x-icon";
     link.rel = "shortcut icon";
     
@@ -148,32 +177,62 @@ function setFaviconURL(color)
             // updates "sameColorTabs" context menu if command that changes color is used
             chrome.runtime.sendMessage("red", function(response){});
             // updates favicon of tab to specified color
-            link.href = chrome.runtime.getURL("img/red-circle-16.png");
+            // link.href = chrome.runtime.getURL("img/red-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/red-circle-16.png");
+            }
             break;
         case "green":
             chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("green", function(response){});
-            link.href = chrome.runtime.getURL("img/green-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/green-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/green-circle-16.png");
+            }
             break;
         case "blue":
             chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("blue", function(response){});
-            link.href = chrome.runtime.getURL("img/blue-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/blue-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/blue-circle-16.png");
+            }
             break;
         case "yellow":
             chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("yellow", function(response){});
-            link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            }
             break;
         case "orange":
             chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("orange", function(response){});
-            link.href = chrome.runtime.getURL("img/orange-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/orange-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/orange-circle-16.png");
+            }
             break;
         case "purple":
             chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("purple", function(response){});
-            link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = chrome.runtime.getURL("img/purple-circle-16.png");
+            }
             break;
         default:
             break;
@@ -183,8 +242,15 @@ function setFaviconURL(color)
 /* sets favicon url from a url */
 function setFaviconURLFromURL(colorURL)
 {
-    /* finds the tab's current favicon by DOM */
-    var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement("link");
+    // current favicon of page; gets all selectors of "icon"
+    var link = document.querySelectorAll("link[rel*='icon']");
+
+    /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+    if (link == null)
+    {
+        link = document.querySelectorAll("link[rel*='shortcut icon']");
+    }
+
     link.type = "image/x-icon";
     link.rel = "shortcut icon";
 
@@ -195,27 +261,51 @@ function setFaviconURLFromURL(colorURL)
     var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
     var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
     var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
-    
+
     /* sets tab's color according to specified color */
     switch (colorURL)
     {
         case redURL:
-            link.href = chrome.runtime.getURL("img/red-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/red-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = redURL;
+            }
             break;
         case greenURL:
-            link.href = chrome.runtime.getURL("img/green-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/green-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = greenURL;
+            }
             break;
         case blueURL:
-            link.href = chrome.runtime.getURL("img/blue-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/blue-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = blueURL;
+            }
             break;
         case yellowURL:
-            link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/yellow-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = yellowURL;
+            }
             break;
         case orangeURL:
-            link.href = chrome.runtime.getURL("img/orange-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/orange-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = orangeURL;
+            }
             break;
         case purpleURL:
-            link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            //link.href = chrome.runtime.getURL("img/purple-circle-16.png");
+            for (var i = 0; i < link.length; i++)
+            {
+                link[i].href = purpleURL;
+            }
             break;
         default:
             break;
