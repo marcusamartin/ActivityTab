@@ -369,22 +369,22 @@ function colorButton(button, group, i)
 	switch (tabColor)
 	{
 		case redURL:
-			button.style.backgroundColor = "#FF0000";
+			button.style.backgroundColor = "#FF3333";
 			break;
 		case greenURL:
-			button.style.backgroundColor = "#00FF00";
+			button.style.backgroundColor = "#5DE619";
 			break;
 		case blueURL:
-			button.style.backgroundColor = "#0000FF";
+			button.style.backgroundColor = "#197FE6";
 			break;
 		case yellowURL:
-			button.style.backgroundColor = "#FFE303";
+			button.style.backgroundColor = "#F2F20D";
 			break;
 		case orangeURL:
-			button.style.backgroundColor = "#FFA500";
+			button.style.backgroundColor = "#F5993D";
 			break;
 		case purpleURL:
-			button.style.backgroundColor = "#A020F0";
+			button.style.backgroundColor = "#B152E0";
 			break;
 		default:
 			break;
@@ -430,30 +430,31 @@ function setSortTabsTextFieldBorderColor()
 		{
 			case redURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save red tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #FF0000";
+				document.getElementById("sortTabsTextField").style.backgroundColor = "#FF7F66";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #FF3333";
 				break;
 			case greenURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save green tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #00FF00";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #5DE619";
 				break;
 			case blueURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save blue tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #0000FF";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #197FE6";
 				break;
 			case yellowURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save yellow tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #FFE303";
+				document.getElementById("sortTabsTextField").style.border = "3px solid 	#F2F20D";
 				break;
 			case orangeURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save orange tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #FFA500";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #F5993D";
 				break;
 			case purpleURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save purple tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #A020F0";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #B152E0";
 				break;
 			default:
-				document.getElementById("sortTabsTextField").style.border = "3px solid #000000";
+				document.getElementById("sortTabsTextField").style.border = "3px solid #3B3B3B";
 				document.getElementById("sortTabsTextField").style.backgroundColor = "#AAAFB4";
 				document.getElementById("sortTabsTextField").disabled = true;
 				break;
@@ -462,7 +463,7 @@ function setSortTabsTextFieldBorderColor()
 }
 
 /* reloads popup after sort tabs text field's border color was changed */
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
 	if (request.msg === "color command")
 	{
@@ -476,22 +477,22 @@ function colorSelectMenuTrashButton(button, menuItem)
 	switch (menuItem)
     {
 		case "menu1":
-			button.style.backgroundColor = "#FF0000";
+			button.style.backgroundColor = "#FF3333";
 			break;
         case "menu2":
-			button.style.backgroundColor = "#00FF00";
+			button.style.backgroundColor = "#5DE619";
             break;
         case "menu3":
-			button.style.backgroundColor = "#0000FF";
+			button.style.backgroundColor = "#197FE6";
             break;
         case "menu4":
-			button.style.backgroundColor = "#FFE303";
+			button.style.backgroundColor = "#F2F20D";
             break;
 		case "menu5":
-			button.style.backgroundColor = "#FFA500";
+			button.style.backgroundColor = "#F5993D";
 			break;
 		case "menu6":
-			button.style.backgroundColor = "#A020F0";
+			button.style.backgroundColor = "#B152E0";
             break;
         default:
             break;

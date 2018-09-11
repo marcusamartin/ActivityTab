@@ -5,7 +5,8 @@ body
 	width: 532px;
 	/* background-color: #5200FF; */
 	/* background-color: #F7F7F9; */
-	background-color: #5842f4;
+	background-color: #F7F7F7;
+	/* background-color: #5842f4; */
 }
 
 /* top half */
@@ -25,7 +26,7 @@ body
 	width: 200px;
     padding: 12px 20px 12px 15px;
     box-sizing: border-box;
-    border: 3px solid #000000;
+    border: 3px solid #3B3B3B;
     transition: 0.3s;
 	outline: none;
 	margin: 5px 8px 6px 8px;
@@ -33,9 +34,14 @@ body
 	text-align: left;
 }
 
+#customTitleField::placeholder 
+{
+    color: #3B3B3B;
+}
+
 #customTitleField:focus
 {
-	background-color: lightblue;
+	background-color: #6EE0F7;
 }
 
 #sortTabsTextField
@@ -52,9 +58,14 @@ body
 	text-align: left;
 }
 
+#sortTabsTextField::placeholder
+{
+	color: #3B3B3B;
+}
+
 #sortTabsTextField:focus
 {
-	background-color: lightblue;
+	background-color: #6EE0F7;
 }
 
 #allTabsTextField
@@ -64,7 +75,7 @@ body
 	width: 200px;
 	padding: 12px 15px 12px 15px;
 	box-sizing: border-box;
-	border: 3px solid #000000;
+	border: 3px solid #3B3B3B;
 	transition: 0.3s;
 	outline: none;
 	margin: 0px 5px 6px 8px;
@@ -72,9 +83,14 @@ body
 	text-align: left;
 }
 
+#allTabsTextField::placeholder
+{
+	color: #3B3B3B;
+}
+
 #allTabsTextField:focus
 {
-	background-color: lightblue;
+	background-color: #6EE0F7;
 }
 
 #sortArea
@@ -86,7 +102,9 @@ body
 
 	/* background-color: #00ADFF; */
 	/* background-color: #C4C4C4; */
-	background-color: #4285f4;
+	/* background-color: #EDEDED; */
+	background-color: #00CCCC;
+	/* background-color: #4285f4; */
 	border-style: outset;
 }
 
@@ -104,32 +122,32 @@ body
 {
 	/* creates equal distance from sides of sort area border as purple button */
 	margin: 0px 3px 5px 8px;
-	background-color: #FF0000;
+	background-color: #FF3333;
 }
 
 #greenButton
 {
-	background-color: #00FF00;
+	background-color: #5DE619;
 }
 
 #blueButton
 {
-	background-color: #0000FF;
+	background-color: #197FE6;
 }
 
 #yellowButton
 {
-	background-color: #FFE303;
+	background-color: #F2F20D;
 }
 
 #orangeButton
 {
-	background-color: #FFA500;
+	background-color: #F5993D;
 }
 
 #purpleButton
 {
-	background-color: #A020F0;
+	background-color: #B152E0;
 }
 
 /* select */
@@ -147,54 +165,54 @@ body
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #FF0000;
+	border-color: #FF3333;
 	border-radius: 5px;
-	background-color: #FF0000;
+	background-color: #FF3333;
 }
 
 .menu2
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #00FF00;
+	border-color: #5DE619;
 	border-radius: 5px;
-	background-color: #00FF00;
+	background-color: #5DE619;
 }
 
 .menu3
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #0000FF;
+	border-color: #197FE6;
 	border-radius: 5px;
-	background-color: #0000FF;
+	background-color: #197FE6;
 }
 
 .menu4
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #FFE303;
+	border-color: #F2F20D;
 	border-radius: 5px;
-	background-color: #FFE303;
+	background-color: #F2F20D;
 }
 
 .menu5
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #FFA500;
+	border-color: #F5993D;
 	border-radius: 5px;
-	background-color: #FFA500;
+	background-color: #F5993D;
 }
 
 .menu6
 {
 	border-width: 3px;
 	border-style: solid;
-	border-color: #A020F0;
+	border-color: #B152E0;
 	border-radius: 5px;
-	background-color: #A020F0;
+	background-color: #B152E0;
 }
 
 #selectMenuTrashButton
@@ -206,7 +224,7 @@ body
 	margin: 5px 40px 0px 0px;
 	font-size: 30px;
 	/* default color is red since select menu's default selection is red */
-	background-color: #FF0000;
+	background-color: #FF3333;
 
 	/* float: center;
 	height: 40px;
@@ -222,7 +240,7 @@ body
 {
 	font-size: 30px;
 	font-weight: bold;
-	margin: 5px 0px 0px 60px;
+	margin: 7px 0px 0px 78px;
 }
 
 /* bottom half */
