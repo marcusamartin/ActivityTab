@@ -626,6 +626,9 @@ function checkDuplicateName(promptUser, objectArr, command)
 						alert("Please enter a different name for the group!");
 						// removes added button from asynchronous function since a button is still added
 						// chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
+						anotherGroup.objectArr.splice(anotherGroup.objectArr.length - 1, 1);
+						var objectArr = anotherGroup.objectArr;
+						chrome.storage.local.set({"objectArr": objectArr});
 
 						/* only if command had activated prompt, not the text fields */
 						if (command != "same-color-text-field" && command != "save-all-tabs-text-field")

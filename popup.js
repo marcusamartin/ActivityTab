@@ -32,8 +32,8 @@ function displayButtons()
 function setEmptyText()
 {
 	document.getElementById("groupButtons").innerHTML = "No tabs are saved!";
-	document.getElementById("groupButtons").style.color = "#7DF9FF";
-	document.getElementById("groupButtons").style.width = "532px";
+	document.getElementById("groupButtons").style.color = "#232323";
+	document.getElementById("groupButtons").style.width = "500px";
 	document.getElementById("groupButtons").style.fontWeight = "900";
 	document.getElementById("groupButtons").style.fontSize = 20;
 	document.getElementById("groupButtons").style.textAlign = "center";
@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function()
 	})
 
 	// title text field is selected when popup is displayed
-	document.getElementById("customTitleField").focus();
+	// document.getElementById("customTitleField").focus();
 	/* registers enter key press for title text field */
 	var customTitleTextField = document.getElementById("customTitleField");
 	customTitleTextField.addEventListener("keyup", function(enterKey)
@@ -370,6 +370,7 @@ function colorButton(button, group, i)
 	{
 		case redURL:
 			button.style.backgroundColor = "#FF3333";
+			// button.style.borderColor = "#FF3333";
 			break;
 		case greenURL:
 			button.style.backgroundColor = "#5DE619";
@@ -430,31 +431,32 @@ function setSortTabsTextFieldBorderColor()
 		{
 			case redURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save red tabs";
-				document.getElementById("sortTabsTextField").style.backgroundColor = "#FF7F66";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #FF3333";
+				// document.getElementById("sortTabsTextField").style.backgroundColor = "#FF7F66";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #FF3333";
 				break;
 			case greenURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save green tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #5DE619";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #5DE619";
 				break;
 			case blueURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save blue tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #197FE6";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #197FE6";
 				break;
 			case yellowURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save yellow tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid 	#F2F20D";
+				document.getElementById("sortTabsTextField").style.border = "1px solid 	#F2F20D";
 				break;
 			case orangeURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save orange tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #F5993D";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #F5993D";
+				document.getElementById("sortTabsTextField").style.color = "#00FFFF";
 				break;
 			case purpleURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save purple tabs";
-				document.getElementById("sortTabsTextField").style.border = "3px solid #B152E0";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #B152E0";
 				break;
 			default:
-				document.getElementById("sortTabsTextField").style.border = "3px solid #3B3B3B";
+				document.getElementById("sortTabsTextField").style.border = "1px solid #AAAFB4"; // 3B3B3B
 				document.getElementById("sortTabsTextField").style.backgroundColor = "#AAAFB4";
 				document.getElementById("sortTabsTextField").disabled = true;
 				break;
