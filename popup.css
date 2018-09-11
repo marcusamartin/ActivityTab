@@ -7,6 +7,7 @@ body
 	/* background-color: #F7F7F9; */
 	background-color: #F7F7F7;
 	/* background-color: #5842f4; */
+	font-family: "Helvetica Neue";
 }
 
 /* top half */
@@ -36,7 +37,8 @@ body
 
 #customTitleField::placeholder 
 {
-    color: #3B3B3B;
+	font-family: "Helvetica Neue";
+	color: #3B3B3B;
 }
 
 #customTitleField:focus
@@ -60,6 +62,7 @@ body
 
 #sortTabsTextField::placeholder
 {
+	font-family: "Helvetica Neue";
 	color: #3B3B3B;
 }
 
@@ -85,6 +88,7 @@ body
 
 #allTabsTextField::placeholder
 {
+	font-family: "Helvetica Neue";
 	color: #3B3B3B;
 }
 
@@ -158,6 +162,7 @@ body
 	margin: 6px 0px 0px 35px;
 	font-size: 20px;
 	height: 34px;
+	font-family: "Helvetica Neue";
 }
 
 /* select dropdowns */
