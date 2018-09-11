@@ -223,7 +223,7 @@ function setFaviconURL(color)
     switch (color)
     {
         case "red":
-            // changes sort tab's popup text placeholder to correct color
+            // changes sort tab's popup text placeholder to correct color by refreshing
             chrome.runtime.sendMessage({msg: "color command"});
             // updates "sameColorTabs" context menu if command that changes color is used
             chrome.runtime.sendMessage("red", function(response){});

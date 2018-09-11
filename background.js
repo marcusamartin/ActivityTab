@@ -158,6 +158,7 @@ function queryKeys(command)
 {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
+		alert("hi");
 		// sends command to content script
 		// selected tab, {command property = command}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
@@ -169,6 +170,7 @@ function queryKeys(command)
 /* sends message with context menu info to content script */
 function queryContextMenu(buttonPress, color)
 {
+	alert("hi2");
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
 		// selected tab, {button property = context menu pressed, color property = button color}, response for error message (not needed)
@@ -824,14 +826,15 @@ var tabIdsToColor = {};
 /* once content script has finished loading in the new tab, send a message with the tab's title to the content script,
    keeps title and color from SAVED tabs persistent through refresh */
 // content script would not be able to received message if page has not been loaded
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
-{
-	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
-	{
-		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
-		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
-	}
-})
+// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
+// {
+// 	alert("hi3");
+// 	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
+// 	{
+// 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
+// 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
+// 	}
+// })
 
 // for keeping title through tab refresh 
 // (saveTitle is initialized in ActivityTabFeatures(command) under "custom-title-toggle-feature")
@@ -914,40 +917,53 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
 /* deletes tab color that is saved in saveColor if color button is pressed;
    if not deleted, asynchronous function calls would make saveColor override color from the button */
 // might not be necessary? keeping just in case
-// function deleteSaveColor(color)
-// {
-// 	// alert('hi');
-// 	// looks at current tab
-// 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
-// 	{
-// 		// only deletes and changes tab color if the tab color is going to change to a different color
-// 		if (saveColor[tab[0].id] != color)
-// 		{
-// 			delete saveColor[tab[0].id];
-// 			// sets saveColor[tab[0].id] to changed color so that the new color is saved
-// 			saveColor[tab[0].id] = color;
-// 		}
-// 	})
-// }
+function deleteSaveColor(color)
+{
+	// looks at current tab
+	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+	{
+		// only deletes and changes tab color if the tab color is going to change to a different color
+		if (saveColor[tab[0].id] != color)
+		{
+			delete saveColor[tab[0].id];
+			// sets saveColor[tab[0].id] to changed color so that the new color is saved
+			saveColor[tab[0].id] = color;
+		}
+	})
+}
 
 /* changes tab's title and color after tab refresh if applicable */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
+	/* changes tab's title and color after tab refresh if applicable */
+	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
+	{
+		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
+		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
+	}
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script,
+       keeps title and color from SAVED tabs persistent through refresh */
+	// content script would not be able to received message if page has not been loaded
+
 	/* title was changed */
 	if (saveTitle[tabId] != null)
 	{
 		// title sent to content script
-    	chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
+		chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		/* sends message to content script if tab is supposed to be colored */
-		if (saveColor[tab[0].id] != undefined)
+		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by groupButton, 
+		   the tab being launched will not be set to the color of the current active tab */
+		if (saveColor[tab[0].id] != undefined && tab[0].id == tabId)
 		{
 			chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
 		}
 	})
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 })
 
 /* creates the tabs */
@@ -964,6 +980,7 @@ function createTab(group, i, j)
 		/* saves color of tab */
 		// var tabColor = group["tabColor" + i][j];
 		var tabColor = group.objectArr[i]["tabColor"][j];
+		alert(tabColor);
 		tabIdsToColor[tab.id] = tabColor;
     })
 }
