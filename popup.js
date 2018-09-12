@@ -354,10 +354,12 @@ function queryButtonClick(buttonPress, color)
 /* sets the background color of the button to correspond with it's tab colors */
 function colorButton(button, group, i)
 {
+	console.log("colorButton");
 	/* colors buttons */
 	// just needs to check first tab since all tabs are colored (from saveColorTabs)
 	// var tabColor = group["tabColor" + i][0];
 	var tabColor = group.objectArr[i]["tabColor"][0];
+	console.log("tabColor: " + tabColor);
 	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
 	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
 	var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");

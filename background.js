@@ -207,7 +207,7 @@ function sameColorTabs(command)
 			var groupObject = {};
 
 			/* stores all of the tab's information into an object and then puts object into storage */
-			chrome.tabs.query({currentWindow: true}, function(tabs)
+			chrome.tabs.query({}, function(tabs)
 			{
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
@@ -224,7 +224,7 @@ function sameColorTabs(command)
 				/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
 				chrome.tabs.query({active: true}, function(tab)
 				{
-					var currentFaviconURL = tab.favIconUrl;
+					var currentFaviconURL = tab[0].favIconUrl;
 
 					/* removes favicon urls that are not colored from tab colors array */
 					for (var i = 0; i < tabColorsArr.length; i++)
@@ -296,12 +296,13 @@ function storeSortTabsTextField(storeSortTabsTextField)
 			var groupObject = {};
 
 			/* stores all of the tab's information into an object and then puts object into storage */
-			chrome.tabs.query({currentWindow: true}, function(tabs)
+			chrome.tabs.query({}, function(tabs)
 			{
 				/* gets each tab's name and url from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
+				alert("tabColorsArr: " + tabColorsArr);
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
@@ -314,7 +315,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
 				chrome.tabs.query({active: true}, function(tab)
 				{
-					var currentFaviconURL = tab.favIconUrl;
+					var currentFaviconURL = tab[0].favIconUrl;
 
 					/* removes favicon urls that are not colored from tab colors array */
 					for (var i = 0; i < tabColorsArr.length; i++)
@@ -332,6 +333,8 @@ function storeSortTabsTextField(storeSortTabsTextField)
 							i--;
 						}
 					}
+
+					alert("tabColorsArr: " + tabColorsArr);
 
 					/* initialize object content */
 					var groupName = "groupName";
@@ -666,7 +669,7 @@ function replaceButton(replacementButton, promptUser)
 			/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
 			chrome.tabs.query({active: true}, function(tab)
 			{
-				var currentFaviconURL = tab.favIconUrl;
+				var currentFaviconURL = tab[0].favIconUrl;
 	
 				/* removes favicon urls that are not colored from tab colors array */
 				for (var i = 0; i < tabColorsArr.length; i++)
