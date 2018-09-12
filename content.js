@@ -28,16 +28,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         /* determine correct color from left/right key command */
         if (request.command == "left-key-toggle-feature")
         {
+            console.log("left key");
             color = leftArrowKeyTabColor();
         }
         else
         {
+            console.log("right key");
             color = rightArrowKeyTabColor();
         }
 
         setFaviconURL(color);
 
+        console.log("color: " + color);
         // sends color to background script for color to persist through tab refresh */
+        // chrome.runtime.sendMessage({msg: "hello"});
         chrome.runtime.sendMessage(color, function(response){});
     }
     /* popup color button press */
@@ -93,7 +97,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             }
         }
 
-        // sends tab color to backgrounds script to change context menu
+        // sends tab color to background script to change context menu
         chrome.runtime.sendMessage(color, function(response){});
     }
 })

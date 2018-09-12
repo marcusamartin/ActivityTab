@@ -158,7 +158,6 @@ function queryKeys(command)
 {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		alert("hi");
 		// sends command to content script
 		// selected tab, {command property = command}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
@@ -170,7 +169,6 @@ function queryKeys(command)
 /* sends message with context menu info to content script */
 function queryContextMenu(buttonPress, color)
 {
-	alert("hi2");
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
 		// selected tab, {button property = context menu pressed, color property = button color}, response for error message (not needed)
@@ -223,9 +221,8 @@ function sameColorTabs(command)
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
 				}
 
-				/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
-				// change to query
-				chrome.tabs.getSelected(null, function(tab)
+				/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
+				chrome.tabs.query({active: true}, function(tab)
 				{
 					var currentFaviconURL = tab.favIconUrl;
 
@@ -313,10 +310,9 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
 				}
 
-				/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
+				/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
 				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
-				// change to query
-				chrome.tabs.getSelected(null, function(tab)
+				chrome.tabs.query({active: true}, function(tab)
 				{
 					var currentFaviconURL = tab.favIconUrl;
 
@@ -667,9 +663,8 @@ function replaceButton(replacementButton, promptUser)
 				tabUrlsArr[tabCount] = tabs[tabCount].url;
 			}
 	
-			/* put everything in getSelected because of asynchronous function not initializing currentFaviconURL before storing */
-			// replace with query
-			chrome.tabs.getSelected(null, function(tab)
+			/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
+			chrome.tabs.query({active: true}, function(tab)
 			{
 				var currentFaviconURL = tab.favIconUrl;
 	
@@ -823,19 +818,6 @@ var tabIdsToTitles = {};
 // stores color of tab for later use when tab is fully updated
 var tabIdsToColor = {};
 
-/* once content script has finished loading in the new tab, send a message with the tab's title to the content script,
-   keeps title and color from SAVED tabs persistent through refresh */
-// content script would not be able to received message if page has not been loaded
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo)
-// {
-// 	alert("hi3");
-// 	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
-// 	{
-// 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
-// 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
-// 	}
-// })
-
 // for keeping title through tab refresh 
 // (saveTitle is initialized in ActivityTabFeatures(command) under "custom-title-toggle-feature")
 var saveTitle = {};
@@ -843,8 +825,11 @@ var saveTitle = {};
 var saveColor = {};
 
 /* saves color and title of tab to keep them through tab refresh */
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
+	// alert("onmessage");
+	// alert("request: " + request);
+	// alert("request.msg: " + request.msg);
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
@@ -980,7 +965,6 @@ function createTab(group, i, j)
 		/* saves color of tab */
 		// var tabColor = group["tabColor" + i][j];
 		var tabColor = group.objectArr[i]["tabColor"][j];
-		alert(tabColor);
 		tabIdsToColor[tab.id] = tabColor;
     })
 }
