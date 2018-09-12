@@ -302,7 +302,6 @@ function storeSortTabsTextField(storeSortTabsTextField)
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
-				alert("tabColorsArr: " + tabColorsArr);
 				var tabCount = 0;
 
 				for (; tabCount < tabs.length; tabCount++)
@@ -333,8 +332,6 @@ function storeSortTabsTextField(storeSortTabsTextField)
 							i--;
 						}
 					}
-
-					alert("tabColorsArr: " + tabColorsArr);
 
 					/* initialize object content */
 					var groupName = "groupName";
