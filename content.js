@@ -195,7 +195,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             if (currentFaviconURL.length == undefined)
             {
                 // updates favicon of tab to specified color
-                currentFaviconURL.href = tabs.favIconUrl;
+                currentFaviconURL.href = tab.favIconUrl;
                 // append currentFaviconURL to document head so favicon will be registered by the document
                 document.head.appendChild(currentFaviconURL);
             }
@@ -204,7 +204,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
                 for (var i = 0; i < currentFaviconURL.length; i++)
                 {
                     // updates favicon of tab to specified color
-                    currentFaviconURL[i].href = tabs.favIconUrl;
+                    currentFaviconURL[i].href = tab.favIconUrl;
                 }
             }
 
@@ -212,7 +212,79 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         }
         else if (request.highlightCommand == "right-key-toggle-feature")
         {
+            switch(tab.favIconUrl)
+            {
+                case redURL:
+                    // change favicon url
+                    tab.favIconUrl = greenURL;
+                    // specify color to change sort tabs text field's border color
+                    color = "green;"
+                    break;
+                case greenURL:
+                    tab.favIconUrl = blueURL;
+                    color = "blue";
+                    break;
+                case blueURL:
+                    tab.favIconUrl = yellowURL;
+                    color = "yellow";
+                    break;
+                case yellowURL:
+                    tab.favIconUrl = orangeURL;
+                    color = "orange";
+                    break;
+                case orangeURL:
+                    tab.favIconUrl = purpleURL;
+                    color = "purple";
+                    break;
+                case purpleURL:
+                    tab.favIconUrl = redURL;
+                    color = "red";
+                    break;
+                // no color is set
+                default:
+                    tab.favIconUrl = redURL;
+                    color = "red";
+                    break;
+            }
 
+            // sends tab color to background script to change context menu
+            chrome.runtime.sendMessage(color, function(response){});
+
+            // gets all selectors of "icon"
+            var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+
+            /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+            if (currentFaviconURL.length == 0)
+            {
+                currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+
+                /* did not find link for "icon" or "shortcut icon" (ex: Google) */
+                if (currentFaviconURL.length == 0)
+                {
+                    currentFaviconURL = document.createElement("link");
+                    currentFaviconURL.type = "image/x-icon";
+                    currentFaviconURL.rel = "shortcut icon";
+                }
+            }
+
+            // link was created
+            if (currentFaviconURL.length == undefined)
+            {
+                // updates favicon of tab to specified color
+                currentFaviconURL.href = tab.favIconUrl;
+                // append currentFaviconURL to document head so favicon will be registered by the document
+                document.head.appendChild(currentFaviconURL);
+            }
+            else
+            {
+                for (var i = 0; i < currentFaviconURL.length; i++)
+                {
+                    // updates favicon of tab to specified color
+                    currentFaviconURL[i].href = tab.favIconUrl;
+                }
+            }
+
+            // chrome.runtime.sendMessage({msg: "color command"});
         }
     }
 })
@@ -247,14 +319,6 @@ function leftArrowKeyTabColor()
     {
         for (var i = 0; i < currentFaviconURL.length; i++)
         {
-            /* sets favicon url depending on current favicon url */
-            if (currentFaviconURL[i].href != redURL && currentFaviconURL[i].href != greenURL && currentFaviconURL[i].href != blueURL &&
-                currentFaviconURL[i].href != yellowURL && currentFaviconURL[i].href != orangeURL && currentFaviconURL[i].href != purpleURL)
-            {
-                // set default color if tab had no previous color
-                return "purple";
-            }
-
             /* cycle through colors */
             switch (currentFaviconURL[i].href)
             {
@@ -271,8 +335,9 @@ function leftArrowKeyTabColor()
                 // cycle back to purple
                 case redURL:
                     return "purple";
+                // tab is uncolored
                 default:
-                    return;
+                    return "purple";
             }
         }
     }
@@ -308,14 +373,6 @@ function rightArrowKeyTabColor()
     {
         for (var i = 0; i < currentFaviconURL.length; i++)
         {
-            /* sets favicon url depending on current favicon url */
-            if (currentFaviconURL[i].href != redURL && currentFaviconURL[i].href != greenURL && currentFaviconURL[i].href != blueURL &&
-                currentFaviconURL[i].href != yellowURL && currentFaviconURL[i].href != orangeURL && currentFaviconURL[i].href != purpleURL)
-            {
-                // set default color if tab had no previous color
-                return "red";
-            }
-    
             /* cycle through colors */
             switch (currentFaviconURL[i].href)
             {
@@ -332,8 +389,9 @@ function rightArrowKeyTabColor()
                 // cycle back to red
                 case purpleURL:
                     return "red";
+                // tab is uncolored
                 default:
-                    return;
+                    return "red";
             }
         }
     }
@@ -364,7 +422,7 @@ function setFaviconURL(color)
     {
         case "red":
             // changes sort tab's popup text placeholder to correct color by refreshing
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             // updates "sameColorTabs" context menu if command that changes color is used
             chrome.runtime.sendMessage("red", function(response){});
             // link was created
@@ -386,7 +444,7 @@ function setFaviconURL(color)
             }
             break;
         case "green":
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("green", function(response){});
             if (link.length == undefined)
             {
@@ -402,7 +460,7 @@ function setFaviconURL(color)
             }
             break;
         case "blue":
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("blue", function(response){});
             if (link.length == undefined)
             {
@@ -418,7 +476,7 @@ function setFaviconURL(color)
             }
             break;
         case "yellow":
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("yellow", function(response){});
             if (link.length == undefined)
             {
@@ -434,7 +492,7 @@ function setFaviconURL(color)
             }
             break;
         case "orange":
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("orange", function(response){});
             if (link.length == undefined)
             {
@@ -450,7 +508,7 @@ function setFaviconURL(color)
             }
             break;
         case "purple":
-            chrome.runtime.sendMessage({msg: "color command"});
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("purple", function(response){});
             if (link.length == undefined)
             {

@@ -166,7 +166,7 @@ function queryKeys(command)
 			{
 				// since each tab has its own content script, send a message to the content script for each tab
 				chrome.tabs.sendMessage(tabS[i].id, {highlightCommand: command, highlightedTabs: tabS[i]}, function(response){});
-				// chrome.runtime.sendMessage({msg: "color command"});
+				chrome.runtime.sendMessage({msg: "color command"});
 			}
 		}
 		else
