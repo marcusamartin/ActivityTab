@@ -10,7 +10,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     else if (request.color)
     {
         // set favicon url according to button color
-        console.log("request.color");
         setFaviconURL(request.color);
     }
     /* color from command */
@@ -18,7 +17,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     else if (request.getColor)
     {
         // set favicon url according to url
-        console.log("request.getColor");
         setFaviconURLFromURL(request.getColor);
     }
     /* command for left/right key */
@@ -38,18 +36,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             console.log("right key");
             color = rightArrowKeyTabColor();
         }
-        console.log("color right after: " + color);
 
         setFaviconURL(color);
 
         console.log("color: " + color);
         // sends color to background script for color to persist through tab refresh */
+        // chrome.runtime.sendMessage({msg: "hello"});
         chrome.runtime.sendMessage(color, function(response){});
     }
     /* popup color button press */
     else if (request.button == "buttonPress")
     {
-        console.log("request.botton");
         setFaviconURL(request.color);
     }
     /* changes sort color context menu's text based on tab color */
@@ -174,8 +171,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
                     break;
             }
 
-            console.log("request.highlightCommand");
-
             // sends tab color to background script to change context menu
             chrome.runtime.sendMessage(color, function(response){});
 
@@ -297,7 +292,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 /* left arrow key: returns correct tab color by looking at favicon url */
 function leftArrowKeyTabColor()
 {
-    console.log("leftArrowKeyTabColor");
     // gets all selectors of "icon"
     var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
@@ -318,7 +312,6 @@ function leftArrowKeyTabColor()
     /* did not find link for "icon" or "shortcut icon" (ex: Google) */
     if (currentFaviconURL.length == 0)
     {
-        console.log("purple1");
         return "purple";
     }
     /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
@@ -330,23 +323,17 @@ function leftArrowKeyTabColor()
             switch (currentFaviconURL[i].href)
             {
                 case purpleURL:
-                console.log("orange");
                     return "orange";
                 case orangeURL:
-                console.log("yellow");
                     return "yellow";
                 case yellowURL:
-                console.log("blue");
                     return "blue";
                 case blueURL:
-                console.log("green");
                     return "green";
                 case greenURL:
-                console.log("red");
                     return "red";
                 // cycle back to purple
                 case redURL:
-                console.log("purple2");
                     return "purple";
                 // tab is uncolored
                 default:
@@ -359,7 +346,6 @@ function leftArrowKeyTabColor()
 /* right arrow key: returns correct tab color by looking at favicon url */
 function rightArrowKeyTabColor()
 {
-    console.log("rightArrowKeyTabColor");
     // gets all selectors of "icon"
     var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
@@ -380,7 +366,6 @@ function rightArrowKeyTabColor()
     /* did not find link for "icon" or "shortcut icon" (ex: Google) */
     if (currentFaviconURL.length == 0)
     {
-        console.log("red1");
         return "red";
     }
     /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
@@ -392,27 +377,20 @@ function rightArrowKeyTabColor()
             switch (currentFaviconURL[i].href)
             {
                 case redURL:
-                    console.log("green");
                     return "green";
                 case greenURL:
-                console.log("blue");
                     return "blue";
                 case blueURL:
-                console.log("yellow");
                     return "yellow";
                 case yellowURL:
-                console.log("orange");
                     return "orange";
                 case orangeURL:
-                console.log("purple");
                     return "purple";
                 // cycle back to red
                 case purpleURL:
-                console.log("red2");
                     return "red";
                 // tab is uncolored
                 default:
-                console.log("red");
                     return "red";
             }
         }
@@ -422,7 +400,6 @@ function rightArrowKeyTabColor()
 /* sets favicon url from a color */
 function setFaviconURL(color)
 {
-    console.log("setFaviconURL color: " + color);
     // gets all selectors of "icon"
     var link = document.querySelectorAll("link[rel*='icon']");
 
@@ -444,6 +421,8 @@ function setFaviconURL(color)
     switch (color)
     {
         case "red":
+            // changes sort tab's popup text placeholder to correct color by refreshing
+            // chrome.runtime.sendMessage({msg: "color command"});
             // updates "sameColorTabs" context menu if command that changes color is used
             chrome.runtime.sendMessage("red", function(response){});
             // link was created
@@ -465,17 +444,15 @@ function setFaviconURL(color)
             }
             break;
         case "green":
-            console.log("isgreen");
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("green", function(response){});
             if (link.length == undefined)
             {
-                console.log("undefined");
                 link.href = chrome.runtime.getURL("img/green_circle_16.png");
                 document.head.appendChild(link);
             }
             else
             {
-                console.log("else");
                 for (var i = 0; i < link.length; i++)
                 {
                     link[i].href = chrome.runtime.getURL("img/green_circle_16.png");
@@ -483,6 +460,7 @@ function setFaviconURL(color)
             }
             break;
         case "blue":
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("blue", function(response){});
             if (link.length == undefined)
             {
@@ -498,6 +476,7 @@ function setFaviconURL(color)
             }
             break;
         case "yellow":
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("yellow", function(response){});
             if (link.length == undefined)
             {
@@ -513,6 +492,7 @@ function setFaviconURL(color)
             }
             break;
         case "orange":
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("orange", function(response){});
             if (link.length == undefined)
             {
@@ -528,6 +508,7 @@ function setFaviconURL(color)
             }
             break;
         case "purple":
+            // chrome.runtime.sendMessage({msg: "color command"});
             chrome.runtime.sendMessage("purple", function(response){});
             if (link.length == undefined)
             {

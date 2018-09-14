@@ -173,7 +173,6 @@ function queryKeys(command)
 		{
 			chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 			{
-				// alert(tab[0].id);
 				// sends command to content script
 				// selected tab, {command property = command}, response for error message (not needed)
 				chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
@@ -874,8 +873,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			})
 		}
 	})
-
-	console.log("request: " + request);
 
 	/* updates "sameColorTabs" context menu text */
 	switch (request)

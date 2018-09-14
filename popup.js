@@ -357,6 +357,7 @@ function colorButton(button, group, i)
 	console.log("colorButton");
 	/* colors buttons */
 	// just needs to check first tab since all tabs are colored (from saveColorTabs)
+	// var tabColor = group["tabColor" + i][0];
 	var tabColor = group.objectArr[i]["tabColor"][0];
 	console.log("tabColor: " + tabColor);
 	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
@@ -387,9 +388,7 @@ function colorButton(button, group, i)
 		case purpleURL:
 			button.style.backgroundColor = "#B152E0";
 			break;
-			//HELLO
 		default:
-			button.style.backgroundColor = "#D2D2D2";
 			break;
 	}
 }
@@ -411,7 +410,7 @@ function renameTab()
 		// title sent to content script
 		chrome.tabs.sendMessage(tabs[0].id, {name: customTitleField}, function(response){});
 		// title sent to background script
-		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response){});
+		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response) {});
 	})
 }
 
