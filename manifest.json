@@ -2,8 +2,13 @@
     "manifest_version": 2,
     "name": "ActivityTab",
     "version": "0.1",
-    "description": "Saves the current tabs.",
-
+    "description": "Ability to organize tabs and save them for later use.",
+    "icons": 
+    {
+        "16": "img/extension_icon_16.png",
+        "48": "img/extension_icon_48.png",
+        "128": "img/extension_icon_128.png"
+    },
     "browser_action":
     {
         "default_title:": "ActivityTab",
@@ -21,7 +26,7 @@
             "js": ["content.js"]
         }
     ],
-    "permissions": ["tabs", "storage", "contextMenus", "*://*/*"],
+    "permissions": ["tabs", "storage", "contextMenus", "*://*/*", "chrome://favicon/"],
     "commands":
     {
         "custom-title-toggle-feature":
@@ -33,7 +38,7 @@
                 "chromeos": "Ctrl + Up",
                 "linux": "Ctrl + Up"
             },
-            "description": "Last Tab: Custom Tab Name Feature (Ctrl/Command + Up)"
+            "description": "Changes a tab's name."
         },
         "left-key-toggle-feature":
         {
@@ -44,7 +49,7 @@
                 "chromeos": "Ctrl + Left",
                 "linux": "Ctrl + Left"
             },
-            "description": "SortTab Feature (Ctrl/Command + Left Arrow Key)"
+            "description": "Changes a tab's color to the next color to the left."
         },
         "right-key-toggle-feature":
         {
@@ -55,7 +60,7 @@
                 "chromeos": "Ctrl + Right",
                 "linux": "Ctrl + Right"
             },
-            "description": "SortTab Feature (Ctrl/Command + Right Arrow Key)"
+            "description": "Changes a tab's color to the next color to the right."
         },
         "same-color-tabs-toggle-feature":
         {
@@ -66,16 +71,16 @@
                 "chromeos": "Ctrl + Down",
                 "linux": "Ctrl + Down"
             },
-            "description": "ActivityTab Feature (Ctrl/Command + Down Arrow Key)"
+            "description": "Saves tabs of the same color."
         }
     },
     "web_accessible_resources": 
     [
-        "img/red-circle-16.png",
-        "img/green-circle-16.png",
-        "img/blue-circle-16.png",
-        "img/yellow-circle-16.png",
-        "img/orange-circle-16.png",
-        "img/purple-circle-16.png"
+        "img/red_circle_16.png",
+        "img/green_circle_16.png",
+        "img/blue_circle_16.png",
+        "img/yellow_circle_16.png",
+        "img/orange_circle_16.png",
+        "img/purple_circle_16.png"
     ]
 }
