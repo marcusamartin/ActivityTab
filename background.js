@@ -824,13 +824,10 @@ var saveTitle = {};
 // for keeping color through tab refresh
 var saveColor = {};
 
-/* saves color and title of tab to keep them through tab refresh */
+/* saves color and title of tab to keep them through tab refresh; updates "sameColorTabs" context menu when tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	// alert("onmessage");
-	// alert("request: " + request);
-	// alert("request: " + request);
-	// alert("request.msg: " + request.msg);
+	// alert("hi2");
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
@@ -843,7 +840,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 		}
 	})
 
-	/* updates "sameColorTabs" context menu command that changes color is used */
+	/* updates "sameColorTabs" context menu text */
 	switch (request)
 	{
 		case "red":
@@ -887,6 +884,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 			break;
 		default:
+			chrome.contextMenus.remove("sameColorTabs");
 			break;
 	}
 
@@ -918,7 +916,7 @@ function deleteSaveColor(color)
 	})
 }
 
-/* changes tab's title and color after tab refresh if applicable */
+/* keeps tab's title and color through tab refresh if applicable; keeps SAVED tab's title and color persistent through refresh */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
 	/* changes tab's title and color after tab refresh if applicable */
@@ -928,18 +926,17 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script,
-       keeps title and color from SAVED tabs persistent through refresh */
-	// content script would not be able to received message if page has not been loaded
+	   keeps title and color from SAVED tabs persistent through refresh (content script would not be able to received message if page has not 
+	   been loaded) */
 
-	/* title was changed */
+	// title was changed
 	if (saveTitle[tabId] != null)
 	{
 		// title sent to content script
 		chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
-
+	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
 		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by groupButton, 
@@ -949,7 +946,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 			chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
 		}
 	})
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 })
 
 /* creates the tabs */
@@ -1033,12 +1029,25 @@ function createWindowTabs(group, i, j)
 	}
 }
 
-/* changes the sort colors context menu text to reflect the color of the current tab */
+/* changes the sort colors context menu text to reflect the color of the current tab when tab becomes "active" */
 chrome.tabs.onActivated.addListener(function(activeInfo)
 {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+    chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
 	{
-		// alert("changeContextMenu");
-		chrome.tabs.sendMessage(tabs[0].id, {request: "changeContextMenu"}, function(response){});
+		console.log("changeContextMenu");
+		chrome.tabs.sendMessage(tab[0].id, {changeContextMenu: "changeContextMenu"}, function(response){});
+	})
+})
+
+chrome.tabs.onCreated.addListener(function(tab)
+{
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
+	{
+		/* changes tab's title and color after tab refresh if applicable */
+		if (changeInfo.status === "complete")
+		{
+			// alert("hi");
+			chrome.tabs.sendMessage(tab.id, {changeContextMenu: "changeContextMenu"}, function(response){});
+		}
 	})
 })

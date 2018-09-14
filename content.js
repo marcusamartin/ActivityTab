@@ -52,27 +52,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* changes sort color context menu's text based on tab color */
     else if (request.changeContextMenu)
     {
-        console.log("request.changeContextMenu: " + request.changeContextMenu);
-
         var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
+        console.log("FIRST currentFaviconURL.length: " + currentFaviconURL.length);
+
         /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
-        if (currentFaviconURL == currentFaviconURL || link.length == 0)
+        if (currentFaviconURL.length == 0)
         {
             currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
 
+            console.log(" SECOND currentFaviconURL.length: " + currentFaviconURL.length);
+
             /* did not find link for "icon" or "shortcut icon" (ex: Google) */
-            if (currentFaviconURL == null || currentFaviconURL.length == 0)
+            if (currentFaviconURL.length == 0)
             {
                 currentFaviconURL = document.createElement("link");
-                // append currentFaviconURL to document head so favicon will be registered by the document
                 currentFaviconURL.type = "image/x-icon";
                 currentFaviconURL.rel = "shortcut icon";
             }
         }
-
-        console.log("currentFaviconURL: " + currentFaviconURL);
-        console.log("currentFaviconURL.length: " + currentFaviconURL.length);
 
         // stores color of tab
         var color;
@@ -84,7 +82,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
         var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
-        if (currentFaviconURL == undefined || currentFaviconURL.length == 0)
+        if (currentFaviconURL.length == undefined)
         {
             console.log("none");
             color = "none;"
@@ -119,6 +117,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             }
         }
 
+        console.log("color: " + color);
         // sends tab color to background script to change context menu
         chrome.runtime.sendMessage(color, function(response){});
     }
