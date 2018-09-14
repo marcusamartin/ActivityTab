@@ -360,12 +360,12 @@ function colorButton(button, group, i)
 	// var tabColor = group["tabColor" + i][0];
 	var tabColor = group.objectArr[i]["tabColor"][0];
 	console.log("tabColor: " + tabColor);
-	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-	var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-	var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-	var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
 	/* changes the button's background color */
 	switch (tabColor)
@@ -418,12 +418,12 @@ function renameTab()
 function setSortTabsTextFieldBorderColor()
 {
 	/* urls of color favicons */
-	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
 	// checks current tab's favicon url
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
@@ -449,7 +449,6 @@ function setSortTabsTextFieldBorderColor()
 			case orangeURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save orange tabs";
 				document.getElementById("sortTabsTextField").style.border = "1px solid #F5993D";
-				document.getElementById("sortTabsTextField").style.color = "#00FFFF";
 				break;
 			case purpleURL:
 				document.getElementById("sortTabsTextField").placeholder = "Save purple tabs";
@@ -563,12 +562,12 @@ function queryDropDownClick(menuItem)
 function checkAndRemoveFaviconURL(color)
 {
 	/* urls of color favicons */
-	var redURL = chrome.runtime.getURL("img/red-circle-16.png");
-	var greenURL = chrome.runtime.getURL("img/green-circle-16.png");
-    var blueURL = chrome.runtime.getURL("img/blue-circle-16.png");
-    var yellowURL = chrome.runtime.getURL("img/yellow-circle-16.png");
-    var orangeURL = chrome.runtime.getURL("img/orange-circle-16.png");
-	var purpleURL = chrome.runtime.getURL("img/purple-circle-16.png");
+	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
 	chrome.tabs.query({currentWindow: true}, function(tabs)
 	{
