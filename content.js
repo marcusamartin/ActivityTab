@@ -52,6 +52,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* changes sort color context menu's text based on tab color */
     else if (request.changeContextMenu)
     {
+        // gets all selectors of "icon"
         var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
         /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
@@ -119,11 +120,107 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         // sends tab color to background script to change context menu
         chrome.runtime.sendMessage(color, function(response){});
     }
+    else if (request.highlightCommand)
+    {
+        var color;
+        /* urls of color favicons */
+        var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+        var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+        var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+        var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+        var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+        var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
+
+        // specified tab (specified by tab id in background script) in highlighted tabs
+        var tab = request.highlightedTabs;
+    
+        if (request.highlightCommand == "left-key-toggle-feature")
+        {
+            switch(tab.favIconUrl)
+            {
+                case redURL:
+                    // change favicon url
+                    tab.favIconUrl = purpleURL;
+                    // specify color to change sort tabs text field's border color
+                    color = "purple;"
+                    break;
+                case greenURL:
+                    tab.favIconUrl = redURL;
+                    color = "red";
+                    break;
+                case blueURL:
+                    tab.favIconUrl = greenURL;
+                    color = "green";
+                    break;
+                case yellowURL:
+                    tab.favIconUrl = blueURL;
+                    color = "blue";
+                    break;
+                case orangeURL:
+                    tab.favIconUrl = yellowURL;
+                    color = "yellow";
+                    break;
+                case purpleURL:
+                    tab.favIconUrl = orangeURL;
+                    color = "orange";
+                    break;
+                // no color is set
+                default:
+                    tab.favIconUrl = purpleURL;
+                    color = "purple";
+                    break;
+            }
+
+            // sends tab color to background script to change context menu
+            chrome.runtime.sendMessage(color, function(response){});
+
+            // gets all selectors of "icon"
+            var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+
+            /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
+            if (currentFaviconURL.length == 0)
+            {
+                currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+
+                /* did not find link for "icon" or "shortcut icon" (ex: Google) */
+                if (currentFaviconURL.length == 0)
+                {
+                    currentFaviconURL = document.createElement("link");
+                    currentFaviconURL.type = "image/x-icon";
+                    currentFaviconURL.rel = "shortcut icon";
+                }
+            }
+
+            // link was created
+            if (currentFaviconURL.length == undefined)
+            {
+                // updates favicon of tab to specified color
+                currentFaviconURL.href = tabs.favIconUrl;
+                // append currentFaviconURL to document head so favicon will be registered by the document
+                document.head.appendChild(currentFaviconURL);
+            }
+            else
+            {
+                for (var i = 0; i < currentFaviconURL.length; i++)
+                {
+                    // updates favicon of tab to specified color
+                    currentFaviconURL[i].href = tabs.favIconUrl;
+                }
+            }
+
+            // chrome.runtime.sendMessage({msg: "color command"});
+        }
+        else if (request.highlightCommand == "right-key-toggle-feature")
+        {
+
+        }
+    }
 })
 
 /* left arrow key: returns correct tab color by looking at favicon url */
 function leftArrowKeyTabColor()
 {
+    // gets all selectors of "icon"
     var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
@@ -184,6 +281,7 @@ function leftArrowKeyTabColor()
 /* right arrow key: returns correct tab color by looking at favicon url */
 function rightArrowKeyTabColor()
 {
+    // gets all selectors of "icon"
     var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
@@ -244,6 +342,7 @@ function rightArrowKeyTabColor()
 /* sets favicon url from a color */
 function setFaviconURL(color)
 {
+    // gets all selectors of "icon"
     var link = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
@@ -374,6 +473,7 @@ function setFaviconURL(color)
 /* sets favicon url from a url */
 function setFaviconURLFromURL(colorURL)
 {
+    // gets all selectors of "icon"
     var link = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */

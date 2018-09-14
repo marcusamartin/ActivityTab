@@ -52,7 +52,7 @@ function onInstall()
 	chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 
 	// launches chrome's extension shortcut tab so user can customize their shortcuts
-    //chrome.tabs.create({url: "chrome://extensions/shortcuts"});
+    chrome.tabs.create({url: "chrome://extensions/shortcuts"});
 }
 
 
@@ -156,13 +156,30 @@ function renameTab()
 /* sends messages with command info */
 function queryKeys(command)
 {
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+	// checks if user has highlighted tabs; if so, change tab color of all highlighted tabs
+	chrome.tabs.query({highlighted: true}, function(tabS)
 	{
-		// sends command to content script
-		// selected tab, {command property = command}, response for error message (not needed)
-		chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
-		// sends a message to popup script so sort tabs text field's border color will update from command
-		chrome.runtime.sendMessage({msg: "color command"});
+		if (tabS.length > 1)
+		{
+			/* iterate through the highlighted tabs and color them */
+			for (var i = 0; i < tabS.length; i++)
+			{
+				// since each tab has its own content script, send a message to the content script for each tab
+				chrome.tabs.sendMessage(tabS[i].id, {highlightCommand: command, highlightedTabs: tabS[i]}, function(response){});
+				// chrome.runtime.sendMessage({msg: "color command"});
+			}
+		}
+		else
+		{
+			chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+			{
+				// sends command to content script
+				// selected tab, {command property = command}, response for error message (not needed)
+				chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
+				// sends a message to popup script so sort tabs text field's border color will update from command
+				chrome.runtime.sendMessage({msg: "color command"});
+			})
+		}
 	})
 }
 
@@ -827,16 +844,33 @@ var saveColor = {};
 /* saves color and title of tab to keep them through tab refresh; updates "sameColorTabs" context menu when tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	// alert("hi2");
-	// looks at current tab
-	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+	chrome.tabs.query({highlighted: true}, function(tabs)
 	{
-		// request is the name of the color, saved into saveColor
-		saveColor[tab[0].id] = request;
-		// tab title from text field sent to be saved into saveTitle
-		if (request.name)
+		if (tabs.length > 1)
 		{
-			saveTitle[tab[0].id] = request.name;
+			for (var i = 0; i < tabs.length; i++)
+			{
+				saveColor[tabs[i].id] = request;
+
+				if (request.name)
+				{
+					saveTitle[tabs[i].id] = request.name;
+				}
+			}
+		}
+		else
+		{
+			// looks at current tab
+			chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+			{
+				// request is the name of the color, saved into saveColor
+				saveColor[tab[0].id] = request;
+				// tab title from text field sent to be saved into saveTitle
+				if (request.name)
+				{
+					saveTitle[tab[0].id] = request.name;
+				}
+			})
 		}
 	})
 
@@ -1039,6 +1073,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 	})
 })
 
+/* changes the sort colors context menu text to reflect the color of the current tab when a tab is created */
 chrome.tabs.onCreated.addListener(function(tab)
 {
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
@@ -1046,7 +1081,8 @@ chrome.tabs.onCreated.addListener(function(tab)
 		/* changes tab's title and color after tab refresh if applicable */
 		if (changeInfo.status === "complete")
 		{
-			// alert("hi");
+			// sends message to content script to detect the color of the tab (if any) and set the context menu accordingly when a message
+			// is sent back to the background script
 			chrome.tabs.sendMessage(tab.id, {changeContextMenu: "changeContextMenu"}, function(response){});
 		}
 	})
