@@ -277,6 +277,13 @@ function sameColorTabs(command)
 
 					/* checks if duplicate name */
 					checkDuplicateName(promptUser, objectArr, command);
+
+					// refreshes popup if command was used when popup is active
+					if (command)
+					{
+						// refresh popup so added button is displayed
+						chrome.runtime.sendMessage({msg: "color command"});
+					}
 				})
 			})
 		}
