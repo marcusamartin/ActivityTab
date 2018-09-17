@@ -333,7 +333,6 @@ function queryButtonClick(buttonPress, color)
 /* sets the background color of the button to correspond with the colors of it's saved tabs */
 function colorButton(button, group, i)
 {
-	console.log("colorButton");
 	/* colors the buttons */
 	// just needs to check the first tab since all of the tabs are the same color (from saveColorTabs)
 	var tabColor = group.objectArr[i]["tabColor"][0];
@@ -368,6 +367,7 @@ function colorButton(button, group, i)
 			button.style.backgroundColor = "#B152E0";
 			break;
 		default:
+			button.style.backgroundColor = "D2D2D2";
 			break;
 	}
 }

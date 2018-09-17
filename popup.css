@@ -179,9 +179,9 @@ body
 {
 	width: 150px;
 	padding: 0px 0px 0px 5px;
-	margin: 6px 0px 0px 55px;
+	margin: 21px 0px 0px 55px; /* 6px */
 	font-size: 20px;
-	height: 34px;
+	height: 45px; /* 34px */
 	font-family: "Helvetica Neue";
 }
 
@@ -243,20 +243,13 @@ body
 #selectMenuTrashButton
 {
 	float: right;
-	height: 34px;
-	width: 35px;
+	height: 45px;
+	width: 45px;
 	border: none;
-	margin: 6px 42px 0px 0px;
-	font-size: 30px;
+	margin: 21px 42px 0px 0px;
+	font-size: 40px;
 	/* default color is red since the select menu's default selection is red */
 	background-color: #FF3333;
-}
-
-#ACTIVITYTAB
-{
-	font-size: 30px;
-	font-weight: bold;
-	margin: 12px 0px 0px 75px;
 }
 
 /* bottom half of the popup */
