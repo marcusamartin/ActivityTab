@@ -247,7 +247,7 @@ body
 	width: 45px;
 	border: none;
 	margin: 21px 42px 0px 0px;
-	font-size: 40px;
+	font-size: 35px;
 	/* default color is red since the select menu's default selection is red */
 	background-color: #FF3333;
 }
