@@ -12,8 +12,7 @@
 			<input id = "allTabsTextField" type = "text" placeholder = "Save all tabs"/>
 		</div>
 		<div id = "sortArea">
-			<!-- chrome extensions not allowed to have inline javascript -->
-			<!-- button event listener added to popup.js -->
+			<!-- chrome extensions are not allowed to have inline javascript, so the button event listener is added to the popup script -->
 			<button class = "sortButton" id = "redButton"></button>
 			<button class = "sortButton" id = "greenButton"></button>
 			<button class = "sortButton" id = "blueButton"></button>
@@ -21,7 +20,7 @@
 			<button class = "sortButton" id = "orangeButton"></button>
 			<button class = "sortButton" id = "purpleButton"></button>
 
-			<!-- select class initialized to menu1 so red is default option -->
+			<!-- select class initialized to menu1 so that the color "red" is the default option -->
 			<select id = "selectMenu" class = "menu1">
 				<option class = "menu1">Red</option>
 				<option class = "menu2">Green</option>
@@ -34,7 +33,7 @@
 			<p id = "ACTIVITYTAB">ActivityTab</p>
 		</div>
 		<!-- line that separates top half and bottom half of popup -->
-		<hr size = "1" width = "490px" color = "black" align = "center"> <!-- 522, 496 -->
+		<hr size = "1" width = "490px" color = "black" align = "center">
 		<div id = "buttonArea">
 			<div id = "groupButtons"></div>
 			<div id = "trashButtons"></div>

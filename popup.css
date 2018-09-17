@@ -2,16 +2,12 @@
 body
 {
 	min-height: 25px;
-	width: 500px;   /* 532 */
-	/* background-color: #5200FF; */
-	/* background-color: #F7F7F9; */
-	/* background-color: #F7F7F7; */
+	width: 500px;
 	background-color: #EAEAEA;
-	/* background-color: #5842f4; */
 	font-family: "Helvetica Neue";
 }
 
-/* top half */
+/* top half of the popup */
 
 #textFieldsContainer
 {
@@ -21,14 +17,13 @@ body
 	display: block;
 }
 
+/* "Rename the tab" text field */
 #customTitleField
 {
 	float: left;
 	height: 40px;
 	width: 200px;
     padding: 12px 20px 12px 15px;
-    /* box-sizing: border-box; */
-	/* border: 3px solid #3B3B3B; */
 	border: 1px solid #FFFFFF;
 	border-radius: 5px;
     transition: 0.3s;
@@ -39,6 +34,7 @@ body
 	font-family: "Helvetica Neue";
 }
 
+/* "Rename the tab" text field's placeholder text */
 #customTitleField::placeholder 
 {
 	font-family: "Helvetica Neue";
@@ -48,7 +44,6 @@ body
 #customTitleField:focus
 {
 	border: 1px solid #6EE0F7;
-	/* background-color: #6EE0F7; */
 }
 
 #customTitleField:focus::placeholder
@@ -57,6 +52,7 @@ body
 	opacity: 0;
 }
 
+/* "Save [COLOR} Tabs" text field */
 #sortTabsTextField
 {
 	float: left;
@@ -83,7 +79,6 @@ body
 #sortTabsTextField:focus
 {
 	border: 1px solid #6EE0F7;
-	/* background-color: #6EE0F7; */
 }
 
 #sortTabsTextField:focus::placeholder
@@ -92,6 +87,7 @@ body
 	opacity: 0;
 }
 
+/* "Save all tabs" text field */
 #allTabsTextField
 {
 	float: left;
@@ -99,7 +95,6 @@ body
 	width: 200px;
 	padding: 12px 15px 12px 15px;
 	box-sizing: border-box;
-	/* border: 3px solid #3B3B3B; */
 	transition: 0.3s;
 	outline: none;
 	margin: 0px 5px 3px 8px;
@@ -119,7 +114,6 @@ body
 #allTabsTextField:focus
 {
 	border: 1px solid #6EE0F7;
-	/* background-color: #6EE0F7; */
 }
 
 #allTabsTextField:focus::placeholder
@@ -128,6 +122,7 @@ body
 	opacity: 0;
 }
 
+/* contains the buttons, select menu, and the select menu trash button */
 #sortArea
 {
 	float: right;
@@ -135,8 +130,6 @@ body
 	width: 300px;
 	margin: 0px 0px 11px 0px;
 	padding: 0px 0px 0px 0px;
-	/* background-color: #00CCCC; */
-	/* border-style: outset; */
 }
 
 .sortButton
@@ -151,7 +144,7 @@ body
 
 #redButton
 {
-	/* creates equal distance from sides of sort area border as purple button */
+	/* creates an equal distance from the sides to reflect the purple button's distance from the sides of the popup */
 	margin: 3px 3px 7px 20px;
 	background-color: #FF3333;
 }
@@ -181,7 +174,7 @@ body
 	background-color: #B152E0;
 }
 
-/* select */
+/* select menu */
 #selectMenu
 {
 	width: 150px;
@@ -192,7 +185,7 @@ body
 	font-family: "Helvetica Neue";
 }
 
-/* select dropdowns */
+/* select menu dropdowns */
 .menu1
 {
 	border-width: 3px;
@@ -255,7 +248,7 @@ body
 	border: none;
 	margin: 6px 42px 0px 0px;
 	font-size: 30px;
-	/* default color is red since select menu's default selection is red */
+	/* default color is red since the select menu's default selection is red */
 	background-color: #FF3333;
 }
 
@@ -266,29 +259,24 @@ body
 	margin: 12px 0px 0px 75px;
 }
 
-/* bottom half */
-
-#buttonArea
-{
-	/* background-color: #00bbd1; */
-}
-
-/* gives appearance that button is popping out of popup */
-button:hover
-{
-	transform: scale3d(1.03, 1.03, 1.03);
-	color: #000000;
-	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-	transition: 0.2s;
-}
+/* bottom half of the popup */
 
 .button
 {
 	border: none;
     background-color: lightblue;
 	text-decoration: none;
-	/* makes buttons be on one line */
+	/* makes the buttons be on one line */
     display: inline-block;
+}
+
+/* gives the appearance that the button is popping out of the popup */
+button:hover
+{
+	transform: scale3d(1.03, 1.03, 1.03);
+	color: #000000;
+	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+	transition: 0.2s;
 }
 
 /* tabs button */
@@ -298,7 +286,6 @@ button:hover
 	height: 40px;
 	width: 290px;
 	border: none;
-	/* border-width: 1px; */
 	margin: 7px 8px 7px 8px;
 	font-size: 20px;
 	text-align: center;
@@ -313,12 +300,13 @@ button:hover
 	height: 40px;
 	width: 60px;
 	border: none;
-	margin: 7px 10px 7px 23px; /* 30 */
+	margin: 7px 10px 7px 23px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;
 }
 
+/* window button icon */
 .fa-external-link
 {
 	float: center;
@@ -335,12 +323,13 @@ button:hover
 	height: 40px;
 	width: 40px;
 	border: none;
-	margin: 7px 8px 7px 31px;  /* 30 */
+	margin: 7px 8px 7px 31px;
 	font-size: 20px;
 	text-align: center;
 	border-radius: 4px;
 }
 
+/* trash button icon */
 .fa-trash
 {
 	float: center;

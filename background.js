@@ -1,15 +1,9 @@
 /* FIXME:
- * buttonCount is inefficient, fix by using an array of object and .length
- * might want to change sameSortTextField to get colored tabs from all windows like saveAllTabs
- * use favIconUrl instead of "shortcut icon" to better change favicon url?
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
-   however, if bookmark icon is clicked again, icon will reset
- * w3schools.com's favicon is not able to be changed (certain websites?)
+ *    regular icon can be set by launching uncolored tab and then clicking bookmark icon
 */
 
 /* Storage Explanation
- * groupCount: tracks the number of buttons when adding and deleting buttons
- * buttonCount: tracks the total number of buttons so all buttons can still be accessed even if groupCount is changed
  * groupName: name of the button given by the user
  * tabNames: names of the tabs
  * tabUrls: urls of the tabs
@@ -19,7 +13,7 @@
 // opens shortcut url upon extension installation
 chrome.runtime.onInstalled.addListener(onInstall);
 
-/* runs on installation of extension */
+/* runs on installation/update of extension */
 function onInstall()
 {
 	/* checks to see if objectArr already exists (for update purposes) */
@@ -33,54 +27,51 @@ function onInstall()
 		}
 	})
 
-	/* prints everything in storage */
-	// chrome.storage.local.get(null, function(items) 
-	// {
-	// 	var allKeys = Object.keys(items);
-	// 	console.log("storage: " + allKeys);
-	// })
-
+	/* initializing context menus */
+	// retitle the tab
 	chrome.contextMenus.create({"id": "renameTab", "title": "Rename the Tab"});
+	// color the tab
 	chrome.contextMenus.create({"id": "redFavicon", "title": "Red"});
 	chrome.contextMenus.create({"id": "greenFavicon", "title": "Green"});
 	chrome.contextMenus.create({"id": "blueFavicon", "title": "Blue"});
 	chrome.contextMenus.create({"id": "orangeFavicon", "title": "Orange"});
 	chrome.contextMenus.create({"id": "yellowFavicon", "title": "Yellow"});
 	chrome.contextMenus.create({"id": "purpleFavicon", "title": "Purple"});
-	// only created on tabs that are colored
+	// saves all of the same colored tabs of the current colored tab (only created on tabs that are colored)
 	// chrome.contextMenus.create({"id": "sameColorTabs", "title": "Save Tabs of Current Tab Color"});
+	// saves all of the tabs
 	chrome.contextMenus.create({"id": "allTabs", "title": "Save All Tabs"});
 
 	// launches chrome's extension shortcut tab so user can customize their shortcuts
-    chrome.tabs.create({url: "chrome://extensions/shortcuts"});
+    // chrome.tabs.create({url: "chrome://extensions/shortcuts"});
 }
 
 
 // when command is executed, determine which command was executed
 chrome.commands.onCommand.addListener(ActivityTabFeatures);
 
-// when context menu icon is clicked, determine which context menu was clicked
+// when context menu is clicked, determine which context menu was clicked
 chrome.contextMenus.onClicked.addListener(ActivityTabFeatures);
 
-/* for commands and context menu */
+/* executes actions for the commands and context menus */
 function ActivityTabFeatures(command)
 {
 	/* commands */
 	switch (command)
 	{
-		/* color change to left */
+		/* left arrow key changes the tab's color */
 		case "left-key-toggle-feature":
 			queryKeys("left-key-toggle-feature");
 			break;
-		/* color change to right */
+		/* right arrow key changes the tab's color */
 		case "right-key-toggle-feature":
 			queryKeys("right-key-toggle-feature");
 			break;
-		/* retitle current tab */
+		/* up arrow key retitles the tab */
 		case "custom-title-toggle-feature":
 			renameTab();
 			break;
-		/* save tabs of current tab color */
+		/* down arrow key saves all of the same colored tabs of the current colored tab */
 		case "same-color-tabs-toggle-feature":
 			sameColorTabs(command);
 			break;
@@ -89,54 +80,51 @@ function ActivityTabFeatures(command)
 	/* context menus */
 	switch (command.menuItemId)
 	{
+		/* retitles the tab */
 		case "renameTab":
 			renameTab();
 			break;
-		/* change tab color */
+		/* updates "save [COLOR] tabs" context menu if "[COLOR]" context menu is clicked */
 		case "redFavicon":
-			// updates "sameColorTabs" context menu if "Red" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Red Tabs"});
 			queryContextMenu("buttonPress", "red");
 			break;
 		case "greenFavicon":
-			// updates "sameColorTabs" context menu if "Green" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Green Tabs"});
 			queryContextMenu("buttonPress", "green");
 			break;
 		case "blueFavicon":
-			// updates "sameColorTabs" context menu if "Blue" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Blue Tabs"});
 			queryContextMenu("buttonPress", "blue");
 			break;
 		case "yellowFavicon":
-			// updates "sameColorTabs" context menu if "Yellow" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Yellow Tabs"});
 			queryContextMenu("buttonPress", "yellow");
 			break;
 		case "orangeFavicon":
-			// updates "sameColorTabs" context menu if "Orange" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Orange Tabs"});
 			queryContextMenu("buttonPress", "orange");
 			break;
 		case "purpleFavicon":
-			// updates "sameColorTabs" context menu if "Purple" context menu is clicked
 			chrome.contextMenus.update("sameColorTabs", {"title": "Save Purple Tabs"});
 			queryContextMenu("buttonPress", "purple");
 			break;
-		/* save tabs of current tab color */
+		/* saves all of the same colored tabs of the current colored tab */
 		case "sameColorTabs":
 			sameColorTabs(command)
 			break;
+		/* saves all of the tabs */
 		case "allTabs":
 			allTabs(command);
 			break;
 	}
 }
 
-/* gets title from prompt and renames tab */
+/* prompts the user and gets the text to retitle the tab (from a command or a context menu) */
 function renameTab()
 {
-	chrome.tabs.query({active: true, currentWindow: true}, function (tabs) 
+	// gets information about the current tab
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
 	{
 		var promptUser = prompt("Rename the tab:");
 
@@ -146,89 +134,92 @@ function renameTab()
 			renameTab();
 		}
 
-		// title sent to content script
+		// title is sent to the content script for the tab to be retitled (current tab's id, user text, response for error message (not needed))
 		chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
-		// saves for persistent title through refresh
+		// saves the title so that the tab's title can persist through a refresh
 		saveTitle[tabs[0].id] = promptUser;
 	})
 }
 
-/* sends messages with command info */
+/* sends a message to the content script to color the tab(s) (from a command) */
 function queryKeys(command)
 {
-	// checks if user has highlighted tabs; if so, change tab color of all highlighted tabs
+	/* gets all highlighted tabs; if so, color all of the highlighted tabs */
 	chrome.tabs.query({highlighted: true}, function(tabS)
 	{
+		// checks if there are multiple highlighted tabs (current tab counts as a highlighted tab)
 		if (tabS.length > 1)
 		{
-			/* iterate through the highlighted tabs and color them */
+			/* iterate through the highlighted tabs and send the command and tab information to content script */
 			for (var i = 0; i < tabS.length; i++)
 			{
 				// since each tab has its own content script, send a message to the content script for each tab
+				// send the current tab's id, command info, and current tab's info; response for error message (not needed)
 				chrome.tabs.sendMessage(tabS[i].id, {highlightCommand: command, highlightedTabs: tabS[i]}, function(response){});
+				// sends a message to the content script so "save [COLOR} tabs" text field's border color will update after command
 				chrome.runtime.sendMessage({msg: "color command"});
 			}
 		}
+		/* color the tab */
 		else
 		{
-			chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+			chrome.tabs.query({currentWindow: true, active: true}, function(tab)
 			{
-				// sends command to content script
-				// selected tab, {command property = command}, response for error message (not needed)
-				chrome.tabs.sendMessage(tabs[0].id, {command: command}, function(response) {});
-				// sends a message to popup script so sort tabs text field's border color will update from command
+				chrome.tabs.sendMessage(tab[0].id, {command: command}, function(response) {});
 				chrome.runtime.sendMessage({msg: "color command"});
 			})
 		}
 	})
 }
 
-/* sends message with context menu info to content script */
+/* sends a message to the content script to color the tabs (from a context menu) */
 function queryContextMenu(buttonPress, color)
 {
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
+	chrome.tabs.query({currentWindow: true, active: true}, function(tab)
 	{
-		// selected tab, {button property = context menu pressed, color property = button color}, response for error message (not needed)
-		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
+		// send the current tab's id, identifier (as the context menu acts the same as the buttons in the popup),
+		// and the color corresponding to the context menu; response for error message (not needed)
+		chrome.tabs.sendMessage(tab[0].id, {button: buttonPress, color: color}, function(response) {});
 	})
 }
 
-/* save tabs of current tab color */
+/* save tabs of the current tab's color (from the command) */
 function sameColorTabs(command)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = prompt("Group name: ");
-		// text limit so the text can fit in the button
+		// limit the text so that the text fits in the button
 		promptUser = promptUser.substr(0, 26);
 
-		/* checks if name is invalid */
 		if (promptUser == "")
 		{
 			alert("Please enter a name for the group!");
 			/* enables user to restart process */
-			// for context menu
+			// restarts context menu process (same as command process but uses .menuItemId to access the command)
 			if (command.menuItemId != null)
 			{
 				sameColorTabs(command.menuItemId);
 			}
-			// for command
+			// restarts command process
 			else
 			{
 				sameColorTabs(command);
 			}
 		}
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		/* stores the group name and the names, urls, and colors of the tabs into an object for storage */
 		else
 		{
 			var groupObject = {};
 
-			/* stores all of the tab's information into an object and then puts object into storage */
+			// gets information from all of the tabs
 			chrome.tabs.query({}, function(tabs)
 			{
-				/* gets each tab's name and url from an array of tabs and stores them into arrays */
+				/* gets each tab's name, url, and color from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
+				// var tabNamesArr = tabs.map(t => t.title);
+				// var tabUrlsArr = tabs.map(t => t.url);
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
 				var tabCount = 0;
 
@@ -238,22 +229,23 @@ function sameColorTabs(command)
 					tabUrlsArr[tabCount] = tabs[tabCount].url;
 				}
 
-				/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
+				/* put everything in query because of how the asynchronous function does not initializing currentFaviconURL before storing the object */
+				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
 				chrome.tabs.query({active: true}, function(tab)
 				{
 					var currentFaviconURL = tab[0].favIconUrl;
 
-					/* removes favicon urls that are not colored from tab colors array */
+					/* removes favicon urls that are not "colored" urls from tab colors array */
 					for (var i = 0; i < tabColorsArr.length; i++)
 					{
 						if (tabColorsArr[i] != currentFaviconURL)
 						{
 							tabColorsArr.splice(i, 1);
-							// removes name of array as well
+							// removes name of array
 							tabNamesArr.splice(i, 1);
-							// removes url of array as well
+							// removes url of array
 							tabUrlsArr.splice(i, 1);
-							// decrements tab count as differe colored tab is removed
+							// decrements tab count as tab is removed
 							tabCount--;
 							// decrement count since array length changed when tab was deleted (ex: [1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 							i--;
@@ -280,7 +272,7 @@ function sameColorTabs(command)
 					group.objectArr.push(groupObject);
 					var objectArr = group.objectArr;
 
-					// updates storage with new objectArr with groupObject
+					// updates storage with new objectArr
 					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
@@ -291,13 +283,13 @@ function sameColorTabs(command)
 	})
 }
 
-/* store tabs of the same color of the current tab */
+/* store tabs of the same color of the current tab (from the text field) */
 function storeSortTabsTextField(storeSortTabsTextField)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = storeSortTabsTextField;
-		// text limit so the text can fit in the button
+		// limit the text so that the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if name is invalid */
@@ -307,15 +299,15 @@ function storeSortTabsTextField(storeSortTabsTextField)
 			// returns so user can re-enter text into text field
 			return;
 		}
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		/* stores all of the information from the tabs into an object and then puts object into storage */
 		else
 		{
 			var groupObject = {};
 
-			/* stores all of the tab's information into an object and then puts object into storage */
+			// gets information from all of the tabs
 			chrome.tabs.query({}, function(tabs)
 			{
-				/* gets each tab's name and url from an array of tabs and stores them into arrays */
+				/* gets each tab's name, url, and color from an array of tabs and stores them into arrays */
 				var tabNamesArr = [];
 				var tabUrlsArr = [];
 				var tabColorsArr = tabs.map(t => t.favIconUrl);
@@ -339,11 +331,11 @@ function storeSortTabsTextField(storeSortTabsTextField)
 						if (tabColorsArr[i] != currentFaviconURL)
 						{
 							tabColorsArr.splice(i, 1);
-							// removes name of array as well
+							// removes name of array
 							tabNamesArr.splice(i, 1);
-							// removes url of array as well
+							// removes url of array
 							tabUrlsArr.splice(i, 1);
-							// decrements tab count as different colored tab is removed
+							// decrements tab count as tab is removed
 							tabCount--;
 							// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 							i--;
@@ -369,7 +361,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					group.objectArr.push(groupObject);
 					var objectArr = group.objectArr;
 
-					// updates storage with new objectArr with groupObject
+					// updates storage with new objectArr
 					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
@@ -381,13 +373,13 @@ function storeSortTabsTextField(storeSortTabsTextField)
 	})
 }
 
-/* responds to context menu for save all tabs */
+/* saves all of the tabs (from the context menu) */
 function allTabs(command)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = prompt("Group name: ");
-		// limit text so the text can fit in the button
+		// limit the text so that the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if name is invalid */
@@ -401,12 +393,12 @@ function allTabs(command)
 				allTabs(command.menuItemId);
 			}
 		}
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		/* stores the group name and the names, urls, and colors of the tabs into an object for storage */
 		else
 		{
 			var groupObject = {};
 
-			/* stores all of the tab's information into an object and then puts object into storage */
+			/* stores information from all of the tabs into an object and then puts object into storage */
 			chrome.windows.getAll({populate: true}, function(windows)
 			{
 				// used to decide storing of a single window or multiple windows
@@ -491,13 +483,13 @@ function allTabs(command)
 	})
 }
 
-/* stores all tabs */
+/* stores all of the tabs (from the text field) */
 function storeAllTabsTextField(storeAllTabsTextField)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = storeAllTabsTextField;
-		// limit text so the text can fit in the button
+		// limit the text so that the text can fit in the button
 		promptUser = promptUser.substr(0, 26);
 
 		/* checks if name is invalid */
@@ -507,12 +499,12 @@ function storeAllTabsTextField(storeAllTabsTextField)
 			// returns so user can re-enter text into text field
 			return;
 		}
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
+		/* stores the group name and the names, urls, and colors of the tabs into an object for storage */
 		else
 		{
 			var groupObject = {};
 
-			/* stores all of the tab's information into an object and then puts object into storage */
+			/* stores information from all of the tabs into an object and then puts object into storage */
 			chrome.windows.getAll({populate: true}, function(windows)
 			{
 				// used to decide storing of a single window or multiple windows
@@ -599,20 +591,16 @@ function storeAllTabsTextField(storeAllTabsTextField)
 
 /* checks if there is a duplicate name and then removes the button at the end that is still
    added because of the first ~asynchronous~ function in sameColorTabs() and storeTabsTextField() */
-   // FIXME: groupCount
 function checkDuplicateName(promptUser, objectArr, command)
 {
-	// if (promptUser != "" && groupCount != 0)
 	if (promptUser != "" && objectArr.length != 1)
 	{
 		/* iterates through the buttons */
-		// added "- 1" because button is already populated and it is catching it as a duplicate when it is just the same button
+		// decremented objectArr's length because the button is already populated; the function is catching the button as a duplicate when it is the button that was just added
 		for (var i = 0; i < objectArr.length - 1; i++)
 		{
-			// chrome.storage.local.get(["groupName" + i, "tabCount" + i], function(i, anotherGroup)
 			chrome.storage.local.get("objectArr", function(i, anotherGroup)
 			{
-				// var groupName = anotherGroup["groupName" + i];
 				var groupName = anotherGroup.objectArr[i]["groupName"];
 					
 				if (groupName == promptUser)
@@ -624,7 +612,6 @@ function checkDuplicateName(promptUser, objectArr, command)
 					{
 						/* if button does not launch multiple windows */
 						if (command == "same-color-tabs-toggle-feature" || command == "same-color-text-field" || command.menuItemId == "sameColorTabs")
-						// if (command != "save-all-tabs" && command != "save-all-tabs-text-field")
 						{
 							replaceButton(i, promptUser);
 						}
@@ -633,19 +620,15 @@ function checkDuplicateName(promptUser, objectArr, command)
 						{
 							replaceAllButton(i, promptUser);
 						}
-						// removes added button from asynchronous function since a button is still added
-						// chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 					}
 					else
 					{
 						alert("Please enter a different name for the group!");
-						// removes added button from asynchronous function since a button is still added
-						// chrome.storage.local.remove(["groupName" + groupCount, "tabNames" + groupCount, "tabUrls" + groupCount, "tabColor" + groupCount, "tabCount" + groupCount]);
 						anotherGroup.objectArr.splice(anotherGroup.objectArr.length - 1, 1);
 						var objectArr = anotherGroup.objectArr;
 						chrome.storage.local.set({"objectArr": objectArr});
 
-						/* only if command had activated prompt, not the text fields */
+						/* restarts process only if a command had activated the prompt */
 						if (command != "same-color-text-field" && command != "save-all-tabs-text-field")
 						{
 							ActivityTabFeatures(command);
@@ -658,14 +641,14 @@ function checkDuplicateName(promptUser, objectArr, command)
 	}
 }
 
-/* updates correct COLOR button with tab information AND REPLACES BUTTON */
+/* updates button that stored a specific tab color with tab information AND REPLACES THE BUTTON */
 function replaceButton(replacementButton, promptUser)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
 		var groupObject = {};
 
-		/* stores all of the tab's information into an object and then puts object into storage */
+		/* stores information from all of the tabs into an object and then puts object into storage */
 		chrome.tabs.query({currentWindow: true}, function(tabs)
 		{
 			/* gets each tab's name and url from an array of tabs and stores them into arrays */
@@ -680,7 +663,7 @@ function replaceButton(replacementButton, promptUser)
 				tabUrlsArr[tabCount] = tabs[tabCount].url;
 			}
 	
-			/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
+			/* put everything in query because of how the asynchronous function does not initializing currentFaviconURL before storing the object */
 			chrome.tabs.query({active: true}, function(tab)
 			{
 				var currentFaviconURL = tab[0].favIconUrl;
@@ -691,11 +674,11 @@ function replaceButton(replacementButton, promptUser)
 					if (tabColorsArr[i] != currentFaviconURL)
 					{
 						tabColorsArr.splice(i, 1);
-						// removes name of array as well
+						// removes name of array
 						tabNamesArr.splice(i, 1);
-						// removes url of array as well
+						// removes url of array
 						tabUrlsArr.splice(i, 1);
-						// decrements tab count as different colored tab is removed
+						// decrements tab count as tab is removed
 						tabCount--;
 						// decrement count since array length changed when tab was deleted ([1, 2, 3] = [1, 3] makes arr[2] = undefined so do i--)
 						i--;
@@ -722,8 +705,9 @@ function replaceButton(replacementButton, promptUser)
 				group.objectArr.splice(replacementButton, 0, groupObject);
 				// removes added button right after replacement button (caused by asynchronous function)
 				group.objectArr.splice(replacementButton + 1, 1);
-				// removes added button from end (caused by asynchronous function)
+				// removes added button from end of popup (caused by asynchronous function)
 				group.objectArr.splice(group.objectArr.length - 1, 1);
+
 				var objectArr = group.objectArr;
 				// updates storage with new objectArr with groupObject
 				chrome.storage.local.set({"objectArr": objectArr});
@@ -735,15 +719,14 @@ function replaceButton(replacementButton, promptUser)
 	})
 }
 
-/* updates correct "ALL TABS" button with tab information AND REPLACES BUTTON */
+/* updates button that stored all of the user's tabs with new tab information AND REPLACES THE BUTTON */
 function replaceAllButton(replacementButton, promptUser)
 {
 	chrome.storage.local.get("objectArr", function(group)
 	{
-		/* stores the number, name, and urls of the tabs, as well as the group name into an object for storage */
 		var groupObject = {};
 
-		/* stores all of the tab's information into an object and then puts object into storage */
+		/* stores information from all of the tabs into an object and then puts object into storage */
 		chrome.windows.getAll({populate: true}, function(windows)
 		{
 			// used to decide storing of a single window or multiple windows */
@@ -820,6 +803,7 @@ function replaceAllButton(replacementButton, promptUser)
 			group.objectArr.splice(replacementButton + 1, 1);
 			// removes added button from end (caused by asynchronous function)
 			group.objectArr.splice(group.objectArr.length - 1, 1);
+
 			var objectArr = group.objectArr;
 			// updates storage with new objectArr with groupObject
 			chrome.storage.local.set({"objectArr": objectArr});
@@ -830,30 +814,29 @@ function replaceAllButton(replacementButton, promptUser)
 	})
 }
 
-// stores title of tab for later use when tab is fully updated
-var tabIdsToTitles = {};
-// stores color of tab for later use when tab is fully updated
-var tabIdsToColor = {};
-
 // for keeping title through tab refresh 
 // (saveTitle is initialized in ActivityTabFeatures(command) under "custom-title-toggle-feature")
 var saveTitle = {};
 // for keeping color through tab refresh
 var saveColor = {};
 
-/* saves color and title of tab to keep them through tab refresh; updates "sameColorTabs" context menu when tab color is changed, opened, or when the tab becomes "active" */
+/* saves the color and the title of the tab to keep them through a tab refresh; 
+   updates "sameColorTabs" context menu when the tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
 	chrome.tabs.query({highlighted: true}, function(tabs)
 	{
+		// the current tab is not the only tab that is selected
 		if (tabs.length > 1)
 		{
 			for (var i = 0; i < tabs.length; i++)
 			{
+				// color saved into saveColor
 				saveColor[tabs[i].id] = request;
 
 				if (request.name)
 				{
+					// tab title that was sent from the text field is saved into saveTitle
 					saveTitle[tabs[i].id] = request.name;
 				}
 			}
@@ -863,9 +846,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			// looks at current tab
 			chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 			{
-				// request is the name of the color, saved into saveColor
 				saveColor[tab[0].id] = request;
-				// tab title from text field sent to be saved into saveTitle
+				
 				if (request.name)
 				{
 					saveTitle[tab[0].id] = request.name;
@@ -925,16 +907,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	sendResponse();
 })
 
-/* removes color and title from saveColor and saveTitle once tab is closed */
+/* removes the color and the title of a tab from saveColor and saveTitle once the tab is closed */
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
 {
 	delete saveColor[tabId];
 	delete saveTitle[tabId];
 })
 
-/* deletes tab color that is saved in saveColor if color button is pressed;
-   if not deleted, asynchronous function calls would make saveColor override color from the button */
-// might not be necessary? keeping just in case
+/* deletes the tab color that is saved in saveColor if color button is pressed;
+   if not deleted, asynchronous function calls would make the color in saveColor override the color from the button */
 function deleteSaveColor(color)
 {
 	// looks at current tab
@@ -950,31 +931,36 @@ function deleteSaveColor(color)
 	})
 }
 
-/* keeps tab's title and color through tab refresh if applicable; keeps SAVED tab's title and color persistent through refresh */
+// stores the title of tabs for later use when the tabs are updated
+var tabIdsToTitles = {};
+// stores color of tabs for later use when the tabs are updated
+var tabIdsToColor = {};
+
+/* keeps the tab's title and color persistent tab refresh if applicable; keeps SAVED tab's title and color persistent through refresh */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
-	/* changes tab's title and color after tab refresh if applicable */
+	/* changes the tab's title and color after tab refresh if applicable */
 	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
 	{
 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
 	}
 
-	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script,
-	   keeps title and color from SAVED tabs persistent through refresh (content script would not be able to received message if page has not 
-	   been loaded) */
+	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script;
+	   keeps the title and color from the SAVED tabs persistent through refresh (content script would not be able to received message if page 
+	   has not been loaded) */
 
-	// title was changed
+	// tab's title was changed
 	if (saveTitle[tabId] != null)
 	{
-		// title sent to content script
+		// tab's title sent to content script
 		chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
 	}
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by groupButton, 
-		   the tab being launched will not be set to the color of the current active tab */
+		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by
+		   a button in the popup that stores the tabs, the tab being launched will not be set to the color of the current active tab */
 		if (saveColor[tab[0].id] != undefined && tab[0].id == tabId)
 		{
 			chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
@@ -982,98 +968,88 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 	})
 })
 
-/* creates the tabs */
+/* creates the tabs (responds to a button in the popup that had stored colored tabs/all of the tabs in a single window) */
 function createTab(group, i, j)
 {
 	/* creates the tabs */
-	// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
 	chrome.tabs.create({"url": group.objectArr[i]["tabUrls"][j], "active": false}, function(tab)
     {
-		/* saves title of tab */
-		// var tabTitle = group["tabNames" + i][j];
+		/* saves the title of the tab */
 		var tabTitle = group.objectArr[i]["tabNames"][j];
 		tabIdsToTitles[tab.id] = tabTitle;
-		/* saves color of tab */
-		// var tabColor = group["tabColor" + i][j];
+
+		/* saves the color of the tab */
 		var tabColor = group.objectArr[i]["tabColor"][j];
 		tabIdsToColor[tab.id] = tabColor;
     })
 }
 
-/* creates all tabs */
+/* creates the tabs (responds to a button in the popup that had stored all of the tabs) */
 function createAllTabs(group, i, j)
 {
 	// creates all of the tabs of the current window
-	// chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
 	chrome.windows.create({"url": group.objectArr[i]["tabUrls"][j], "state": "maximized"}, function(window)
 	{
-		/* iterates through the tabs of a window to put tab names and tab color */
-		// for (var k = 0; k < group["tabUrls" + i][j].length; k++)
+		/* iterates through the tabs of a window to assign tab names and tab color to the tabs */
 		for (var k = 0; k < group.objectArr[i]["tabUrls"][j].length; k++)
 		{
-			/* saves title of tab */
-			// var tabTitle = group["tabNames" + i][j][k];
+			/* saves the title of the tab */
 			var tabTitle = group.objectArr[i]["tabNames"][j][k];
 			tabIdsToTitles[window.tabs[k].id] = tabTitle;
-			/* saves color of tab */
-			// var tabColor = group["tabColor" + i][j][k];
+
+			/* saves the color of the tab */
 			var tabColor = group.objectArr[i]["tabColor"][j][k];
 			tabIdsToColor[window.tabs[k].id] = tabColor;
 		}
 	})
 }
 
-/* creates the tabs in a new window */
+/* creates the tabs in a new window (responds to a button in the popup that had stored all of the tabs) */
 function createWindowTabs(group, i, j)
 {
 	/* creates a window with the first tab */
 	if (j == 0)
 	{
-		// chrome.windows.create({"url": group["tabUrls" + i][j], "state": "maximized"}, function(window)
 		chrome.windows.create({"url": group.objectArr[i]["tabUrls"][j], "state": "maximized"}, function(window)
 		{
-			// accesses window's array of tabs to access first tab's id
+			// accesses the window's array of tabs to access the first tab's id to use to identify the tab for tabIdsToTitles and tabIdsToColor
 			var firstTabInWindow = window.tabs[0].id;
 
-			/* saves title of tab */
-			// var tabTitle = group["tabNames" + i][j];
+			/* saves the title of the tab */
 			var tabTitle = group.objectArr[i]["tabNames"][j];
 			tabIdsToTitles[firstTabInWindow] = tabTitle;
-			/* saves color of tab */
-			// var tabColor = group["tabColor" + i][j];
+
+			/* saves the color of the tab */
 			var tabColor = group.objectArr[i]["tabColor"][j];
 			tabIdsToColor[firstTabInWindow] = tabColor;
 		})
 	}
 	else
 	{
-		/* creates the tabs */
-		// chrome.tabs.create({"url": group["tabUrls" + i][j], "active": false}, function(tab)
+		/* creates the remaining tabs of the window */
 		chrome.tabs.create({"url": group.objectArr[i]["tabUrls"][j], "active": false}, function(tab)
 		{
-			/* saves title of tab */
-			// var tabTitle = group["tabNames" + i][j];
+			/* saves the title of the tab */
 			var tabTitle = group.objectArr[i]["tabNames"][j];
 			tabIdsToTitles[tab.id] = tabTitle;
-			/* saves color of tab */
-			// var tabColor = group["tabColor" + i][j];
+
+			/* saves the color of the tab */
 			var tabColor = group.objectArr[i]["tabColor"][j];
 			tabIdsToColor[tab.id] = tabColor;
 		})
 	}
 }
 
-/* changes the sort colors context menu text to reflect the color of the current tab when tab becomes "active" */
+/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when the tab becomes "active" */
 chrome.tabs.onActivated.addListener(function(activeInfo)
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
 	{
-		console.log("changeContextMenu");
 		chrome.tabs.sendMessage(tab[0].id, {changeContextMenu: "changeContextMenu"}, function(response){});
 	})
 })
 
-/* changes the sort colors context menu text to reflect the color of the current tab when a tab is created */
+/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when a tab is created */
 chrome.tabs.onCreated.addListener(function(tab)
 {
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
@@ -1081,8 +1057,7 @@ chrome.tabs.onCreated.addListener(function(tab)
 		/* changes tab's title and color after tab refresh if applicable */
 		if (changeInfo.status === "complete")
 		{
-			// sends message to content script to detect the color of the tab (if any) and set the context menu accordingly when a message
-			// is sent back to the background script
+			// sends a message to the content script to detect the color of the tab (if any) and set the context menu accordingly
 			chrome.tabs.sendMessage(tab.id, {changeContextMenu: "changeContextMenu"}, function(response){});
 		}
 	})
