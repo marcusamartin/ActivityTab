@@ -65,53 +65,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         }
 
         // stores the color of the tab
-        var color;
-
-        /* urls of color favicons */
-        var redURL = chrome.runtime.getURL("img/red_circle_16.png");
-        var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
-        var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
-        var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
-        var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
-        var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
-
-        // link was created
-        if (currentFaviconURL.length == undefined)
-        {
-            // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
-            color = "none;"
-        }
-        else
-        {
-            for (var i = 0; i < currentFaviconURL.length; i++)
-            {
-                switch(currentFaviconURL[i].href)
-                {
-                    case redURL:
-                        color = "red";
-                        break;
-                    case greenURL:
-                        color = "green";
-                        break;
-                    case blueURL:
-                        color = "blue";
-                        break;
-                    case yellowURL:
-                        color = "yellow";
-                        break;
-                    case orangeURL:
-                        color = "orange";
-                        break;
-                    case purpleURL:
-                        color = "purple";
-                        break;
-                    default:
-                        // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
-                        color = "none";
-                        break;
-                }
-            }
-        }
+        var color = changeContextMenu(currentFaviconURL);
 
         /* sends the color to the background script to change the context menu */
         // does not send color if sent from onUpdated because if a colored tab was launched, then the current tab would
@@ -646,5 +600,47 @@ function setFaviconURLFromURL(colorURL)
             break;
         default:
             break;
+    }
+}
+
+function changeContextMenu(currentFaviconURL)
+{
+    /* urls of color favicons */
+    var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+    var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+    var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+    var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+    var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+    var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
+
+    // link was created
+    if (currentFaviconURL.length == undefined)
+    {
+        // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
+        return "none;"
+    }
+    else
+    {
+        for (var i = 0; i < currentFaviconURL.length; i++)
+        {
+            switch(currentFaviconURL[i].href)
+            {
+                case redURL:
+                    return "red";
+                case greenURL:
+                    return "green";
+                case blueURL:
+                    return "blue";
+                case yellowURL:
+                    return "yellow";
+                case orangeURL:
+                    return "orange";
+                case purpleURL:
+                    return "purple";
+                default:
+                    // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
+                    return "none";
+            }
+        }
     }
 }
