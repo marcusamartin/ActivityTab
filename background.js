@@ -1,6 +1,6 @@
 /* FIXME:
  * if page is launched with bookmark icon, changing favicon colors will change bookmark icon as well;
- *    regular icon can be set by launching uncolored tab and then clicking bookmark icon
+   regular icon can be set by launching uncolored tab and then clicking bookmark icon
 */
 
 /* Storage Explanation
@@ -853,7 +853,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			// looks at current tab
 			chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 			{
-				saveColor[tab[0].id] = request;
+				if (request != "none")
+				{
+					saveColor[tab[0].id] = request;
+				}
+				else if (request == "none" || request == undefined)
+				{
+					chrome.contextMenus.remove("sameColorTabs");
+				}
 				
 				if (request.name)
 				{
@@ -914,11 +921,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	sendResponse();
 })
 
-/* removes the color and the title of a tab from saveColor and saveTitle once the tab is closed */
-chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
+/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when the tab becomes "active" */
+chrome.tabs.onActivated.addListener(function(activeInfo)
 {
-	delete saveColor[tabId];
-	delete saveTitle[tabId];
+    chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
+	{
+		chrome.tabs.sendMessage(tab[0].id, {changeContextMenu: "changeContextMenu"}, function(response){});
+	})
+})
+
+/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when a tab is created */
+chrome.tabs.onCreated.addListener(function(tab)
+{
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
+	{
+		/* changes tab's title and color after tab refresh if applicable */
+		if (changeInfo.status === "complete")
+		{
+			// sends a message to the content script to detect the color of the tab (if any) and set the context menu accordingly
+			chrome.tabs.sendMessage(tab.id, {changeContextMenu: "changeContextMenu", onUpdated: "onUpdated"}, function(response){});
+		}
+	})
 })
 
 /* deletes the tab color that is saved in saveColor if color button is pressed;
@@ -937,6 +960,13 @@ function deleteSaveColor(color)
 		}
 	})
 }
+
+/* removes the color and the title of a tab from saveColor and saveTitle once the tab is closed */
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
+{
+	delete saveColor[tabId];
+	delete saveTitle[tabId];
+})
 
 // stores the title of tabs for later use when the tabs are updated
 var tabIdsToTitles = {};
@@ -1046,26 +1076,3 @@ function createWindowTabs(group, i, j)
 		})
 	}
 }
-
-/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when the tab becomes "active" */
-chrome.tabs.onActivated.addListener(function(activeInfo)
-{
-    chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
-	{
-		chrome.tabs.sendMessage(tab[0].id, {changeContextMenu: "changeContextMenu"}, function(response){});
-	})
-})
-
-/* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when a tab is created */
-chrome.tabs.onCreated.addListener(function(tab)
-{
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
-	{
-		/* changes tab's title and color after tab refresh if applicable */
-		if (changeInfo.status === "complete")
-		{
-			// sends a message to the content script to detect the color of the tab (if any) and set the context menu accordingly
-			chrome.tabs.sendMessage(tab.id, {changeContextMenu: "changeContextMenu"}, function(response){});
-		}
-	})
-})

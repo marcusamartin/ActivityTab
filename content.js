@@ -66,6 +66,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
         // stores the color of the tab
         var color;
+
         /* urls of color favicons */
         var redURL = chrome.runtime.getURL("img/red_circle_16.png");
         var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
@@ -112,8 +113,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             }
         }
 
-        // sends the color to the background script to change the context menu
-        chrome.runtime.sendMessage(color, function(response){});
+        /* sends the color to the background script to change the context menu */
+        // does not send color if sent from onUpdated because if a colored tab was launched, then the current tab would
+        // have the launched tab color stored
+        if (request.onUpdated != "onUpdated")
+        {
+            chrome.runtime.sendMessage(color, function(response){});
+        }
     }
     else if (request.highlightCommand)
     {
@@ -521,7 +527,6 @@ function setFaviconURL(color)
 /* sets the tab's favicon url from a url */
 function setFaviconURLFromURL(colorURL)
 {
-    console.log("hi");
     // gets all selectors of "icon"
     var link = document.querySelectorAll("link[rel*='icon']");
 
