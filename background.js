@@ -25,7 +25,7 @@ function onInstall()
 			var objectArr = [];
 			chrome.storage.local.set({"objectArr": objectArr});
 			var zero = 0;
-			chrome.storage.local.set({"onMessageCounter": zero});
+			chrome.storage.local.set({"onMessageFlag": zero});
 		}
 	})
 
@@ -833,11 +833,11 @@ var saveColor = {};
    updates "sameColorTabs" context menu when the tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	chrome.storage.local.get("onMessageCounter", function(counter)
+	chrome.storage.local.get("onMessageFlag", function(counter)
 	{
 		chrome.tabs.query({highlighted: true}, function(tabs)
 		{
-			if (counter.onMessageCounter != 1)
+			if (counter.onMessageFlag != 1)
 			{
 				// the current tab is not the only tab that is selected
 				if (tabs.length > 1)
@@ -874,12 +874,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 						}
 					})
 				}
-				chrome.storage.local.set({"onMessageCounter": 1});
+				
+				// set onMessageeFlag to 1 since the tab color has been changed for the first time
+				chrome.storage.local.set({"onMessageFlag": 1});
 			}
 			else
 			{
-				// set onMessageCounter to 0 if the tab color has already been changed
-				chrome.storage.local.set({"onMessageCounter": 0});
+				// set onMessageFlag to 0 if the tab color has already been changed
+				chrome.storage.local.set({"onMessageFlag": 0});
 			}
 		})
 
@@ -930,11 +932,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 				chrome.contextMenus.remove("sameColorTabs");
 				break;
 		}
-
-		sendResponse();
-			
-		// need to increment onMessageCounter so onmessage is not called again since color was changed to new color
-		chrome.storage.local.set({"onMessageCounter": 1});
 	})
 })
 
