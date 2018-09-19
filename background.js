@@ -835,6 +835,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
 	chrome.storage.local.get("onMessageFlag", function(counter)
 	{
+		// alert('counter.onMessageFlag: ' + counter.onMessageFlag);
 		chrome.tabs.query({highlighted: true}, function(tabs)
 		{
 			if (counter.onMessageFlag != 1)
@@ -867,7 +868,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 						{
 							chrome.contextMenus.remove("sameColorTabs");
 						}
-							
+								
 						if (request.name)
 						{
 							saveTitle[tab[0].id] = request.name;
@@ -1018,6 +1019,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
+		console.log("onupdated");
 		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by
 		   a button in the popup that stores the tabs, the tab being launched will not be set to the color of the current active tab */
 		if (saveColor[tab[0].id] != undefined && tab[0].id == tabId)

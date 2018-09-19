@@ -10,7 +10,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     else if (request.color)
     {
         // set favicon url according to button color
-        setFaviconURL(request.color);
+        chrome.tabs.query({highlighted: true}, function(tabs)
+        {
+            /* prevents weird color changes if there are highlighted tabs */
+            if (tabs.length < 1)
+            {
+                setFaviconURL(request.color);
+            }
+        })
     }
     /* color from command */
     else if (request.getColor)
@@ -64,7 +71,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
             }
         }
 
-        // stores the color of the tab
+        // stores the color for the tab
         var color = changeContextMenu(currentFaviconURL);
 
         /* sends the color to the background script to change the context menu */
@@ -77,6 +84,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     }
     else if (request.highlightCommand)
     {
+        // stores the color for the tabs
         var color;
         /* urls of color favicons */
         var redURL = chrome.runtime.getURL("img/red_circle_16.png");
