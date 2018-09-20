@@ -24,8 +24,6 @@ function onInstall()
 			// objectArr will store the group objects and will allow the popup buttons to be displayed exactly
 			var objectArr = [];
 			chrome.storage.local.set({"objectArr": objectArr});
-			var zero = 0;
-			chrome.storage.local.set({"onMessageFlag": zero});
 		}
 	})
 
@@ -146,31 +144,10 @@ function renameTab()
 /* sends a message to the content script to color the tab(s) (from a command) */
 function queryKeys(command)
 {
-	/* gets all highlighted tabs; if so, color all of the highlighted tabs */
-	chrome.tabs.query({highlighted: true}, function(tabS)
+	chrome.tabs.query({currentWindow: true, active: true}, function(tab)
 	{
-		// checks if there are multiple highlighted tabs (current tab counts as a highlighted tab)
-		if (tabS.length > 1)
-		{
-			/* iterate through the highlighted tabs and send the command and tab information to content script */
-			for (var i = 0; i < tabS.length; i++)
-			{
-				// since each tab has its own content script, send a message to the content script for each tab
-				// send the current tab's id, command info, and current tab's info; response for error message (not needed)
-				chrome.tabs.sendMessage(tabS[i].id, {highlightCommand: command, highlightedTabs: tabS[i]}, function(response){});
-				// sends a message to the content script so "save [COLOR} tabs" text field's border color will update after command
-				chrome.runtime.sendMessage({msg: "color command"});
-			}
-		}
-		/* color the tab */
-		else
-		{
-			chrome.tabs.query({currentWindow: true, active: true}, function(tab)
-			{
-				chrome.tabs.sendMessage(tab[0].id, {command: command}, function(response) {});
-				chrome.runtime.sendMessage({msg: "color command"});
-			})
-		}
+		chrome.tabs.sendMessage(tab[0].id, {command: command}, function(response) {});
+		chrome.runtime.sendMessage({msg: "color command"});
 	})
 }
 
@@ -833,56 +810,21 @@ var saveColor = {};
    updates "sameColorTabs" context menu when the tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	chrome.storage.local.get("onMessageFlag", function(counter)
-	{
-		// alert('counter.onMessageFlag: ' + counter.onMessageFlag);
-		chrome.tabs.query({highlighted: true}, function(tabs)
+		// looks at current tab
+		chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 		{
-			if (counter.onMessageFlag != 1)
+			if (request != "none")
 			{
-				// the current tab is not the only tab that is selected
-				if (tabs.length > 1)
-				{
-					for (var i = 0; i < tabs.length; i++)
-					{
-						// color saved into saveColor
-						saveColor[tabs[i].id] = request;
-
-						if (request.name)
-						{
-							// tab title that was sent from the text field is saved into saveTitle
-							saveTitle[tabs[i].id] = request.name;
-						}
-					}
-				}
-				else
-				{
-					// looks at current tab
-					chrome.tabs.query({active: true, currentWindow: true}, function(tab)
-					{
-						if (request != "none")
-						{
-							saveColor[tab[0].id] = request;
-						}
-						else if (request == "none" || request == undefined)
-						{
-							chrome.contextMenus.remove("sameColorTabs");
-						}
-								
-						if (request.name)
-						{
-							saveTitle[tab[0].id] = request.name;
-						}
-					})
-				}
-				
-				// set onMessageeFlag to 1 since the tab color has been changed for the first time
-				chrome.storage.local.set({"onMessageFlag": 1});
+				saveColor[tab[0].id] = request;
 			}
-			else
+			else if (request == "none" || request == undefined)
 			{
-				// set onMessageFlag to 0 if the tab color has already been changed
-				chrome.storage.local.set({"onMessageFlag": 0});
+				chrome.contextMenus.remove("sameColorTabs");
+			}
+					
+			if (request.name)
+			{
+				saveTitle[tab[0].id] = request.name;
 			}
 		})
 
@@ -933,7 +875,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 				chrome.contextMenus.remove("sameColorTabs");
 				break;
 		}
-	})
 })
 
 /* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when the tab becomes "active" */
@@ -1019,7 +960,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 	// looks at current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 	{
-		console.log("onupdated");
 		/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by
 		   a button in the popup that stores the tabs, the tab being launched will not be set to the color of the current active tab */
 		if (saveColor[tab[0].id] != undefined && tab[0].id == tabId)
