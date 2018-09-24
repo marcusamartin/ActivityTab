@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
         {
             color = leftArrowKeyTabColor();
         }
-        else
+        else if (request.command == "right-key-toggle-feature")
         {
             color = rightArrowKeyTabColor();
         }
@@ -47,27 +47,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     else if (request.changeContextMenu)
     {
         // gets all selectors of "icon"
-        var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+        var link = document.querySelectorAll("link[rel*='icon']");
 
         /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
-        if (currentFaviconURL.length == 0)
+        if (link.length == 0)
         {
-            currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+            link = document.querySelectorAll("link[rel*='shortcut icon']");
 
             /* did not find link for "icon" or "shortcut icon" (ex: Google) */
-            if (currentFaviconURL.length == 0)
+            if (link.length == 0)
             {
-                currentFaviconURL = document.createElement("link");
-                currentFaviconURL.type = "image/x-icon";
-                currentFaviconURL.rel = "shortcut icon";
+                link = document.createElement("link");
+                link.type = "image/x-icon";
+                link.rel = "shortcut icon";
             }
         }
 
         // stores the color for the tab
-        var color = changeContextMenu(currentFaviconURL);
+        var color = changeContextMenu(link);
 
         /* sends the color to the background script to change the context menu */
-        // does not send color if sent from onUpdated because if a colored tab was launched, then the current tab would
+        // does not send color if message is sent from onUpdated because if a colored tab was launched, then the current tab would
         // have the launched tab color stored
         if (request.onUpdated != "onUpdated")
         {
@@ -80,12 +80,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 function leftArrowKeyTabColor()
 {
     // gets all selectors of "icon"
-    var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+    var link = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
-    if (currentFaviconURL.length == 0)
+    if (link.length == 0)
     {
-        currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+        link = document.querySelectorAll("link[rel*='shortcut icon']");
+
+        /* did not find link for "icon" or "shortcut icon" (ex: Google) */
+        if (link.length == 0)
+        {
+            link = document.createElement("link");
+            link.type = "image/x-icon";
+            link.rel = "shortcut icon";
+        }
     }
 
     /* urls of color favicons */
@@ -97,17 +105,17 @@ function leftArrowKeyTabColor()
 	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
     /* did not find link for "icon" or "shortcut icon" (ex: Google) */
-    if (currentFaviconURL.length == 0)
+    if (link.length == 0 || link.length == undefined)
     {
         return "purple";
     }
     /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
     else
     {
-        for (var i = 0; i < currentFaviconURL.length; i++)
+        for (var i = 0; i < link.length; i++)
         {
-            /* cycle through colors */
-            switch (currentFaviconURL[i].href)
+            /* cycle through the colors */
+            switch (link[i].href)
             {
                 case purpleURL:
                     return "orange";
@@ -134,12 +142,20 @@ function leftArrowKeyTabColor()
 function rightArrowKeyTabColor()
 {
     // gets all selectors of "icon"
-    var currentFaviconURL = document.querySelectorAll("link[rel*='icon']");
+    var link = document.querySelectorAll("link[rel*='icon']");
 
     /* gets all selectors of "shortcut icon" if there are no selectors for "icon" (some websites use "icon" and others use shortcut icon") */
-    if (currentFaviconURL.length == 0)
+    if (link.length == 0)
     {
-        currentFaviconURL = document.querySelectorAll("link[rel*='shortcut icon']");
+        link = document.querySelectorAll("link[rel*='shortcut icon']");
+
+        /* did not find link for "icon" or "shortcut icon" (ex: Google) */
+        if (link.length == 0)
+        {
+            link = document.createElement("link");
+            link.type = "image/x-icon";
+            link.rel = "shortcut icon";
+        }
     }
 
     /* urls of color favicons */
@@ -151,17 +167,17 @@ function rightArrowKeyTabColor()
 	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
     /* did not find link for "icon" or "shortcut icon" (ex: Google) */
-    if (currentFaviconURL.length == 0)
+    if (link.length == 0 || link.length == undefined)
     {
         return "red";
     }
     /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
     else
     {
-        for (var i = 0; i < currentFaviconURL.length; i++)
+        for (var i = 0; i < link.length; i++)
         {
-            /* cycle through colors */
-            switch (currentFaviconURL[i].href)
+            /* cycle through the colors */
+            switch (link[i].href)
             {
                 case redURL:
                     return "green";
@@ -204,110 +220,26 @@ function setFaviconURL(color)
         }
     }
     
-    /* sets tab's color according to specified color */
+    /* sets the tab's color according to the specified color */
     switch (color)
     {
         case "red":
-            // updates "Save [COLOR] Tabs" context menu
-            chrome.runtime.sendMessage("red", function(response){});
-
-            // link was created
-            if (link.length == undefined)
-            {
-                // updates the tab's favicon to the specified color
-                link.href = chrome.runtime.getURL("img/red_circle_16.png");
-                // appends the link to the document's head so that favicon will be registered by the document
-                document.head.appendChild(link);
-            }
-            else
-            {
-                /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
-                for (var i = 0; i < link.length; i++)
-                {
-                    // updates favicon of tab to specified color
-                    link[i].href = chrome.runtime.getURL("img/red_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/red_circle_16.png");
             break;
         case "green":
-            chrome.runtime.sendMessage("green", function(response){});
-
-            if (link.length == undefined)
-            {
-                link.href = chrome.runtime.getURL("img/green_circle_16.png");
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = chrome.runtime.getURL("img/green_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/green_circle_16.png");
             break;
         case "blue":
-            chrome.runtime.sendMessage("blue", function(response){});
-
-            if (link.length == undefined)
-            {
-                link.href = chrome.runtime.getURL("img/blue_circle_16.png");
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = chrome.runtime.getURL("img/blue_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/blue_circle_16.png");
             break;
         case "yellow":
-            chrome.runtime.sendMessage("yellow", function(response){});
-
-            if (link.length == undefined)
-            {
-                link.href = chrome.runtime.getURL("img/yellow_circle_16.png");
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = chrome.runtime.getURL("img/yellow_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/yellow_circle_16.png");
             break;
         case "orange":
-            chrome.runtime.sendMessage("orange", function(response){});
-
-            if (link.length == undefined)
-            {
-                link.href = chrome.runtime.getURL("img/orange_circle_16.png");
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = chrome.runtime.getURL("img/orange_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/orange_circle_16.png");
             break;
         case "purple":
-            chrome.runtime.sendMessage("purple", function(response){});
-
-            if (link.length == undefined)
-            {
-                link.href = chrome.runtime.getURL("img/purple_circle_16.png");
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = chrome.runtime.getURL("img/purple_circle_16.png");
-                }
-            }
+            setColor(color, link, "img/purple_circle_16.png");
             break;
         default:
             break;
@@ -346,100 +278,30 @@ function setFaviconURLFromURL(colorURL)
     switch (colorURL)
     {
         case redURL:
-            // link was created
-            if (link.length == undefined)
-            {
-                // updates the tab's favicon to the specified color
-                link.href = redURL;
-                // appends the link to the document's head so that favicon will be registered by the document
-                document.head.appendChild(link);
-            }
-            else
-            {
-                /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
-                for (var i = 0; i < link.length; i++)
-                {
-                    // updates favicon of tab to specified color
-                    link[i].href = redURL;
-                }
-            }
+            setColorURL(link, redURL);
             break;
         case greenURL:
-            if (link.length == undefined)
-            {
-                link.href = greenURL;
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = greenURL;
-                }
-            }
+            setColorURL(link, greenURL);
             break;
         case blueURL:
-            if (link.length == undefined)
-            {
-                link.href = blueURL;
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = blueURL;
-                }
-            }
+            setColorURL(link, blueURL);
             break;
         case yellowURL:
-            if (link.length == undefined)
-            {
-                link.href = yellowURL;
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = yellowURL;
-                }
-            }
+            setColorURL(link, yellowURL);
             break;
         case orangeURL:
-            if (link.length == undefined)
-            {
-                link.href = orangeURL;
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = orangeURL;
-                }
-            }
+            setColorURL(link, orangeURL);
             break;
         case purpleURL:
-            if (link.length == undefined)
-            {
-                link.href = purpleURL;
-                document.head.appendChild(link);
-            }
-            else
-            {
-                for (var i = 0; i < link.length; i++)
-                {
-                    link[i].href = purpleURL;
-                }
-            }
+            setColorURL(link, purpleURL);
             break;
         default:
             break;
     }
 }
 
-function changeContextMenu(currentFaviconURL)
+/* updates the context menu to reflect the current color of the tab */
+function changeContextMenu(link)
 {
     /* urls of color favicons */
     var redURL = chrome.runtime.getURL("img/red_circle_16.png");
@@ -450,16 +312,17 @@ function changeContextMenu(currentFaviconURL)
     var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
     // link was created
-    if (currentFaviconURL.length == undefined)
+    if (link.length == undefined)
     {
         // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
         return "none;"
     }
     else
     {
-        for (var i = 0; i < currentFaviconURL.length; i++)
+        for (var i = 0; i < link.length; i++)
         {
-            switch(currentFaviconURL[i].href)
+            /* find the color of the tab */
+            switch(link[i].href)
             {
                 case redURL:
                     return "red";
@@ -477,6 +340,52 @@ function changeContextMenu(currentFaviconURL)
                     // color set to none since there is no set color for the tab since there would be "shortcut icon" if there was
                     return "none";
             }
+        }
+    }
+}
+
+/* sets the tab's color according to the specified color */
+function setColor(color, link, url)
+{
+    // updates "Save [COLOR] Tabs" context menu
+    chrome.runtime.sendMessage(color, function(response){});
+
+    // link was created
+    if (link.length == undefined)
+    {
+        // updates the tab's favicon to the specified color
+        link.href = chrome.runtime.getURL(url);
+        // appends the link to the document's head so that favicon will be registered by the document
+        document.head.appendChild(link);
+    }
+    else
+    {
+        /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+        for (var i = 0; i < link.length; i++)
+        {
+            // updates favicon of tab to specified color
+            link[i].href = chrome.runtime.getURL(url);
+        }
+    }
+}
+
+function setColorURL(link, url)
+{
+    // link was created
+    if (link.length == undefined)
+    {
+        // updates the tab's favicon to the specified color
+        link.href = url;
+        // appends the link to the document's head so that favicon will be registered by the document
+        document.head.appendChild(link);
+    }
+    else
+    {
+        /* changes all selectors of either "icon" or "shortcut icon" to new favicon */
+        for (var i = 0; i < link.length; i++)
+        {
+            // updates favicon of tab to specified color
+            link[i].href = url;
         }
     }
 }

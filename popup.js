@@ -447,7 +447,7 @@ function setSortTabsTextFieldBorderColor()
 /* reloads the popup after "Save [COLOR] Tabs" text field's border color was changed */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	if (request.msg === "color command")
+	if (request.msg === "reload popup")
 	{
 		window.location.reload();
 	}

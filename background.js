@@ -147,7 +147,7 @@ function queryKeys(command)
 	chrome.tabs.query({currentWindow: true, active: true}, function(tab)
 	{
 		chrome.tabs.sendMessage(tab[0].id, {command: command}, function(response) {});
-		chrome.runtime.sendMessage({msg: "color command"});
+		chrome.runtime.sendMessage({msg: "reload popup"});
 	})
 }
 
@@ -210,7 +210,7 @@ function sameColorTabs(command)
 
 				/* put everything in query because of how the asynchronous function does not initializing currentFaviconURL before storing the object */
 				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
-				chrome.tabs.query({active: true}, function(tab)
+				chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 				{
 					var currentFaviconURL = tab[0].favIconUrl;
 
@@ -261,7 +261,7 @@ function sameColorTabs(command)
 					if (command)
 					{
 						// refresh popup so added button is displayed
-						chrome.runtime.sendMessage({msg: "color command"});
+						chrome.runtime.sendMessage({msg: "reload popup"});
 					}
 				})
 			})
@@ -307,7 +307,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 
 				/* put everything in query because of asynchronous function not initializing currentFaviconURL before storing */
 				// looks at color of current tab to determine which tabs should be removed from the color arr (tabs that dont match color)
-				chrome.tabs.query({active: true}, function(tab)
+				chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 				{
 					var currentFaviconURL = tab[0].favIconUrl;
 
@@ -635,7 +635,7 @@ function replaceButton(replacementButton, promptUser)
 		var groupObject = {};
 
 		/* stores information from all of the tabs into an object and then puts object into storage */
-		chrome.tabs.query({currentWindow: true}, function(tabs)
+		chrome.tabs.query({}, function(tabs)
 		{
 			/* gets each tab's name and url from an array of tabs and stores them into arrays */
 			var tabNamesArr = [];
@@ -650,7 +650,7 @@ function replaceButton(replacementButton, promptUser)
 			}
 	
 			/* put everything in query because of how the asynchronous function does not initializing currentFaviconURL before storing the object */
-			chrome.tabs.query({active: true}, function(tab)
+			chrome.tabs.query({active: true, currentWindow: true}, function(tab)
 			{
 				var currentFaviconURL = tab[0].favIconUrl;
 	
@@ -699,7 +699,7 @@ function replaceButton(replacementButton, promptUser)
 				chrome.storage.local.set({"objectArr": objectArr});
 
 				// refresh popup so added duplicate button is not displayed (caused by asynchronous function)
-				chrome.runtime.sendMessage({msg: "color command"});
+				chrome.runtime.sendMessage({msg: "reload popup"});
 			})
 		})
 	})
@@ -795,7 +795,7 @@ function replaceAllButton(replacementButton, promptUser)
 			chrome.storage.local.set({"objectArr": objectArr});
 			
 			// sends a message to popup script so sort tabs text field's border color will update from command
-			chrome.runtime.sendMessage({msg: "color command"});
+			chrome.runtime.sendMessage({msg: "reload popup"});
 		})
 	})
 }
