@@ -73,7 +73,20 @@ function ActivityTabFeatures(command)
 			break;
 		/* down arrow key saves all of the same colored tabs of the current colored tab */
 		case "same-color-tabs-toggle-feature":
-			sameColorTabs(command);
+			/* checks if the tab is colored */
+			chrome.tabs.query({active: true, currentWindow: true}, function(tab)
+			{
+				var isColored = checkTabColor(tab);
+
+				if (isColored)
+				{
+					sameColorTabs(command);
+				}
+				else
+				{
+					alert("Cannot save the tab! The tab is not colored.");
+				}
+			})
 			break;
 	}
 
@@ -123,6 +136,7 @@ function ActivityTabFeatures(command)
 /* prompts the user and gets the text to retitle the tab (from a command or a context menu) */
 function renameTab()
 {
+	alert("Rename the tab");
 	// gets information about the current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
 	{
@@ -160,6 +174,30 @@ function queryContextMenu(buttonPress, color)
 		// and the color corresponding to the context menu; response for error message (not needed)
 		chrome.tabs.sendMessage(tab[0].id, {button: buttonPress, color: color}, function(response) {});
 	})
+}
+
+/* returns false if tab is not colored and true if tab is colored */
+function checkTabColor(tab)
+{
+	// current tab favicon
+	var currentFaviconURL = tab[0].favIconUrl;
+	/* urls of color favicons */
+	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
+
+	if (currentFaviconURL != redURL && currentFaviconURL != greenURL && currentFaviconURL != blueURL &&
+		currentFaviconURL != yellowURL && currentFaviconURL != orangeURL && currentFaviconURL != purpleURL)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /* save tabs of the current tab's color (from the command) */
