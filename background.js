@@ -136,7 +136,6 @@ function ActivityTabFeatures(command)
 /* prompts the user and gets the text to retitle the tab (from a command or a context menu) */
 function renameTab()
 {
-	alert("Rename the tab");
 	// gets information about the current tab
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
 	{
@@ -147,11 +146,13 @@ function renameTab()
 			alert("Please enter a name for the tab!");
 			renameTab();
 		}
-
-		// title is sent to the content script for the tab to be retitled (current tab's id, user text, response for error message (not needed))
-		chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
-		// saves the title so that the tab's title can persist through a refresh
-		saveTitle[tabs[0].id] = promptUser;
+		else if (promptUser)
+		{
+			// title is sent to the content script for the tab to be retitled (current tab's id, user text, response for error message (not needed))
+			chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
+			// saves the title so that the tab's title can persist through a refresh
+			saveTitle[tabs[0].id] = promptUser;
+		}
 	})
 }
 
