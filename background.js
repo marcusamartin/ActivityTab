@@ -1008,7 +1008,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 
 			if (saveColor[tabId])
 			{
-				chrome.tabs.sendMessage(tabId, {color: saveColor[tabId], tabid: tabId}, function(response){});
+				chrome.tabs.sendMessage(tabId, {color: saveColor[tabId]}, function(response){});
 			}
 		})
 	}

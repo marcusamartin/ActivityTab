@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* color from SAVED color */
     else if (request.color)
     {
-        setFaviconURL(request.color, request.tabid);
+        setFaviconURL(request.color);
     }
     /* color from command */
     else if (request.getColor)
@@ -204,7 +204,7 @@ function rightArrowKeyTabColor()
 }
 
 /* sets the tab's favicon url by a specified color */
-function setFaviconURL(color, tabid)
+function setFaviconURL(color)
 {
     // gets all selectors of "icon"
     var link = document.querySelectorAll("link[rel*='icon']");
@@ -227,22 +227,22 @@ function setFaviconURL(color, tabid)
     switch (color)
     {
         case "red":
-            setColor(color, link, "img/red_circle_16.png", tabid);
+            setColor(link, "img/red_circle_16.png");
             break;
         case "green":
-            setColor(color, link, "img/green_circle_16.png", tabid);
+            setColor(link, "img/green_circle_16.png");
             break;
         case "blue":
-            setColor(color, link, "img/blue_circle_16.png", tabid);
+            setColor(link, "img/blue_circle_16.png");
             break;
         case "yellow":
-            setColor(color, link, "img/yellow_circle_16.png", tabid);
+            setColor(link, "img/yellow_circle_16.png");
             break;
         case "orange":
-            setColor(color, link, "img/orange_circle_16.png", tabid);
+            setColor(link, "img/orange_circle_16.png");
             break;
         case "purple":
-            setColor(color, link, "img/purple_circle_16.png", tabid);
+            setColor(link, "img/purple_circle_16.png");
             break;
         default:
             break;
@@ -347,14 +347,8 @@ function changeContextMenu(link)
 }
 
 /* sets the tab's color according to the specified color */
-function setColor(color, link, url, tabid)
+function setColor(link, url)
 {
-    // updates "Save [COLOR] Tabs" context menu
-    if (tabid)
-    {
-        chrome.runtime.sendMessage({color: color, tabid: tabid}, function(response){});
-    }
-
     // link was created
     if (link.length == undefined)
     {
@@ -376,6 +370,7 @@ function setColor(color, link, url, tabid)
 
 function setColorURL(link, url)
 {
+    console.log("setcolorurl");
     // link was created
     if (link.length == undefined)
     {
