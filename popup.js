@@ -119,6 +119,7 @@ function displayWindowButton(group, i)
 		/* creates a new window with the saved tabs of the button */
 		windowButton.onclick = function()
 		{
+			window.close();
 			for (var j = 0; j < objectArr[i]["tabCount"]; j++)
 			{
 				chrome.extension.getBackgroundPage().createWindowTabs(group, i, j);
