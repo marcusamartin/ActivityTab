@@ -849,38 +849,22 @@ var saveColor = {};
    updates "sameColorTabs" context menu when the tab color is changed, opened, or when the tab becomes "active" */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	// looks at current tab 
-	// chrome.tabs.query({active: true, currentWindow: true}, function(tab)
-	// {
-		alert("request: " + request);
-		alert("request.color: " + request.color);
-		alert("request.tabid: " + request.tabid);
-		if (request != "none")
+	if (request != "none")
+	{
+		if (request.color)
 		{
-			if (request.color)
-			{
-				if (saveColor[request.tabid] == undefined)
-				{
-					saveColor[request.tabid] = request.color;
-				}
-			}
-			// alert("request != none, tab[0].id: " + tab[0].id + ", request: " + request)
-			// if (saveColor[tab[0].id] == undefined)
-			// {
-			// 	alert(saveColor[tab[0].id]);
-			// 	saveColor[tab[0].id] = request;
-			// }
+			saveColor[request.tabid] = request.color;
 		}
-		else if (request == "none" || request == undefined)
-		{
-			chrome.contextMenus.remove("sameColorTabs");
-		}
+	}
+	else if (request == "none" || request == undefined)
+	{
+		chrome.contextMenus.remove("sameColorTabs");
+	}
 					
-		if (request.name)
-		{
-			saveTitle[tab[0].id] = request.name;
-		}
-	// })
+	if (request.name)
+	{
+		saveTitle[tab[0].id] = request.name;
+	}
 
 	/* updates "sameColorTabs" context menu text */
 	switch (request.color)
@@ -934,23 +918,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 /* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when the tab becomes "active" */
 chrome.tabs.onActivated.addListener(function(activeInfo)
 {
-    // chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
-	// {
+	// query is solely used for checking if the tab is a new tab to remove the "Save [COLOR] Tabs" context menu
+    chrome.tabs.query({active: true, currentWindow: true}, function(tab) 
+	{
 		// removes "Save [COLOR] Tabs" context menu if tab is a new tab
-		// if (tab[0].url == "chrome://newtab/")
-		// {
-		// 	chrome.contextMenus.remove("sameColorTabs");
-		// }
-		// else if (tab[0].id == activeInfo.tabId)
-
-		// {
-			alert("Activeinfo.tabId: " + activeInfo.tabId);
-			chrome.tabs.sendMessage(activeInfo.tabId, {changeContextMenu: "changeContextMenu", tabid: activeInfo.tabId, onActivate: "onActivate"}, function(response){});
-		// }
-	// })
-
-	// alert(activeInfo.tabId);
-	// chrome.tabs.sendMessage(activeInfo.tabId, {changeContextMenu: "changeContextMenu"}, function(response){});
+		if (tab[0].url == "chrome://newtab/")
+		{
+			chrome.contextMenus.remove("sameColorTabs");
+		}
+		// check if the current tab is the activated tab so then the color of a tab that is not the active tab will not be changed
+		// ex: colored tab is loading, user switches to another tab, new tab will not be assigned/stored color of loading tab
+		else if (tab[0].id == activeInfo.tabId)
+		{
+			chrome.tabs.sendMessage(activeInfo.tabId, {changeContextMenu: "changeContextMenu"}, function(response){});
+		}
+	})
 })
 
 /* changes the "Save [COLOR] Tabs" context menu text to reflect the color of the current tab when a tab is created */
@@ -998,10 +980,13 @@ var tabIdsToColor = {};
 /* keeps the tab's title and color persistent tab refresh if applicable; keeps SAVED tab's title and color persistent through refresh */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
+	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script;
+	   keeps the title and color from the SAVED tabs persistent through refresh (content script would not be able to received message if page 
+	   has not been loaded) */
+
 	/* changes the tab's title and color after tab refresh if applicable */
 	if (tabIdsToTitles[tabId] && changeInfo.status === "complete")
 	{
-		alert("onupdated, complete");
 		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
 		chrome.tabs.sendMessage(tabId, {getColor: tabIdsToColor[tabId]}, function(response){});
 	}
@@ -1013,7 +998,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 		{
 			// tab's title sent to content script
 			chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
-			// alert("tab[0].id: " + tab[0].id + ", tabId: " + tabId);
 		}
 
 		// looks at current tab
@@ -1021,37 +1005,13 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 		{
 			/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by
 			a button in the popup that stores the tabs, the tab being launched will not be set to the color of the current active tab */
-			// if (saveColor[tabId] != undefined && tab[0].id == tabId)
-			// {
-			// 	alert("hi");
-			// 	chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
-			// }
 
-			alert("tabId: " + tabId + ", saveColor[tabId]: " + saveColor[tabId]);
-			alert("current tab id: " + tab[0].id + "saveColor[tab[0].id]: " + saveColor[tab[0].id]);
 			if (saveColor[tabId])
 			{
-				alert("TABTABTABID: " + tabId);
 				chrome.tabs.sendMessage(tabId, {color: saveColor[tabId], tabid: tabId}, function(response){});
 			}
 		})
 	}
-
-	/* once content script has finished loading in the new tab, send a message with the tab's title and color to the content script;
-	   keeps the title and color from the SAVED tabs persistent through refresh (content script would not be able to received message if page 
-	   has not been loaded) */
-
-	// looks at current tab
-	// chrome.tabs.query({active: true, currentWindow: true}, function(tab)
-	// {
-	// 	alert("saveColor[tab[0].id]: " + saveColor[tab[0].id]);
-	// 	/* sends message to content script if tab is supposed to be colored; tabId is checked so that if tab is being launched by
-	// 	   a button in the popup that stores the tabs, the tab being launched will not be set to the color of the current active tab */
-	// 	if (saveColor[tab[0].id] != undefined && tab[0].id == tabId)
-	// 	{
-	// 		chrome.tabs.sendMessage(tabId, {color: saveColor[tab[0].id]}, function(response){});
-	// 	}
-	// })
 })
 
 /* creates the tabs (responds to a button in the popup that had stored colored tabs/all of the tabs in a single window) */

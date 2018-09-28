@@ -321,7 +321,6 @@ function queryButtonClick(buttonPress, color)
 {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs)
 	{
-		alert("queryButtonClick");
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
 		// deletes and reinitializes color in saveColor so tab color will be correct and persist through tab refresh
@@ -387,7 +386,6 @@ function renameTab()
 	
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs)
 	{
-		alert("runtime onmessage");
 		// title sent to the content script to be changed
 		chrome.tabs.sendMessage(tabs[0].id, {name: customTitleField}, function(response){});
 		// title sent to the background script to be saved
