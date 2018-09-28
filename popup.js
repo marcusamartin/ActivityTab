@@ -327,6 +327,8 @@ function queryButtonClick(buttonPress, color)
 		chrome.extension.getBackgroundPage().deleteSaveColor(color);
 		// refreshes popup to change sort tabs text field's border color to correct color
 		window.location.reload();
+		// changes "Save [COLOR] Tabs" context menu text to reflect the color of the tab
+		chrome.extension.getBackgroundPage().updateContextMenu(color);
 	})
 }
 
