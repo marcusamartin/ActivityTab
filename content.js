@@ -41,7 +41,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
     /* popup color button was pressed */
     else if (request.button == "buttonPress")
     {
-        setFaviconURL(request.color);
+        setFaviconURL(request.contextMenuColor);
+
+        // sends the color to the background script so that the tab's color can persist through a tab refresh */
+        chrome.runtime.sendMessage({color: request.contextMenuColor, tabid: request.tabid}, function(response){});
     }
     /* changes "Save [COLOR] Tabs" context menu's text based on the current tab's color */
     else if (request.changeContextMenu)
@@ -222,27 +225,35 @@ function setFaviconURL(color)
             link.rel = "shortcut icon";
         }
     }
+
+    /* urls of color favicons */
+    var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
     
     /* sets the tab's color according to the specified color */
     switch (color)
     {
         case "red":
-            setColor(link, "img/red_circle_16.png");
+            setColor(link, redURL);
             break;
         case "green":
-            setColor(link, "img/green_circle_16.png");
+            setColor(link, greenURL);
             break;
         case "blue":
-            setColor(link, "img/blue_circle_16.png");
+            setColor(link, blueURL);
             break;
         case "yellow":
-            setColor(link, "img/yellow_circle_16.png");
+            setColor(link, yellowURL);
             break;
         case "orange":
-            setColor(link, "img/orange_circle_16.png");
+            setColor(link, orangeURL);
             break;
         case "purple":
-            setColor(link, "img/purple_circle_16.png");
+            setColor(link, purpleURL);
             break;
         default:
             break;
@@ -353,7 +364,7 @@ function setColor(link, url)
     if (link.length == undefined)
     {
         // updates the tab's favicon to the specified color
-        link.href = chrome.runtime.getURL(url);
+        link.href = url;
         // appends the link to the document's head so that favicon will be registered by the document
         document.head.appendChild(link);
     }
@@ -363,14 +374,13 @@ function setColor(link, url)
         for (var i = 0; i < link.length; i++)
         {
             // updates favicon of tab to specified color
-            link[i].href = chrome.runtime.getURL(url);
+            link[i].href = url;
         }
     }
 }
 
 function setColorURL(link, url)
 {
-    console.log("setcolorurl");
     // link was created
     if (link.length == undefined)
     {

@@ -173,7 +173,7 @@ function queryContextMenu(buttonPress, color)
 	{
 		// send the current tab's id, identifier (as the context menu acts the same as the buttons in the popup),
 		// and the color corresponding to the context menu; response for error message (not needed)
-		chrome.tabs.sendMessage(tab[0].id, {button: buttonPress, color: color}, function(response) {});
+		chrome.tabs.sendMessage(tab[0].id, {button: buttonPress, contextMenuColor: color, tabid: tab[0].id}, function(response) {});
 	})
 }
 
