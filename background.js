@@ -151,6 +151,8 @@ function renameTab()
 			// title is sent to the content script for the tab to be retitled (current tab's id, user text, response for error message (not needed))
 			chrome.tabs.sendMessage(tabs[0].id, {title: promptUser}, function(response){});
 			// saves the title so that the tab's title can persist through a refresh
+			alert("promptuser: " + promptUser);
+			alert("tabs id: " + tabs[0].id);
 			saveTitle[tabs[0].id] = promptUser;
 		}
 	})
@@ -863,7 +865,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 					
 	if (request.name)
 	{
-		saveTitle[tab[0].id] = request.name;
+		saveTitle[request.tabid] = request.name;
 	}
 
 	/* updates "sameColorTabs" context menu text */

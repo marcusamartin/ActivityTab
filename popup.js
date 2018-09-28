@@ -389,7 +389,7 @@ function renameTab()
 		// title sent to the content script to be changed
 		chrome.tabs.sendMessage(tabs[0].id, {name: customTitleField}, function(response){});
 		// title sent to the background script to be saved
-		chrome.runtime.sendMessage({id: tabs[0].id, name: customTitleField}, function(response){});
+		chrome.runtime.sendMessage({tabid: tabs[0].id, name: customTitleField}, function(response){});
 	})
 }
 
