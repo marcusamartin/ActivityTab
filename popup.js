@@ -325,6 +325,7 @@ function queryButtonClick(buttonPress, color)
 		// selected tab, {button property = button pressed, color property = button color}, response for error message (not needed)
 		chrome.tabs.sendMessage(tabs[0].id, {button: buttonPress, color: color}, function(response) {});
 		// deletes and reinitializes color in saveColor so tab color will be correct and persist through tab refresh
+		// tab color will not be refreshed to previous tab color and will be refreshed to current tab color
 		chrome.extension.getBackgroundPage().deleteSaveColor(color);
 		// refreshes popup to change sort tabs text field's border color to correct color
 		window.location.reload();

@@ -253,6 +253,38 @@ function checkTabColor(tab)
 	}
 }
 
+/* returns the color of the tab */
+function returnTabColor(tab)
+{
+	// current tab favicon
+	var currentFaviconURL = tab[0].favIconUrl;
+	/* urls of color favicons */
+	var redURL = chrome.runtime.getURL("img/red_circle_16.png");
+	var greenURL = chrome.runtime.getURL("img/green_circle_16.png");
+	var blueURL = chrome.runtime.getURL("img/blue_circle_16.png");
+	var yellowURL = chrome.runtime.getURL("img/yellow_circle_16.png");
+	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
+	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
+
+	switch (currentFaviconURL)
+	{
+		case redURL:
+			return "red";
+		case greenURL:
+			return "green";
+		case blueURL:
+			return "blue";
+		case yellowURL:
+			return "yellow";
+		case orangeURL:
+			return "orange";
+		case purpleURL:
+			return "purple";
+		default:
+			break;
+	}
+}
+
 /* save tabs of the current tab's color (from the command) */
 function sameColorTabs(command)
 {
@@ -904,7 +936,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	// tab color exists
 	if (request.color != "none")
 	{
-		saveColor[request.tabid] = request.color;
+		chrome.tabs.query({currentWindow: true, active: true}, function(tab)
+		{
+			if (request.color == undefined)
+			{
+				request.color = returnTabColor(tab);
+			}
+			saveColor[request.tabid] = request.color;
+		})
 	}
 	else if (request == "none")
 	{
