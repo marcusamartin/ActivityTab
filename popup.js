@@ -543,7 +543,7 @@ function queryDropDownClick(menuItem)
     }
 }
 
-/* iterates through the current tabs in the window and deletes the tabs of the specified color */
+/* iterates through all of the tabs and deletes the tabs of the specified color */
 function checkAndRemoveFaviconURL(color)
 {
 	/* urls of color favicons */
@@ -554,7 +554,7 @@ function checkAndRemoveFaviconURL(color)
 	var orangeURL = chrome.runtime.getURL("img/orange_circle_16.png");
 	var purpleURL = chrome.runtime.getURL("img/purple_circle_16.png");
 
-	chrome.tabs.query({currentWindow: true}, function(tabs)
+	chrome.tabs.query({}, function(tabs)
 	{
 		for (var i = 0; i < tabs.length; i++)
 		{

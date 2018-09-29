@@ -714,8 +714,7 @@ function checkDuplicateName(promptUser, objectArr, command)
 					
 				if (groupName == promptUser)
 				{
-					alert("Duplicate name!");
-					var duplicatePrompt = confirm("Would you like to replace the group?");
+					var duplicatePrompt = confirm("Duplicate name! Would you like to replace the group?");
 
 					if (duplicatePrompt)
 					{
