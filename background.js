@@ -1009,18 +1009,20 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 		})
 	}
 
-	/* gets tab title for saved tabs */
-	if (tabIdsToTitles[tabId])
-	{
-		chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
-	}
-
 	/* gets tab title for tabs that are not saved */
-	// tab's title was changed
+	// checks saveTitle before tabIdsToTitles since saveTitle is used when the tab title is changed while tabIdsToTitles is the title that was saved
 	if (saveTitle[tabId] != null)
 	{
 		// tab's title sent to content script
 		chrome.tabs.sendMessage(tabId, {title: saveTitle[tabId]}, function(response){});
+	}
+	/* gets tab title for saved tabs */
+	else if (tabIdsToTitles[tabId])
+	{
+		if (tabIdsToTitles[tabId])
+		{
+			chrome.tabs.sendMessage(tabId, {getTitle: tabIdsToTitles[tabId]}, function(response){});
+		}
 	}
 })
 
