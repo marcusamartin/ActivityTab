@@ -4,7 +4,7 @@ displayButtons();
 /* Display the buttons in the popup */
 function displayButtons()
 {
-	chrome.storage.local.get("objectArr", function(group)
+	chrome.storage.sync.get("objectArr", function(group)
 	{
 		var objectArr = group.objectArr;
 		
@@ -186,10 +186,10 @@ function displayTrashButton(group, i)
 			// remove the object at the specific index
 			objectArr.splice(i, 1);
 
-			chrome.storage.local.set({"objectArr": objectArr});
+			chrome.storage.sync.set({"objectArr": objectArr});
 
 			/* set empty text if applicable */
-			chrome.storage.local.get("objectArr", function(group)
+			chrome.storage.sync.get("objectArr", function(group)
 			{
 				if (group.objectArr.length == 0)
 				{
