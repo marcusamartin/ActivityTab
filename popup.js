@@ -69,6 +69,8 @@ function displayTabButton(group, i)
 		// 0 is the flag to know that the user saved all their tabs with only one window open
 		if (objectArr[i]["tabCount"][1] != undefined || objectArr[i]["tabCount"][1] == 0)
 		{
+			// closes the popup window in the current tab before launching a new window
+			window.close();
 			/* traverses the windows */
 			for (var j = 0; j < objectArr[i]["tabCount"].length; j++)
 			{
@@ -119,6 +121,7 @@ function displayWindowButton(group, i)
 		/* creates a new window with the saved tabs of the button */
 		windowButton.onclick = function()
 		{
+			// closes the popup window in the current tab before launching a new window
 			window.close();
 			for (var j = 0; j < objectArr[i]["tabCount"]; j++)
 			{
