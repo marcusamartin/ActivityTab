@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "ActivityTab",
     "short_name": "ActivityTab",
-    "version": "0.1.1",
+    "version": "0.0.1",
     "description": "Enables you to organize and save your tabs for future use.",
     "icons": 
     {
