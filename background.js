@@ -17,13 +17,13 @@ chrome.runtime.onInstalled.addListener(onInstall);
 function onInstall()
 {
 	/* checks to see if objectArr already exists (for update purposes) */
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		if (group.objectArr == undefined)
 		{
 			// objectArr will store the group objects and will allow the popup buttons to be displayed exactly
 			var objectArr = [];
-			chrome.storage.sync.set({"objectArr": objectArr});
+			chrome.storage.local.set({"objectArr": objectArr});
 		}
 	})
 
@@ -288,7 +288,7 @@ function returnTabColor(tab)
 /* save tabs of the current tab's color (from the command) */
 function sameColorTabs(command)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = prompt("Group name: ");
 		// limit the text so that the text fits in the button
@@ -375,7 +375,7 @@ function sameColorTabs(command)
 					var objectArr = group.objectArr;
 
 					// updates storage with new objectArr
-					chrome.storage.sync.set({"objectArr": objectArr});
+					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
 					checkDuplicateName(promptUser, objectArr, command);
@@ -395,7 +395,7 @@ function sameColorTabs(command)
 /* store tabs of the same color of the current tab (from the text field) */
 function storeSortTabsTextField(storeSortTabsTextField)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = storeSortTabsTextField;
 		// limit the text so that the text can fit in the button
@@ -471,7 +471,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 					var objectArr = group.objectArr;
 
 					// updates storage with new objectArr
-					chrome.storage.sync.set({"objectArr": objectArr});
+					chrome.storage.local.set({"objectArr": objectArr});
 
 					/* checks if duplicate name */
 					// specified command to have duplicate checked the same way as the sort colors command since sortTabsTextField has the same purpose
@@ -485,7 +485,7 @@ function storeSortTabsTextField(storeSortTabsTextField)
 /* saves all of the tabs (from the context menu) */
 function allTabs(command)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = prompt("Group name: ");
 		// limit the text so that the text can fit in the button
@@ -582,7 +582,7 @@ function allTabs(command)
 				var objectArr = group.objectArr;
 
 				// updates storage with new objectArr with groupObject
-				chrome.storage.sync.set({"objectArr": objectArr});
+				chrome.storage.local.set({"objectArr": objectArr});
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
@@ -595,7 +595,7 @@ function allTabs(command)
 /* stores all of the tabs (from the text field) */
 function storeAllTabsTextField(storeAllTabsTextField)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var promptUser = storeAllTabsTextField;
 		// limit the text so that the text can fit in the button
@@ -688,7 +688,7 @@ function storeAllTabsTextField(storeAllTabsTextField)
 				var objectArr = group.objectArr;
 
 				// updates storage with new objectArr with groupObject
-				chrome.storage.sync.set({"objectArr": objectArr});
+				chrome.storage.local.set({"objectArr": objectArr});
 
 				/* checks if duplicate name */
 				// specified command to have duplicate checked the same way as the sort colors command
@@ -708,7 +708,7 @@ function checkDuplicateName(promptUser, objectArr, command)
 		// decremented objectArr's length because the button is already populated; the function is catching the button as a duplicate when it is the button that was just added
 		for (var i = 0; i < objectArr.length - 1; i++)
 		{
-			chrome.storage.sync.get("objectArr", function(i, anotherGroup)
+			chrome.storage.local.get("objectArr", function(i, anotherGroup)
 			{
 				var groupName = anotherGroup.objectArr[i]["groupName"];
 					
@@ -734,7 +734,7 @@ function checkDuplicateName(promptUser, objectArr, command)
 						alert("Please enter a different name for the group!");
 						anotherGroup.objectArr.splice(anotherGroup.objectArr.length - 1, 1);
 						var objectArr = anotherGroup.objectArr;
-						chrome.storage.sync.set({"objectArr": objectArr});
+						chrome.storage.local.set({"objectArr": objectArr});
 
 						/* restarts process only if a command had activated the prompt */
 						if (command != "same-color-text-field" && command != "save-all-tabs-text-field")
@@ -752,7 +752,7 @@ function checkDuplicateName(promptUser, objectArr, command)
 /* updates button that stored a specific tab color with tab information AND REPLACES THE BUTTON */
 function replaceButton(replacementButton, promptUser)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var groupObject = {};
 
@@ -818,7 +818,7 @@ function replaceButton(replacementButton, promptUser)
 
 				var objectArr = group.objectArr;
 				// updates storage with new objectArr with groupObject
-				chrome.storage.sync.set({"objectArr": objectArr});
+				chrome.storage.local.set({"objectArr": objectArr});
 
 				// refresh popup so added duplicate button is not displayed (caused by asynchronous function)
 				chrome.runtime.sendMessage({msg: "reload popup"});
@@ -830,7 +830,7 @@ function replaceButton(replacementButton, promptUser)
 /* updates button that stored all of the user's tabs with new tab information AND REPLACES THE BUTTON */
 function replaceAllButton(replacementButton, promptUser)
 {
-	chrome.storage.sync.get("objectArr", function(group)
+	chrome.storage.local.get("objectArr", function(group)
 	{
 		var groupObject = {};
 
@@ -914,7 +914,7 @@ function replaceAllButton(replacementButton, promptUser)
 
 			var objectArr = group.objectArr;
 			// updates storage with new objectArr with groupObject
-			chrome.storage.sync.set({"objectArr": objectArr});
+			chrome.storage.local.set({"objectArr": objectArr});
 			
 			// sends a message to popup script so sort tabs text field's border color will update from command
 			chrome.runtime.sendMessage({msg: "reload popup"});

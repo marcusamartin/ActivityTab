@@ -1,6 +1,6 @@
 /* sets the title and color of the tab */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
+{  
     /* title from command/saved title, title from popup text field, creating tabs with title */
     if (request.title || request.name || request.getTitle)
     {
